@@ -1,1 +1,21 @@
+# Dependency directories
+node_modules/
+
+# Tooling logs
+*.log
+
+# Our temprorary files (e.g. ad-hoc scripts)
+*.temp.*
+
+# IDE
+.idea
+
+# Built js libs
+lib/
+
+# Build files
+package/
+dist/
+
+# Oclif
 oclif.manifest.json
