@@ -117,7 +117,7 @@ export default class Logs extends CliCommand {
     async fetchLogs(squidName: string, versionName: string, { reverse, ...query }: {
         limit: number,
         from: Date,
-        container: string[],
+        container?: string[],
         nextPage?: string,
         orderBy?: string,
         reverse?: boolean,
