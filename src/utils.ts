@@ -12,6 +12,7 @@ import {
   getDeployPipeline
 } from './rest-client/routes/pipeline';
 import { streamSquidLogs } from './api';
+import { existsSync, readFileSync } from 'fs';
 
 function buildPipelineErrorMessage(text: string, errorMessage: string): string {
   return `${text} ${errorMessage ? `: ${errorMessage}` : ''}`;
@@ -217,4 +218,60 @@ export function parseNameAndVersion(
   const squidName = nameAndVersion.split('@')[0];
   const versionName = nameAndVersion.split('@')[1];
   return {squidName, versionName};
+}
+
+const ENV_VALUE_PATTERN = /^[ \t]*(?<name>\S*?) *\= *(?<value>"[^"]*"|'[^']*?'|\S*?)[ \t]*(?<comment> \#.*)?$/
+const ENV_COMMENT_PATTERN = /^(?<comment_line>[ \t]*?\#.*?)$/
+const ENV_EMPTY_LINE_PATTERN = /^(?<empty_line>[ \t]*)$/
+const ENV_PATTERN = RegExp(`${ENV_VALUE_PATTERN.source}|${ENV_COMMENT_PATTERN.source}|${ENV_EMPTY_LINE_PATTERN.source}`)
+
+export type EnvValue = {
+  name: string,
+  value: string,
+  isComment: boolean,
+  isEmpty: boolean,
+}
+
+export function getEnv(e: string): EnvValue {
+    const variable = ENV_PATTERN.exec(e);
+    if (variable == null || variable.groups == null) {
+        throw new Error(`❌ An error occurred during parsing variable "${e}"`);
+    }
+    var value = variable.groups.value;
+    if (value != null) 
+      if (/^'.*'$|^".*"$/.test(value))
+        value = value.slice(1, value.length-1)
+    return { 
+      name: variable.groups.name, 
+      value: value,
+      isComment: variable.groups.comment_line != undefined,
+      isEmpty: variable.groups.empty_line != undefined,
+    }
+}
+
+export function mergeEnvWithFile(envs: Record<string, string>, path: string) {
+    if (!existsSync(path)) return envs;
+    return readFileSync(path)
+        .toString()
+        .replace(/\r\n/g,'\n')
+        .split('\n')
+        .reduce((res, e: string) => {
+            const {name, value, isComment, isEmpty} = getEnv(e);
+            return isComment || isEmpty ? {...res} : {...res, [name]: value};
+        }, { ...envs })
+}
+
+export function parseEnvs(envFlags: string[] | undefined, envFilePath: string | undefined) {
+    let envs: Record<string, string> = {} 
+        
+    envFlags?.forEach((e: string)=>{
+        const { name, value } = getEnv(e);
+        if (name != null)
+          envs[name] = value;
+    });
+    
+    if (envFilePath != undefined)
+        envs = mergeEnvWithFile(envs, envFilePath)
+    
+    return envs
 }

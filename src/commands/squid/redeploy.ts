@@ -2,9 +2,9 @@ import { Flags } from '@oclif/core';
 import { redeploySquid } from '../../api';
 import { CliCommand } from '../../command';
 import {
+    parseEnvs,
     parseNameAndVersion,
 } from '../../utils';
-import { parseEnvs } from './release';
 
 
 export default class Redeploy extends CliCommand {

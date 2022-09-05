@@ -1,5 +1,4 @@
 import { Flags } from '@oclif/core';
-import { existsSync, readFileSync } from 'fs';
 import simpleGit, { SimpleGit, SimpleGitOptions } from 'simple-git';
 import { updateSquid } from '../../api';
 import { CliCommand } from '../../command';
@@ -7,8 +6,8 @@ import {
     buildRemoteUrlFromGit,
     parseNameAndVersion,
     pollDeployPipelines,
+    parseEnvs
 } from '../../utils';
-import { parseEnvs } from './release';
 
 const options: Partial<SimpleGitOptions> = {
     baseDir: process.cwd(),
