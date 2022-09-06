@@ -25,7 +25,7 @@ function getPayload(container: string, payload: LogPayload) {
     return payload || '';
   }
 
-  const { msg, ns, err, level, ...rest } = payload;
+  const { msg, ns, err, level, timestamp, ...rest } = payload;
   const res = [ns ? chalk.cyan(ns) : null, msg];
 
   if (container === 'db' && rest.statement) {
