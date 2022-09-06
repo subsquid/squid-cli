@@ -1,0 +1,53 @@
+name: Release
+on:
+  workflow_dispatch:
+#  pull_request:
+#    branches:
+#      - develop
+#    paths:
+#      - .github/workflows/release.yaml
+#      - src/**
+#      - bin/**
+#      - yarn.lock
+
+jobs:
+  build-publish:
+    name: Build & publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: cancel previous runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Write npm credentials
+        run: |
+          echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
+          echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc-publish
+          npm whoami
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/cache@v3
+        id: yarn-cache
+        env:
+          cache-name: subsquid-cli
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-yarn-
+
+      - name: Install
+        run: yarn install
+
+      - name: Unit tests
+         --tag beta --access public --dry-run
+

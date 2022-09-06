@@ -1,7 +1,7 @@
 {
   "name": "@subsquid/cli",
   "description": "squid cli tool",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "license": "GPL-3.0-or-later",
   "repository": "git@github.com:subsquid/squid.git",
   "publishConfig": {
@@ -12,10 +12,7 @@
   },
   "files": [
     "bin",
-    "lib",
-    "src",
-    "src/marshal.ts",
-    "oclif.manifest.json"
+    "lib"
   ],
   "oclif": {
     "commands": "./lib/commands",
