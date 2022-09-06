@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'fs';
 import { Command, CliUx } from '@oclif/core';
 import { dim } from 'chalk';
 import cliSelect from 'cli-select';
+import { parse } from 'dotenv';
 import { DefaultLogFields, LogOptions, RemoteWithRefs, SimpleGit } from 'simple-git';
 
 import { streamSquidLogs } from './api';
@@ -167,60 +168,27 @@ export function parseNameAndVersion(
   return { squidName, versionName };
 }
 
-const ENV_VALUE_PATTERN =
-  /^[ \t]*(?<name>\S*?)[ \t]*\=[ \t]*(?<value>"[^"]*"|'[^']*?'|.*?(?<! \#))[ \t]*(?<comment> \#.*)?$/;
-const ENV_COMMENT_PATTERN = /^(?<comment_line>[ \t]*?\#.*?)$/;
-const ENV_EMPTY_LINE_PATTERN = /^(?<empty_line>[ \t]*)$/;
-const ENV_PATTERN = RegExp(
-  `${ENV_VALUE_PATTERN.source}|${ENV_COMMENT_PATTERN.source}|${ENV_EMPTY_LINE_PATTERN.source}`,
-);
-
-export type EnvValue = {
-  name: string;
-  value: string;
-  isComment: boolean;
-  isEmpty: boolean;
-};
-
-export function getEnv(e: string): EnvValue {
-  const variable = ENV_PATTERN.exec(e);
-  if (variable == null || variable.groups == null) {
+export function getEnv(e: string): Record<string, string> {
+  const variable = parse(Buffer.from(e));
+  if (Object.keys(variable).length == 0) {
     throw new Error(`❌ An error occurred during parsing variable "${e}"`);
   }
-  let value = variable.groups.value;
-  if (value != null) if (/^'.*'$|^".*"$/.test(value)) value = value.slice(1, value.length - 1);
-  return {
-    name: variable.groups.name,
-    value: value,
-    isComment: variable.groups.comment_line != undefined,
-    isEmpty: variable.groups.empty_line != undefined,
-  };
+  return variable;
 }
 
-function mergeEnvWithFile(envs: Record<string, string>, path: string) {
-  if (!existsSync(path)) return envs;
-  return readFileSync(path)
-    .toString()
-    .replace(/\r\n/g, '\n')
-    .split('\n')
-    .reduce(
-      (res, e: string) => {
-        const { name, value, isComment, isEmpty } = getEnv(e);
-        return isComment || isEmpty ? { ...res } : { ...res, [name]: value };
-      },
-      { ...envs },
-    );
+function parseEnvFile(path: string): Record<string, string> {
+  if (!existsSync(path)) return {};
+  const envFile = parse(readFileSync(path));
+  return envFile;
 }
 
 export function parseEnvs(envFlags: string[] | undefined, envFilePath: string | undefined) {
   let envs: Record<string, string> = {};
 
   envFlags?.forEach((e: string) => {
-    const { name, value } = getEnv(e);
-    if (name != null) envs[name] = value;
+    envs = { ...envs, ...getEnv(e) };
   });
 
-  if (envFilePath != undefined) envs = mergeEnvWithFile(envs, envFilePath);
-
-  return envs;
+  const fileEnvs = envFilePath != undefined ? parseEnvFile(envFilePath) : {};
+  return { ...envs, ...fileEnvs };
 }
