@@ -20,16 +20,15 @@ jobs:
         with:
           access_token: ${{ github.token }}
 
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Write npm credentials
         run: |
           echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
-          echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc-publish
           npm whoami
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
-      - name: Checkout
-        uses: actions/checkout@v3
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -48,6 +47,10 @@ jobs:
       - name: Install
         run: yarn install
 
-      - name: Unit tests
-        run: npm --tag beta --access public --dry-run
+      - name: Build
+        run: yarn build
 
+      - name: Release
+        run: npm publish --tag beta --access public
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
