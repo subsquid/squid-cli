@@ -1,50 +1,60 @@
-import fetch from 'node-fetch';
 import path from 'path';
+
 import chalk from 'chalk';
+import fetch from 'node-fetch';
 import qs from 'query-string';
+
 import { getConfig } from '../config';
 
 const debug = process.env.API_DEBUG === 'true';
 
-let version = 'unknown'
+let version = 'unknown';
 try {
-  version = require(path.resolve(__dirname, '../../package.json')).version
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  version = require(path.resolve(__dirname, '../../package.json')).version;
 } catch (e) {}
 
 export class ApiError extends Error {
-  constructor(public status: number, public body: {
-    error: string
-    invalidFields?: { path: string[], message: string, type: string }[]
-  }) {
+  constructor(
+    public status: number,
+    public body: {
+      error: string;
+      invalidFields?: { path: string[]; message: string; type: string }[];
+    },
+  ) {
     super();
   }
 }
 
-export async function api<T = any>(
-  { method, path, data, query, responseType = 'json' } : {
-    method: 'get' |'post' | 'put' | 'delete' | 'patch'
-    path: string,
-    query?: Record<string, string | string[] | boolean | number | undefined>,
-    data?: unknown
-    responseType?: 'json' | 'stream'
-  }
-): Promise<{ body: T } > {
+export async function api<T = any>({
+  method,
+  path,
+  data,
+  query,
+  responseType = 'json',
+}: {
+  method: 'get' | 'post' | 'put' | 'delete' | 'patch';
+  path: string;
+  query?: Record<string, string | string[] | boolean | number | undefined>;
+  data?: unknown;
+  responseType?: 'json' | 'stream';
+}): Promise<{ body: T }> {
   const config = getConfig();
 
-  const url = `${config.apiUrl}${path}${query ? `?${qs.stringify(query)}` : ''}`
+  const url = `${config.apiUrl}${path}${query ? `?${qs.stringify(query)}` : ''}`;
 
   const headers = {
     'Content-Type': 'application/json',
     authorization: `token ${config.credentials}`,
     'X-CLI-Version': version,
-  }
+  };
 
   if (debug) {
     console.log(
       chalk.cyan`[HTTP REQUEST]`,
       chalk.dim(method?.toUpperCase()),
       url,
-      chalk.dim(JSON.stringify({headers}))
+      chalk.dim(JSON.stringify({ headers })),
     );
     if (data) {
       console.log(chalk.dim(JSON.stringify(data)));
@@ -56,9 +66,9 @@ export async function api<T = any>(
     body: data ? JSON.stringify(data) : undefined,
   });
 
-  let body
+  let body;
   try {
-    body = responseType === 'json'? await response.json() : response.body;
+    body = responseType === 'json' ? await response.json() : response.body;
   } catch (e) {}
 
   if (debug) {
@@ -66,7 +76,7 @@ export async function api<T = any>(
       chalk.cyan`[HTTP RESPONSE]`,
       url,
       chalk.cyan(response.status),
-      chalk.dim(JSON.stringify({ headers: response.headers }))
+      chalk.dim(JSON.stringify({ headers: response.headers })),
     );
     if (body && responseType === 'json') {
       console.log(chalk.dim(JSON.stringify(body, null, 2)));
