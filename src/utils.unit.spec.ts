@@ -1,6 +1,6 @@
 import { writeFileSync, unlinkSync } from 'fs';
 
-import { getEnv, parseEnvs } from '../../utils';
+import { getEnv, parseEnvs } from './utils';
 
 type EnvTests = [string, Record<string, string>][];
 
