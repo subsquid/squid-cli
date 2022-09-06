@@ -1,6 +1,6 @@
 import queryString from 'query-string';
 
-import { getCreds } from '../../creds';
+import { getCreds } from '../../config';
 import { baseUrl } from '../baseUrl';
 import { request } from '../request';
 

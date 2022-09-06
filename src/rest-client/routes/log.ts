@@ -1,7 +1,7 @@
 import * as fetch from 'node-fetch';
 import queryString from 'query-string';
 
-import { getCreds } from '../../creds';
+import { getCreds } from '../../config';
 import { baseUrl } from '../baseUrl';
 
 export async function log(squidName: string, versionName: string, follow: boolean, lines: number): Promise<void> {
