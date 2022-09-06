@@ -220,7 +220,7 @@ export function parseNameAndVersion(
   return {squidName, versionName};
 }
 
-const ENV_VALUE_PATTERN = /^[ \t]*(?<name>\S*?) *\= *(?<value>"[^"]*"|'[^']*?'|\S*?)[ \t]*(?<comment> \#.*)?$/
+const ENV_VALUE_PATTERN = /^[ \t]*(?<name>\S*?)[ \t]*\=[ \t]*(?<value>"[^"]*"|'[^']*?'|.*?(?<! \#))[ \t]*(?<comment> \#.*)?$/
 const ENV_COMMENT_PATTERN = /^(?<comment_line>[ \t]*?\#.*?)$/
 const ENV_EMPTY_LINE_PATTERN = /^(?<empty_line>[ \t]*)$/
 const ENV_PATTERN = RegExp(`${ENV_VALUE_PATTERN.source}|${ENV_COMMENT_PATTERN.source}|${ENV_EMPTY_LINE_PATTERN.source}`)
@@ -249,7 +249,7 @@ export function getEnv(e: string): EnvValue {
     }
 }
 
-export function mergeEnvWithFile(envs: Record<string, string>, path: string) {
+function mergeEnvWithFile(envs: Record<string, string>, path: string) {
     if (!existsSync(path)) return envs;
     return readFileSync(path)
         .toString()

@@ -1,4 +1,5 @@
-import { getEnv } from "../../utils";
+import { getEnv, parseEnvs } from "../../utils";
+import { writeFileSync, unlinkSync } from 'fs';
 
 type EnvTests = [string, { name: string | undefined, value: string | undefined, isComment: boolean, isEmpty: boolean }][];
 
@@ -29,14 +30,42 @@ const quotesTest: EnvTests = [
     ['MY_ENV="value with spaces"', {name: "MY_ENV", value: "value with spaces", isComment: false, isEmpty: false}]
 ]
 
-test('spaces and comments should not affect env parsing result', () => {
+test('spaces and comments should not affect the env parsing result', () => {
     spacesAndCommentsTests.forEach(v => {
         expect(getEnv(v[0])).toStrictEqual(v[1]);
     });
     blankLinesAndLineCommentsTests.forEach(v => {
         expect(getEnv(v[0])).toStrictEqual(v[1]);
     });
+})
+
+test('quotes must define the boundaries of the env value', () => {
     quotesTest.forEach(v => {
         expect(getEnv(v[0])).toStrictEqual(v[1]);
-    });
+    })
+})
+
+test('env values must parse from file and merge', () => {
+    const PATH_TO_TEST_FILE = ".env.unit-test"
+    const testValues = "MY_ENV_1=value_1\n MY_ENV_2 = value_2 \nMY_ENV_3	=	value_3\nMY_ENV_4	=	value_4\n\n#comment\nMY_ENV_5=value_5 #comment";
+    const testResults: Record<string, string> = {
+        "MY_ENV_1": "value_1",
+        "MY_ENV_2": "value_2",
+        "MY_ENV_3": "value_3",
+        "MY_ENV_4": "value_4",
+        "MY_ENV_5": "value_5"
+    }
+    const mergeTestValues: string[] = [
+        "MY_ENV=value"
+    ]
+    const mergeTestResults: Record<string, string> = {
+        ...testResults,
+        "MY_ENV": "value"
+    }
+    writeFileSync(PATH_TO_TEST_FILE, testValues);
+    const results = parseEnvs(undefined, PATH_TO_TEST_FILE);
+    const mergeResults = parseEnvs(mergeTestValues, PATH_TO_TEST_FILE);
+    unlinkSync(PATH_TO_TEST_FILE);
+    expect(results).toStrictEqual(testResults);
+    expect(mergeResults).toStrictEqual(mergeTestResults);
 })
