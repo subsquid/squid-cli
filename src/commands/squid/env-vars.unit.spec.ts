@@ -5,15 +5,14 @@ import { getEnv, parseEnvs } from '../../utils';
 type EnvTests = [string, Record<string, string>][];
 
 const SPACES = '   ';
-const COMMENT = ' # some comment';
 
 function getSpacesAndCommentsTestValues(): EnvTests {
   const values: EnvTests = [];
-  for (let i = 0; i < 32; i++) {
-    const b = i.toString(2).padStart(5, '0');
+  for (let i = 0; i < 16; i++) {
+    const b = i.toString(2).padStart(4, '0');
     values.push([
-      `${SPACES.repeat(Number(b[4]))}MY_ENV${SPACES.repeat(Number(b[3]))}` +
-        `=${SPACES.repeat(Number(b[2]))}value${SPACES.repeat(Number(b[1]))}${COMMENT.repeat(Number(b[0]))}`,
+      `${SPACES.repeat(Number(b[3]))}MY_ENV${SPACES.repeat(Number(b[2]))}` +
+        `=${SPACES.repeat(Number(b[1]))}value${SPACES.repeat(Number(b[0]))}`,
       { MY_ENV: 'value' },
     ]);
   }
