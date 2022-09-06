@@ -53,10 +53,7 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "rootDir": "./src",
-    "testEnvironment": "node",
-    "moduleNameMapper": {
-      "@commands/(.+)": "<rootDir>/commands/$1"
-    }
+    "testEnvironment": "node"
   },
   "dependencies": {
     "@oclif/core": "^1.3.0",
