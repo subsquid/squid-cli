@@ -1,6 +1,6 @@
 import { Command, Flags, CliUx } from '@oclif/core';
 
-import { squidList } from '../../rest-client/routes/squids';
+import { squidList } from '../../api';
 import { versionList } from '../../rest-client/routes/versions';
 
 export default class Ls extends Command {
