@@ -1,6 +1,6 @@
 export type HttpResponse<T> = {
-  payload: T
-}
+  payload: T;
+};
 
 export enum DeployStatus {
   IMAGE_BUILDING = 'IMAGE_BUILDING',
@@ -11,11 +11,11 @@ export enum DeployStatus {
 }
 
 export type DeployResponse = {
-  id: string
-  status: DeployStatus
-  failed: boolean
-  logs: string[]
-}
+  id: string;
+  status: DeployStatus;
+  failed: boolean;
+  logs: string[];
+};
 
 export type DeploymentStatus = 'CREATED' | 'DEPLOYING' | 'DEPLOY_ERROR' | 'DEPLOYED';
 export type SecretsStatus = 'UP_TO_DATE' | 'NONE' | 'OUTDATED';
@@ -28,14 +28,14 @@ export type VersionResponse = {
   status: DeploymentStatus;
   secretStatus: SecretsStatus;
   api: {
-    status: string
+    status: string;
   };
   processor: {
-    status: string
+    status: string;
     syncState: {
-      currentBlock: number
-      totalBlocks: number
-    }
+      currentBlock: number;
+      totalBlocks: number;
+    };
   };
   alias: string;
   createdAt: number;
@@ -49,19 +49,19 @@ export type SquidResponse = {
   sourceCodeUrl: string;
   websiteUrl: string;
   versions: VersionResponse[];
-  aliasProd: string
-  isPublic: boolean
-  deploy?: DeployResponse
-  createdAt: Date
+  aliasProd: string;
+  isPublic: boolean;
+  deploy?: DeployResponse;
+  createdAt: Date;
 };
 
 export type SecretsListResponse = {
   secrets: Record<string, string>;
-}
+};
 
 export type ManifestResponse = {
-  squid: SquidResponse
-}
+  squid: SquidResponse;
+};
 
 export enum LogLevel {
   Error = 'ERROR',
@@ -72,14 +72,14 @@ export enum LogLevel {
   Critical = 'CRITICAL',
   Fatal = 'FATAL',
 }
-export type LogPayload = string | Record<string, unknown>
+export type LogPayload = string | Record<string, unknown>;
 
 export type LogEntry = {
-  timestamp: string
-  container: string
-  level: LogLevel
-  payload: LogPayload
-}
+  timestamp: string;
+  container: string;
+  level: LogLevel;
+  payload: LogPayload;
+};
 
 export type LogsResponse = {
   logs: LogEntry[];
@@ -87,9 +87,9 @@ export type LogsResponse = {
 };
 
 export type SquidVersionResponse = {
-  id: number
-  name: string
-  version: { 
-    deploymentUrl: string 
-  }
-}
+  id: number;
+  name: string;
+  version: {
+    deploymentUrl: string;
+  };
+};
