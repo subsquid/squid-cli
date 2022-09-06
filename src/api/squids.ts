@@ -5,6 +5,15 @@ import { pretty } from '../logs';
 import { api } from './api';
 import { HttpResponse, LogEntry, LogsResponse, SquidResponse, SquidVersionResponse, VersionResponse } from './types';
 
+export async function squidList(): Promise<SquidResponse[]> {
+  const { body } = await api<SquidResponse[]>({
+    method: 'get',
+    path: '/client/squid',
+  });
+
+  return body;
+}
+
 export async function versionHistoryLogs(
   squidName: string,
   versionName: string,

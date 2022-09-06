@@ -1,0 +1,70 @@
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { homedir } from 'os';
+import { resolve, dirname } from 'path';
+
+export const DEFAULT_API_URL = 'https://saas.infra.gc.subsquid.io/api';
+
+export type Config = {
+  apiUrl: string;
+  credentials: string;
+};
+
+function defaultConfig(apiUrl: string = DEFAULT_API_URL) {
+  return {
+    apiUrl,
+    credentials: 'empty',
+  };
+}
+
+export function getConfigFilePath() {
+  return process.env.SUBSQUID_CLI_CONFIG_DIR || resolve(homedir(), '.hydra-cli', 'config.json');
+}
+
+function writeConfig(config: Config) {
+  const path = getConfigFilePath();
+  const dir = dirname(path);
+
+  if (!existsSync(path)) {
+    if (!existsSync(dir)) {
+      mkdirSync(dir);
+    }
+  }
+
+  writeFileSync(path, JSON.stringify(config), {
+    flag: 'w',
+    encoding: 'utf8',
+  });
+}
+
+export function getConfig(): Config {
+  try {
+    return JSON.parse(readFileSync(getConfigFilePath(), 'utf8'));
+  } catch (e) {
+    return defaultConfig();
+  }
+}
+
+export function setConfig(creds: string, host: string) {
+  const config = {
+    ...getConfig(),
+    apiUrl: host,
+    credentials: creds,
+  };
+
+  writeConfig(config);
+
+  return config;
+}
+
+/**
+ * @deprecated Use getConfig()
+ */
+export function getCreds(): string {
+  return getConfig().credentials;
+}
+/**
+ * @deprecated Use getConfig()
+ */
+export function getConfigField(name: 'apiUrl' | 'credentials'): any {
+  return getConfig()[name];
+}

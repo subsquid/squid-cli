@@ -1,9 +1,10 @@
 import { Command, Flags } from '@oclif/core';
 
-import { setCreds } from '../creds';
-import { me as identifyMe } from '../rest-client';
+import { me } from '../api/me';
+import { CliCommand } from '../command';
+import { DEFAULT_API_URL, setConfig } from '../config';
 
-export default class Auth extends Command {
+export default class Auth extends CliCommand {
   static description = `Authenticate to deploy and manage squids 🦑`;
 
   static flags = {
@@ -12,13 +13,23 @@ export default class Auth extends Command {
       description: 'Aquarium deployment key. Log in to https://app.subsquid.io to create or update your key.',
       required: true,
     }),
+    host: Flags.string({
+      char: 'h',
+      hidden: true,
+      default: DEFAULT_API_URL,
+      required: false,
+    }),
   };
 
   async run(): Promise<void> {
-    const { flags } = await this.parse(Auth);
-    const accessKey = flags.key;
-    setCreds(accessKey);
-    const identificationMessage = await identifyMe(accessKey);
-    this.log(identificationMessage);
+    const {
+      flags: { key, host },
+    } = await this.parse(Auth);
+
+    setConfig(key, host);
+
+    const { username } = await me();
+
+    this.log(`Successfully logged as ${username}`);
   }
 }

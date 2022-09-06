@@ -1,7 +1,7 @@
 {
   "name": "@subsquid/cli",
   "description": "squid cli tool",
-  "version": "0.6.0",
+  "version": "0.7.0-alpha.0",
   "license": "GPL-3.0-or-later",
   "repository": "git@github.com:subsquid/squid.git",
   "publishConfig": {
@@ -12,10 +12,7 @@
   },
   "files": [
     "bin",
-    "lib",
-    "src",
-    "src/marshal.ts",
-    "oclif.manifest.json"
+    "lib"
   ],
   "oclif": {
     "commands": "./lib/commands",
@@ -33,8 +30,9 @@
   "scripts": {
     "build": "rm -rf lib && tsc",
     "dev": "./bin/dev",
+    "lint": "eslint --fix src/**/*",
     "test:unit": "NODE_ENV=test jest --bail --testRegex=.unit.spec.ts$",
-    "lint": "eslint --fix src/**/*"
+    "tsc": "tsc --noEmit"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -42,13 +40,10 @@
       "json",
       "ts"
     ],
-    "transformIgnorePatterns": [
-      "\\/node_modules\\/"
-    ],
+    "rootDir": ".",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "rootDir": "./src",
     "testEnvironment": "node"
   },
   "dependencies": {

@@ -1,0 +1,48 @@
+name: Tests
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+    paths:
+      - .github/workflows/test.yaml
+      - src/**
+      - bin/**
+      - yarn.lock
+
+jobs:
+  setup-build-publish-deploy:
+    name: Run tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: cancel previous runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/cache@v3
+        id: yarn-cache
+        env:
+          cache-name: rest-api
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-yarn-
+
+      - name: Install
+        run: yarn install
+
+      - name: Typescript check
+        run: yarn tsc
+
+      - name: Unit tests
+        run: yarn test:unit
