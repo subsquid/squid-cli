@@ -14,6 +14,18 @@ export async function squidList(): Promise<SquidResponse[]> {
   return body;
 }
 
+export async function getSquid(squidName: string, versionName?: string): Promise<SquidResponse> {
+  const { body } = await api<SquidResponse>({
+    method: 'get',
+    path: `/client/squid/${squidName}`,
+    query: {
+      versionName,
+    },
+  });
+
+  return body;
+}
+
 export async function versionHistoryLogs(
   squidName: string,
   versionName: string,

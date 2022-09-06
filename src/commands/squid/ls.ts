@@ -1,9 +1,9 @@
-import { Command, Flags, CliUx } from '@oclif/core';
+import { CliUx, Flags } from '@oclif/core';
 
-import { squidList } from '../../api';
-import { versionList } from '../../rest-client/routes/versions';
+import { getSquid, squidList } from '../../api';
+import { CliCommand } from '../../command';
 
-export default class Ls extends Command {
+export default class Ls extends CliCommand {
   static description = 'List squids and squid versions';
 
   static flags = {
@@ -26,17 +26,17 @@ export default class Ls extends Command {
     const squidName = flags.name;
 
     if (squidName) {
-      const deployments = await versionList(squidName);
-      if (deployments) {
+      const squid = await getSquid(squidName);
+      if (squid.versions) {
         CliUx.ux.table(
-          deployments,
+          squid.versions,
           {
-            name: { header: 'version' },
-            artifactUrl: { header: 'endpoint' },
-            deploymentUrl: { header: 'source' },
-            status: { header: 'status' },
-            secretsStatus: { header: 'secrets' },
-            createdAt: { header: 'created at' },
+            name: { header: 'Version' },
+            artifactUrl: { header: 'Source' },
+            deploymentUrl: { header: 'Endpoint' },
+            status: { header: 'Status' },
+            secretsStatus: { header: 'Secrets' },
+            createdAt: { header: 'Created at' },
           },
           { 'no-truncate': noTruncate },
         );
