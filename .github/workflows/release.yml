@@ -4,7 +4,7 @@ on:
     inputs:
       tag:
         type: choice
-        description: Who to greet
+        description: Tag
         required: true
         options:
           - beta
