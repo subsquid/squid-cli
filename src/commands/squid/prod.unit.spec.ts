@@ -14,10 +14,11 @@ describe('Prod', () => {
     expect(inferProdUrl('http://squid.devsquid.net/squid-template/graphql', 'squid-template')).toEqual(
       'https://squid.devsquid.net/squid-template/graphql',
     );
-  }),
-    it('infers prod url from a prod url', () => {
-      expect(inferProdUrl('http://squid.devsquid.net/squid-template/graphql', 'squid-template')).toEqual(
-        'https://squid.devsquid.net/squid-template/graphql',
-      );
-    });
+  });
+
+  it('infers prod url from a prod url', () => {
+    expect(inferProdUrl('http://squid.devsquid.net/squid-template/graphql', 'squid-template')).toEqual(
+      'https://squid.devsquid.net/squid-template/graphql',
+    );
+  });
 });
