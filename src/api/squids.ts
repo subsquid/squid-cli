@@ -111,12 +111,13 @@ export async function releaseSquid(
   description?: string,
   envs?: Record<string, string>,
 ): Promise<SquidVersionResponse> {
-  const { body } = await api<HttpResponse<SquidVersionResponse>>({
+  const { body } = await api<SquidVersionResponse>({
     method: 'post',
     path: `/client/squid/${squidName}/version`,
     data: { artifactUrl, versionName, description, envs },
   });
-  return body.payload;
+
+  return body;
 }
 
 export async function updateSquid(
@@ -126,12 +127,12 @@ export async function updateSquid(
   hardReset: boolean,
   envs?: Record<string, string>,
 ): Promise<VersionResponse> {
-  const { body } = await api<HttpResponse<VersionResponse>>({
+  const { body } = await api<VersionResponse>({
     method: 'put',
     path: `/client/squid/${squidName}/version/${versionName}/deployment`,
     data: { artifactUrl, hardReset, envs },
   });
-  return body.payload;
+  return body;
 }
 
 export async function redeploySquid(
