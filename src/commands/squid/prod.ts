@@ -7,11 +7,11 @@ import { parseNameAndVersion } from '../../utils';
 
 export default class Prod extends CliCommand {
   static description = 'Assign a squid version to the production endpoint';
-  static hidden = true;
   static args = [
     {
       name: 'nameAndVersion',
-      description: 'name@version'
+      description: 'name@version',
+      required: true
     },
   ];
 
