@@ -1,6 +1,15 @@
 name: Release
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        type: choice
+        description: Who to greet
+        required: true
+        options:
+          - beta
+          - latest
+
 #  pull_request:
 #    branches:
 #      - develop
@@ -51,6 +60,6 @@ jobs:
         run: yarn build
 
       - name: Release
-        run: npm publish --tag beta --access public
+        run: npm publish --tag ${{ github.event.inputs.tag }} --access public
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
