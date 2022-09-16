@@ -1,7 +1,7 @@
 {
   "name": "@subsquid/cli",
   "description": "squid cli tool",
-  "version": "0.7.0-alpha.0",
+  "version": "0.7.0",
   "license": "GPL-3.0-or-later",
   "repository": "git@github.com:subsquid/squid.git",
   "publishConfig": {
@@ -37,7 +37,7 @@
     "lint": "eslint --fix src/**/*",
     "test:unit": "NODE_ENV=test jest --bail --testRegex=.unit.spec.ts$",
     "tsc": "tsc",
-    "pkg:build": "rm -rf package && pkg -t node16-${TARGET_PLATFORM:-macos}-${TARGET_ARCH:-x64} --compress GZip -o package/sqd package.json",
+    "pkg:build": "rm -rf package && pkg -t node18-${TARGET_PLATFORM:-macos}-${TARGET_ARCH:-x64} --compress GZip -o package/sqd package.json",
     "pkg:compress": "cd package && tar -czf subsquid-cli-${npm_package_version}-${TARGET_PLATFORM:-macos}-${TARGET_ARCH:-x64}.tar.gz sqd && rm sqd"
   },
   "jest": {
