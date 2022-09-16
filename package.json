@@ -37,7 +37,7 @@
     "lint": "eslint --fix src/**/*",
     "test:unit": "NODE_ENV=test jest --bail --testRegex=.unit.spec.ts$",
     "tsc": "tsc",
-    "pkg:build": "rm -rf package && pkg -d -t node16-${TARGET_PLATFORM:-macos}-${TARGET_ARCH:-x64} --compress GZip -o package/sqd package.json",
+    "pkg:build": "rm -rf package && pkg -t node16-${TARGET_PLATFORM:-macos}-${TARGET_ARCH:-x64} --compress GZip -o package/sqd package.json",
     "pkg:compress": "cd package && tar -czf subsquid-cli-${npm_package_version}-${TARGET_PLATFORM:-macos}-${TARGET_ARCH:-x64}.tar.gz sqd && rm sqd"
   },
   "jest": {
