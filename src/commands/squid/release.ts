@@ -1,53 +1,15 @@
-import { existsSync, readFileSync } from 'fs';
-
 import { Flags } from '@oclif/core';
 import simpleGit, { SimpleGit, SimpleGitOptions } from 'simple-git';
 
 import { releaseSquid } from '../../api';
 import { CliCommand } from '../../command';
-import { buildRemoteUrlFromGit, parseNameAndVersion, pollDeployPipelines } from '../../utils';
+import { buildRemoteUrlFromGit, parseNameAndVersion, pollDeployPipelines, parseEnvs } from '../../utils';
 
 const options: Partial<SimpleGitOptions> = {
   baseDir: process.cwd(),
   binary: 'git',
 };
 const git: SimpleGit = simpleGit(options);
-
-export function getEnv(e: string): { name: string; value: string } {
-  const variable = /^(?<name>.*)=(?<value>.*)$/.exec(e);
-  if (variable == null || variable.groups == null) {
-    throw new Error(`❌ An error occurred during parsing variable "${e}"`);
-  }
-  return { name: variable.groups.name, value: variable.groups.value };
-}
-
-export function mergeEnvWithFile(envs: Record<string, string>, path: string) {
-  if (!existsSync(path)) return envs;
-  return readFileSync(path)
-    .toString()
-    .replace(/\r\n/g, '\n')
-    .split('\n')
-    .reduce(
-      (res, e: string) => {
-        const { name, value } = getEnv(e);
-        return { ...res, [name]: value };
-      },
-      { ...envs },
-    );
-}
-
-export function parseEnvs(envFlags: string[] | undefined, envFilePath: string | undefined) {
-  let envs: Record<string, string> = {};
-
-  envFlags?.forEach((e: string) => {
-    const { name, value } = getEnv(e);
-    envs[name] = value;
-  });
-
-  if (envFilePath != undefined) envs = mergeEnvWithFile(envs, envFilePath);
-
-  return envs;
-}
 
 export default class Release extends CliCommand {
   static description = 'Create a new squid version';

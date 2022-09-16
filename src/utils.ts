@@ -1,6 +1,9 @@
+import { existsSync, readFileSync } from 'fs';
+
 import { Command, CliUx } from '@oclif/core';
 import { dim } from 'chalk';
 import cliSelect from 'cli-select';
+import { parse } from 'dotenv';
 import { DefaultLogFields, LogOptions, RemoteWithRefs, SimpleGit } from 'simple-git';
 
 import { streamSquidLogs } from './api';
@@ -163,4 +166,29 @@ export function parseNameAndVersion(
   const squidName = nameAndVersion.split('@')[0];
   const versionName = nameAndVersion.split('@')[1];
   return { squidName, versionName };
+}
+
+export function getEnv(e: string): Record<string, string> {
+  const variable = parse(Buffer.from(e));
+  if (Object.keys(variable).length == 0) {
+    throw new Error(`❌ An error occurred during parsing variable "${e}"`);
+  }
+  return variable;
+}
+
+function parseEnvFile(path: string): Record<string, string> {
+  if (!existsSync(path)) return {};
+  const envFile = parse(readFileSync(path));
+  return envFile;
+}
+
+export function parseEnvs(envFlags: string[] | undefined, envFilePath: string | undefined) {
+  let envs: Record<string, string> = {};
+
+  envFlags?.forEach((e: string) => {
+    envs = { ...envs, ...getEnv(e) };
+  });
+
+  const fileEnvs = envFilePath != undefined ? parseEnvFile(envFilePath) : {};
+  return { ...envs, ...fileEnvs };
 }

@@ -59,10 +59,6 @@ export type SecretsListResponse = {
   secrets: Record<string, string>;
 };
 
-export type ManifestResponse = {
-  squid: SquidResponse;
-};
-
 export enum LogLevel {
   Error = 'ERROR',
   Debug = 'DEBUG',
