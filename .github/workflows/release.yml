@@ -74,3 +74,20 @@ jobs:
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Checkout subsquid/homebrew-cli
+        uses: actions/checkout@v3
+        with:
+          repository: subsquid/homebrew-cli
+          ref: 'master'
+          token: ${{ github.token }}
+          path: homebrew
+      
+      - name: Update Sqd formula
+        run: |
+          yarn gen:formula
+          mv sqd.rb ./homebrew/Formula
+          cd homebrew
+          git add ./Formula/sqd.rb
+          git commit -m "chore: release"
+          git push
