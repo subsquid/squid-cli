@@ -6,12 +6,23 @@
   },
   "github": {
     "release": true,
+    "releaseName": "v${version}",
     "assets": ["package/*.tar.gz"]
-  },
-  "npm": {
-    "publish": false
   },
   "hooks": {
     "before:git": "yarn pkg:build && yarn pkg:compress"
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "infile": "CHANGELOG.md",
+      "header": "# Change Log - @subsquid/cli",
+      "preset": {
+        "name": "conventionalcommits"
+      },
+      "ignoreRecommendedBump": true,
+      "writerOpts": {
+        "groupBy": "scope"
+      }
+    }
   }
 }
