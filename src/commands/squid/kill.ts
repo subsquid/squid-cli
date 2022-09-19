@@ -1,4 +1,4 @@
-import { Command } from '@oclif/core';
+import { CliUx, Command } from '@oclif/core';
 
 import { destroyApp, destroyDeployment } from '../../rest-client/routes/destroy';
 import { parseNameAndVersion } from '../../utils';
@@ -17,12 +17,17 @@ export default class Kill extends Command {
     const { flags, args } = await this.parse(Kill);
     const params: string = args.nameAndVersion;
     let message;
+
     if (params.includes('@')) {
       const { squidName, versionName } = parseNameAndVersion(params, this);
+      CliUx.ux.action.start('◷ Deleting version');
       message = await destroyDeployment(squidName, versionName);
     } else {
+      CliUx.ux.action.start('◷ Deleting squid');
       message = await destroyApp(params);
     }
+    CliUx.ux.action.stop();
+
     this.log(message);
   }
 }
