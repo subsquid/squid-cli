@@ -83,25 +83,43 @@ export async function streamSquidLogs(
   onLog: (log: string) => unknown,
   query: { container?: string[]; level?: string[] } = {},
 ) {
-  const stream = await versionLogsFollow(squidName, versionName, query);
+  while (true) {
+    const retry = await new Promise(async (resolve) => {
+      const stream = await versionLogsFollow(squidName, versionName, query).catch((e) => {
+        /**
+         * 524 status means timeout
+         */
+        if (e.status === 524) {
+          resolve(true);
+          return;
+        }
 
-  await new Promise((resolve, reject) => {
-    streamLines(stream, (line) => {
-      if (line.length === 0) return;
+        resolve(false);
+      });
 
-      try {
-        const entries: LogEntry[] = JSON.parse(line);
+      if (!stream) return;
 
-        pretty(entries).forEach((l) => {
-          onLog(l);
-        });
-      } catch (e) {
-        reject(e);
-      }
+      streamLines(stream, (line) => {
+        if (line.length === 0) return;
+
+        try {
+          const entries: LogEntry[] = JSON.parse(line);
+
+          pretty(entries).forEach((l) => {
+            onLog(l);
+          });
+        } catch (e) {
+          resolve(false);
+        }
+      });
+
+      stream.on('error', async (e) => {
+        resolve(false);
+      });
     });
 
-    stream.on('error', reject);
-  });
+    if (!retry) return;
+  }
 }
 
 export async function releaseSquid(
