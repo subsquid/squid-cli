@@ -1,0 +1,17 @@
+{
+  "git": {
+    "commitMessage": "chore: release v${version}",
+    "tagName": "v${version}",
+    "requireBranch": "master"
+  },
+  "github": {
+    "release": true,
+    "assets": ["package/*.tar.gz"]
+  },
+  "npm": {
+    "publish": false
+  },
+  "hooks": {
+    "before:git": "yarn pkg:build && yarn pkg:compress"
+  }
+}
