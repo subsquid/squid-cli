@@ -109,8 +109,11 @@ jobs:
       
       - name: Update Homebrew Repo
         run: |
-          mv sqd.rb ./homebrew/Formula
-          cd homebrew
-          git add ./Formula/sqd.rb
+          if [[ "${{ github.event.inputs.tag }}" == "beta" ]]; then
+            mv sqd.rb ./homebrew/Formula/sqd@beta.rb
+          else
+            mv sqd.rb ./homebrew/Formula/sqd.rb
+          fi
+          git add ./Formula/*
           git commit -m "chore: release"
           git push
