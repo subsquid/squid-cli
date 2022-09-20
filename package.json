@@ -37,9 +37,9 @@
     "lint": "eslint --fix src/**/*",
     "test:unit": "NODE_ENV=test jest --bail --testRegex=.unit.spec.ts$",
     "tsc": "tsc --noEmit",
-    "pkg:build": "./bin/pkg-build.sh",
-    "pkg:compress": "./bin/pkg-compress.sh",
-    "gen:formula": "./bin/gen-formula.sh"
+    "pkg:build": "./scripts/pkg-build.sh",
+    "pkg:compress": "./scripts/pkg-compress.sh",
+    "gen:formula": "./scripts/gen-formula.sh"
   },
   "jest": {
     "moduleFileExtensions": [
