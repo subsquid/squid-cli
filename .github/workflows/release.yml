@@ -119,7 +119,7 @@ jobs:
       - name: Push Homebrew Repo
         run: |
           git add ./Formula/*
-          git commit -m "chore: release"
+          git commit -m "chore: release v${{ github.event.inputs.version }}"
           git push -u origin master
 
   # update-chocolatey:
