@@ -38,8 +38,7 @@
     "test:unit": "NODE_ENV=test jest --bail --testRegex=.unit.spec.ts$",
     "tsc": "tsc --noEmit",
     "pkg:build": "./scripts/pkg-build.sh",
-    "pkg:compress": "./scripts/pkg-compress.sh",
-    "gen:formula": "./scripts/gen-formula.sh"
+    "pkg:compress": "./scripts/pkg-compress.sh"
   },
   "jest": {
     "moduleFileExtensions": [
