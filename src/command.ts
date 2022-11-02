@@ -1,5 +1,6 @@
 import { Command } from '@oclif/core';
 import { CLIError } from '@oclif/core/lib/errors';
+import chalk from 'chalk';
 
 import { ApiError } from './api';
 
@@ -15,10 +16,10 @@ export abstract class CliCommand extends Command {
           );
         case 400:
           if (body.invalidFields) {
-            const messages = body.invalidFields.map(function (obj: any) {
-              return obj.message;
+            const messages = body.invalidFields.map(function (obj: any, index: number) {
+              return `${index + 1}) ${chalk.bold('"' + obj.path.join('.') + '"')} — ${obj.message}`;
             });
-            this.error(`Validation error.\n\t${messages.join('\n\t')}`);
+            this.error(`Validation error:\n${messages.join('\n')}`);
           }
           this.error(body.message);
         case 404:
