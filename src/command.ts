@@ -18,11 +18,13 @@ export abstract class CliCommand extends Command {
             const messages = body.invalidFields.map(function (obj: any) {
               return obj.message;
             });
-            throw new CLIError(`Validation error. ${messages.join(' ')}`);
+            this.error(`Validation error.\n\t${messages.join('\n\t')}`);
           }
           this.error(body.message);
         case 404:
           this.error(body?.message || 'API url not found');
+        case 405:
+          this.error(body?.message || 'Method not allowed');
         default:
           this.error(
             'Squid server error. Please come back later. If the error persists please open an issue at https://github.com/subsquid/squid and report to t.me/HydraDevs',
