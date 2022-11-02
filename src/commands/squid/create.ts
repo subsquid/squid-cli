@@ -1,8 +1,9 @@
-import { Command, Flags } from '@oclif/core';
+import { Flags } from '@oclif/core';
 
-import { create } from '../../rest-client/routes/create';
+import { squidCreate } from '../../api';
+import { CliCommand } from '../../command';
 
-export default class Create extends Command {
+export default class Create extends CliCommand {
   static description = 'Create a squid';
   static args = [
     {
@@ -37,7 +38,7 @@ export default class Create extends Command {
     const logoUrl = flags.logo;
     const websiteUrl = flags.website;
 
-    const createSquidMessage = await create(name, description, logoUrl, websiteUrl);
-    this.log(createSquidMessage);
+    const responseBody = await squidCreate(name, description, logoUrl, websiteUrl);
+    this.log(`Created squid with name "${responseBody.name}"`);
   }
 }

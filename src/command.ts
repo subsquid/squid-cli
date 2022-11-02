@@ -14,16 +14,19 @@ export abstract class CliCommand extends Command {
             `Authentication failure. Please obtain a new deployment key at https://app.subsquid.io and follow the instructions`,
           );
         case 400:
+          if (body.invalidFields) {
+            const messages = body.invalidFields.map(function (obj: any) {
+              return obj.message;
+            });
+            throw new CLIError(`Validation error. ${messages.join(' ')}`);
+          }
           this.error(body.message);
-          return;
         case 404:
           this.error(body?.message || 'API url not found');
-          return;
         default:
           this.error(
             'Squid server error. Please come back later. If the error persists please open an issue at https://github.com/subsquid/squid and report to t.me/HydraDevs',
           );
-          return;
       }
     }
 
