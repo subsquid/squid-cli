@@ -5,6 +5,26 @@ import { pretty } from '../logs';
 import { api } from './api';
 import { HttpResponse, LogEntry, LogsResponse, SquidResponse, SquidVersionResponse, VersionResponse } from './types';
 
+export async function squidCreate(
+  name: string,
+  description?: string,
+  logoUrl?: string,
+  websiteUrl?: string,
+): Promise<SquidResponse> {
+  const { body } = await api<SquidResponse>({
+    method: 'post',
+    path: '/client/squid',
+    data: {
+      name: name,
+      description: description,
+      logoUrl: logoUrl,
+      websiteUrl: websiteUrl,
+    },
+  });
+
+  return body;
+}
+
 export async function squidList(): Promise<SquidResponse[]> {
   const { body } = await api<SquidResponse[]>({
     method: 'get',
