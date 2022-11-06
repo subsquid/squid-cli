@@ -36,7 +36,7 @@ export default class Logs extends CliCommand {
       summary: `Container name`,
       required: false,
       multiple: true,
-      options: ['processor', 'query-node', 'db-migrate', 'db'],
+      options: ['processor', 'query-node', 'api', 'db-migrate', 'db'],
     }),
     pageSize: Flags.integer({
       char: 'p',

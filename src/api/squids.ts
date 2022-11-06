@@ -3,7 +3,15 @@ import { createInterface } from 'readline';
 import { pretty } from '../logs';
 
 import { api } from './api';
-import { HttpResponse, LogEntry, LogsResponse, SquidResponse, SquidVersionResponse, VersionResponse } from './types';
+import {
+  DeployResponse,
+  HttpResponse,
+  LogEntry,
+  LogsResponse,
+  SquidResponse,
+  SquidVersionResponse,
+  VersionResponse,
+} from './types';
 
 export async function squidCreate(
   name: string,
@@ -156,6 +164,16 @@ export async function releaseSquid(
   });
 
   return body;
+}
+
+export async function deploySquid(data: { hardReset: boolean; artifactUrl: string }): Promise<DeployResponse> {
+  const { body } = await api<HttpResponse<DeployResponse>>({
+    method: 'post',
+    path: `/squids/deploy`,
+    data,
+  });
+
+  return body.payload;
 }
 
 export async function updateSquid(

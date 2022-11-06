@@ -3,18 +3,23 @@ export type HttpResponse<T> = {
 };
 
 export enum DeployStatus {
+  CREATED = 'CREATED',
+  RESETTING = 'RESETTING',
+  UNPACKING = 'UNPACKING',
   IMAGE_BUILDING = 'IMAGE_BUILDING',
+  IMAGE_PUSHING = 'IMAGE_PUSHING',
   DEPLOYING = 'DEPLOYING',
-  INITIALIZING = 'INITIALIZING',
-  DONE = 'DONE',
-  FAILED = 'FAILED',
+  OK = 'OK',
 }
 
 export type DeployResponse = {
   id: string;
   status: DeployStatus;
+  squidName?: string;
+  versionName?: string;
+  deploymentUrl?: string;
   failed: boolean;
-  logs: string[];
+  logs: { severity: 'debug' | 'info' | 'error'; message: string }[];
 };
 
 export type DeploymentStatus = 'CREATED' | 'DEPLOYING' | 'DEPLOY_ERROR' | 'DEPLOYED';
