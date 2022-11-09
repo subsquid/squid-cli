@@ -1,4 +1,4 @@
-import { Command, Flags } from '@oclif/core';
+import { Flags } from '@oclif/core';
 
 import { me } from '../api/me';
 import { CliCommand } from '../command';
@@ -26,9 +26,9 @@ export default class Auth extends CliCommand {
       flags: { key, host },
     } = await this.parse(Auth);
 
-    setConfig(key, host);
-
     const { username } = await me();
+
+    setConfig(key, host);
 
     this.log(`Successfully logged as ${username}`);
   }
