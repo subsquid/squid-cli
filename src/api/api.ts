@@ -31,15 +31,17 @@ export async function api<T = any>({
   path,
   data,
   query,
+  auth,
   responseType = 'json',
 }: {
   method: 'get' | 'post' | 'put' | 'delete' | 'patch';
   path: string;
   query?: Record<string, string | string[] | boolean | number | undefined>;
   data?: unknown;
+  auth?: { apiUrl: string; credentials: string };
   responseType?: 'json' | 'stream';
 }): Promise<{ body: T }> {
-  const config = getConfig();
+  const config = auth || getConfig();
 
   const url = `${config.apiUrl}${path}${query ? `?${qs.stringify(query)}` : ''}`;
 
