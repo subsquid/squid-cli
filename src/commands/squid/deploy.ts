@@ -60,7 +60,7 @@ export default class Deploy extends CliCommand {
         switch (this.deploy.status) {
           case DeployStatus.UNPACKING:
             CliUx.ux.action.start('◷ Preparing your squid');
-            if (this.deploy.failed) return this.showError(`❌ An error occurred while building the squid`);
+            if (this.deploy.failed) return this.showError(`❌ An error occurred while unpacking the squid`);
 
             return false;
           case DeployStatus.RESETTING:
@@ -125,6 +125,7 @@ export default class Deploy extends CliCommand {
   };
 
   showError(text: string): boolean {
+    CliUx.ux.action.stop('');
     this.error(
       [
         text,
@@ -136,6 +137,10 @@ export default class Deploy extends CliCommand {
       ]
         .filter(Boolean)
         .join('\n'),
+      {
+        message: '',
+        ref: '2',
+      },
     );
 
     return true;
