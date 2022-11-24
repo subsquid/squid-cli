@@ -20,12 +20,12 @@ export abstract class CliCommand extends Command {
             });
             return this.error(`Validation error:\n${messages.join('\n')}`);
           }
-          return this.error(body.message);
+          return this.error(body?.error || body.message);
         case 404:
-          return this.error(body?.message || 'API url not found');
+          return this.error(body?.error || body?.message || 'API url not found');
 
         case 405:
-          return this.error(body?.message || 'Method not allowed');
+          return this.error(body?.error || body?.message || 'Method not allowed');
         default:
           return this.error(
             'Squid server error. Please come back later. If the error persists please open an issue at https://github.com/subsquid/squid and report to t.me/HydraDevs',
