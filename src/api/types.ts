@@ -19,7 +19,14 @@ export type DeployResponse = {
   versionName?: string;
   deploymentUrl?: string;
   failed: boolean;
-  logs: { severity: 'debug' | 'info' | 'error'; message: string }[];
+  logs: { severity: 'debug' | 'warn' | 'info' | 'error'; message: string }[];
+};
+
+export type UploadUrlResponse = {
+  uploadUrl: string;
+  uploadFields: Record<string, string>;
+  maxUploadBytes: number;
+  fileUrl: string;
 };
 
 export type DeploymentStatus = 'CREATED' | 'DEPLOYING' | 'DEPLOY_ERROR' | 'DEPLOYED';
