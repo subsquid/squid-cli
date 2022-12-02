@@ -1,10 +1,15 @@
 import { Flags } from '@oclif/core';
 
-import { squidCreate } from '../../api';
-import { CliCommand } from '../../command';
+import { squidCreate } from '../api';
+import { CliCommand } from '../command';
 
 export default class Create extends CliCommand {
+  static state = 'deprecated';
+  static aliases = ['squid:create'];
+  static hidden = true;
+
   static description = 'Create a squid';
+
   static args = [
     {
       name: 'name',

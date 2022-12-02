@@ -1,10 +1,12 @@
 import { Flags } from '@oclif/core';
 
-import { redeploySquid } from '../../api';
-import { CliCommand } from '../../command';
-import { parseEnvs, parseNameAndVersion } from '../../utils';
+import { redeploySquid } from '../api';
+import { CliCommand } from '../command';
+import { parseEnvs, parseNameAndVersion } from '../utils';
 
 export default class Redeploy extends CliCommand {
+  static aliases = ['squid:redeploy'];
+
   static description = 'Restart a squid version';
   static args = [
     {
@@ -13,7 +15,6 @@ export default class Redeploy extends CliCommand {
       required: true,
     },
   ];
-
   static flags = {
     env: Flags.string({
       char: 'e',

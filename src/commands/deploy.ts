@@ -3,7 +3,7 @@ import path from 'path';
 import { promisify } from 'util';
 
 import { CliUx, Flags } from '@oclif/core';
-import chalk, { dim, red, yellow, cyan } from 'chalk';
+import chalk from 'chalk';
 import inquirer from 'inquirer';
 import yaml from 'js-yaml';
 import targz from 'targz';
@@ -16,10 +16,10 @@ import {
   isVersionExists,
   streamSquidLogs,
   uploadFile,
-} from '../../api';
-import { CliCommand } from '../../command';
-import { Manifest } from '../../manifest';
-import { doUntil } from '../../utils';
+} from '../api';
+import { CliCommand } from '../command';
+import { Manifest } from '../manifest';
+import { doUntil } from '../utils';
 
 const compressAsync = promisify(targz.compress);
 
@@ -27,7 +27,7 @@ const SQUID_PATH_DESC = [
   `Squid source. Could be:`,
   `  - a relative or absolute path to a local folder (e.g. ".")`,
   `  - a URL to a .tar.gz archive`,
-  `  - a github URL to a git repo with an optional branch or commit tag`,
+  `  - a github URL to a git repo with an branch or commit tag`,
 ];
 
 export function resolveManifest(
@@ -50,9 +50,11 @@ export function resolveManifest(
     const manifestValue = yaml.load(fs.readFileSync(manifestPath).toString()) as Manifest;
 
     if (!manifestValue.name) {
-      return { error: `The manifest does not contain squid name` };
+      return { error: `A Squid  ${chalk.bold('name')} must be specified in manifest` };
+    } else if (manifestValue.version < 1) {
+      return { error: `A Squid ${chalk.bold('version')} must be greater than 0` };
     } else if (!manifestValue.version) {
-      return { error: `The manifest does not contain version name` };
+      return { error: `A Squid ${chalk.bold('version')} must be specified in manifest` };
     }
 
     return {
@@ -66,8 +68,9 @@ export function resolveManifest(
 }
 
 export default class Deploy extends CliCommand {
-  static description = 'Deploy a new squid version';
+  static aliases = ['squid:deploy'];
 
+  static description = 'Deploy a new squid version';
   static args = [
     {
       name: 'source',
@@ -75,7 +78,6 @@ export default class Deploy extends CliCommand {
       required: true,
     },
   ];
-
   static flags = {
     manifest: Flags.string({
       char: 'm',
@@ -121,9 +123,9 @@ export default class Deploy extends CliCommand {
       const archiveName = `${manifestValue.name}-v${manifestValue.version}.tar.gz`;
       const squidArtifact = path.join(buildDir, archiveName);
 
-      this.log(dim(`Squid directory: ${squidDir}`));
-      this.log(dim(`Build directory: ${buildDir}`));
-      this.log(dim(`Manifest: ${manifest}`));
+      this.log(chalk.dim(`Squid directory: ${squidDir}`));
+      this.log(chalk.dim(`Build directory: ${buildDir}`));
+      this.log(chalk.dim(`Manifest: ${manifest}`));
 
       const foundVersion = await isVersionExists(manifestValue.name, `v${manifestValue.version}`);
       if (foundVersion && !update) {
@@ -153,10 +155,10 @@ export default class Deploy extends CliCommand {
               case '.git':
               case '.github':
               case '.idea':
-                this.log(dim(`-- ignoring ${relativePath}`));
+                this.log(chalk.dim(`-- ignoring ${relativePath}`));
                 return true;
               default:
-                this.log(dim(`adding ${relativePath}`));
+                this.log(chalk.dim(`adding ${relativePath}`));
 
                 filesCount++;
                 return false;
@@ -280,16 +282,16 @@ export default class Deploy extends CliCommand {
       .forEach(({ severity, message }) => {
         switch (severity) {
           case 'info':
-            this.log(cyan(message));
+            this.log(chalk.cyan(message));
             return;
           case 'warn':
-            this.log(yellow(message));
+            this.log(chalk.yellow(message));
             return;
           case 'error':
-            this.log(red(message));
+            this.log(chalk.red(message));
             return;
           default:
-            this.log(dim(message));
+            this.log(chalk.dim(message));
         }
       });
   };
@@ -301,16 +303,12 @@ export default class Deploy extends CliCommand {
         text,
         `------`,
         'Please report to Discord https://discord.gg/KRvRcBdhEE or SquidDevs https://t.me/HydraDevs',
-        `${dim('Deploy:')} ${this.deploy?.id}`,
-        this.deploy?.squidName ? `${dim('Squid:')} ${this.deploy?.squidName}` : null,
-        this.deploy?.versionName ? `${dim('Version:')} ${this.deploy?.versionName}` : null,
+        `${chalk.dim('Deploy:')} ${this.deploy?.id}`,
+        this.deploy?.squidName ? `${chalk.dim('Squid:')} ${this.deploy?.squidName}` : null,
+        this.deploy?.versionName ? `${chalk.dim('Version:')} ${this.deploy?.versionName}` : null,
       ]
         .filter(Boolean)
         .join('\n'),
-      {
-        message: '',
-        ref: '2',
-      },
     );
 
     return true;

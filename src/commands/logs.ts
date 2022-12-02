@@ -1,10 +1,10 @@
 import { CliUx, Flags } from '@oclif/core';
 import ms from 'ms';
 
-import { streamSquidLogs, versionHistoryLogs } from '../../api';
-import { CliCommand } from '../../command';
-import { pretty } from '../../logs';
-import { parseNameAndVersion } from '../../utils';
+import { streamSquidLogs, versionHistoryLogs } from '../api';
+import { CliCommand } from '../command';
+import { pretty } from '../logs';
+import { parseNameAndVersion } from '../utils';
 
 type LogResult = {
   hasLogs: boolean;
@@ -21,6 +21,8 @@ function parseDate(str: string): Date {
 }
 
 export default class Logs extends CliCommand {
+  static aliases = ['squid:logs'];
+
   static description = 'Fetch squid logs';
   static args = [
     {
@@ -29,7 +31,6 @@ export default class Logs extends CliCommand {
       required: true,
     },
   ];
-
   static flags = {
     container: Flags.string({
       char: 'c',
