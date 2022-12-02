@@ -67,6 +67,10 @@ export type SquidResponse = {
   createdAt: Date;
 };
 
+export type SquidNameIsAvailableResponse = {
+  available: boolean;
+};
+
 export type SecretsListResponse = {
   secrets: Record<string, string>;
 };
