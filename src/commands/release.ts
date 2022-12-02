@@ -1,9 +1,9 @@
 import { Flags } from '@oclif/core';
 import simpleGit, { SimpleGit, SimpleGitOptions } from 'simple-git';
 
-import { updateSquid } from '../../api';
-import { CliCommand } from '../../command';
-import { buildRemoteUrlFromGit, parseNameAndVersion, pollDeployPipelines, parseEnvs } from '../../utils';
+import { releaseSquid } from '../api';
+import { CliCommand } from '../command';
+import { buildRemoteUrlFromGit, parseNameAndVersion, pollDeployPipelines, parseEnvs } from '../utils';
 
 const options: Partial<SimpleGitOptions> = {
   baseDir: process.cwd(),
@@ -11,8 +11,12 @@ const options: Partial<SimpleGitOptions> = {
 };
 const git: SimpleGit = simpleGit(options);
 
-export default class Update extends CliCommand {
-  static description = 'Update a version image';
+export default class Release extends CliCommand {
+  static state = 'deprecated';
+  static aliases = ['squid:release'];
+  static hidden = true;
+
+  static description = 'Create a new squid version';
   static args = [
     {
       name: 'nameAndVersion',
@@ -20,18 +24,16 @@ export default class Update extends CliCommand {
       required: true,
     },
   ];
-
   static flags = {
     source: Flags.string({
       char: 's',
-      description: 'source',
+      description: 'A fully qualified git url, e.g. https://github.com/squidlover/my-squid.git#v5',
       required: false,
     }),
-    hardReset: Flags.boolean({
-      char: 'r',
-      description: 'perform a hard reset (db wipeout)',
+    description: Flags.string({
+      char: 'd',
+      description: 'description',
       required: false,
-      default: false,
     }),
     verbose: Flags.boolean({
       char: 'v',
@@ -51,7 +53,8 @@ export default class Update extends CliCommand {
   };
 
   async run(): Promise<void> {
-    const { flags, args } = await this.parse(Update);
+    const { flags, args } = await this.parse(Release);
+    const description = flags.description;
     const nameAndVersion = args.nameAndVersion;
     const { squidName, versionName } = parseNameAndVersion(nameAndVersion, this);
 
@@ -65,19 +68,20 @@ export default class Update extends CliCommand {
         ? deployUrl
         : `${deployUrl.split('#')[0]}.git${deployUrl.split('#')[1] ? '#' + deployUrl.split('#')[1] : ''}`;
     }
+
     this.log(`🦑 Releasing the squid at ${deployUrl}`);
-    const result = await updateSquid(
+    const result = await releaseSquid(
       squidName,
       versionName,
       deployUrl as string,
-      flags.hardReset,
+      description,
       Object.keys(envs).length ? envs : undefined,
     );
     this.log(
       '◷ You may now detach from the build process by pressing Ctrl + C. The Squid deployment will continue uninterrupted.',
     );
     this.log('◷ The new squid will be available as soon as the deployment is complete.');
-    await pollDeployPipelines(squidName, versionName, result?.deploymentUrl || '', this);
+    await pollDeployPipelines(squidName, versionName, result?.version.deploymentUrl || '', this);
     this.log('✔️ Done!');
   }
 }

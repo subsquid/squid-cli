@@ -200,7 +200,7 @@ export async function isVersionExists(squid: string, version: string) {
 export async function getUploadUrl(): Promise<UploadUrlResponse> {
   const { body } = await api<HttpResponse<UploadUrlResponse>>({
     method: 'post',
-    path: `/squids/deploy/upload-url`,
+    path: `/deploys/upload-url`,
   });
 
   return body.payload;

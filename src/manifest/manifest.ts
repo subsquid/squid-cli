@@ -1,4 +1,4 @@
 export type Manifest = {
   name: string;
-  version: string;
+  version: number;
 };

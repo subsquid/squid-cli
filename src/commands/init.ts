@@ -6,9 +6,9 @@ import chalk from 'chalk';
 import yaml from 'js-yaml';
 import simpleGit from 'simple-git';
 
-import { squidNameIsAvailable } from '../../api';
-import { CliCommand } from '../../command';
-import { Manifest } from '../../manifest';
+import { squidNameIsAvailable } from '../api';
+import { CliCommand } from '../command';
+import { Manifest } from '../manifest';
 
 const SQUID_NAME_DESC = [
   `Squid name. Must contains only alphanumeric and "-" symbols and do not start with "-".`,
@@ -19,8 +19,8 @@ const TEMPLATE_ALIASES: Record<string, { url: string }> = {
   substrate: {
     url: 'https://github.com/subsquid/squid-substrate-template',
   },
-  ethereum: {
-    url: 'https://github.com/subsquid/squid-ethereum-template',
+  evm: {
+    url: 'https://github.com/subsquid/squid-evm-template',
   },
   'frontier-evm': {
     url: 'https://github.com/subsquid/squid-frontier-evm-template',

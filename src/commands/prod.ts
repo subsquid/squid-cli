@@ -2,12 +2,13 @@ import assert from 'assert';
 
 import inquirer from 'inquirer';
 
-import { getSquid } from '../../api';
-import { setProduction } from '../../api/alias';
-import { CliCommand } from '../../command';
-import { parseNameAndVersion } from '../../utils';
+import { getSquid, setProduction } from '../api';
+import { CliCommand } from '../command';
+import { parseNameAndVersion } from '../utils';
 
 export default class Prod extends CliCommand {
+  static aliases = ['squid:prod'];
+
   static description = 'Assign a squid version to the production endpoint';
   static args = [
     {
