@@ -18,14 +18,10 @@ import {
   uploadFile,
 } from '../../api';
 import { CliCommand } from '../../command';
+import { Manifest } from '../../manifest';
 import { doUntil } from '../../utils';
 
 const compressAsync = promisify(targz.compress);
-
-type Manifest = {
-  name: string;
-  version: string;
-};
 
 const SQUID_PATH_DESC = [
   `Squid source. Could be:`,

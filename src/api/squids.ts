@@ -8,6 +8,7 @@ import {
   HttpResponse,
   LogEntry,
   LogsResponse,
+  SquidNameIsAvailableResponse,
   SquidResponse,
   SquidVersionResponse,
   UploadUrlResponse,
@@ -53,6 +54,15 @@ export async function getSquid(squidName: string, versionName?: string): Promise
   });
 
   return body;
+}
+
+export async function squidNameIsAvailable(squidName: string): Promise<boolean> {
+  const { body } = await api<HttpResponse<SquidNameIsAvailableResponse>>({
+    method: 'get',
+    path: `/squids/${squidName}/available`,
+  });
+
+  return Boolean(body.payload?.available);
 }
 
 export async function versionHistoryLogs(
