@@ -14,7 +14,7 @@ export async function uploadFile(path: string): Promise<{ error: string | null; 
 
   if (size > maxUploadBytes) {
     return {
-      error: `Squid archive size is ${size} bytes, this excess the limit on file upload. Please try to reduce squid files`,
+      error: `The squid archive size is too large (${size} bytes), exceeding the limit of ${Math.round(maxUploadBytes/1_000_0000).toFixed(1)}M.`,
     };
   }
 
