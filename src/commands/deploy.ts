@@ -27,7 +27,7 @@ const SQUID_PATH_DESC = [
   `Squid source. Could be:`,
   `  - a relative or absolute path to a local folder (e.g. ".")`,
   `  - a URL to a .tar.gz archive`,
-  `  - a github URL to a git repo with an branch or commit tag`,
+  `  - a github URL to a git repo with a branch or commit tag`,
 ];
 
 export function resolveManifest(
@@ -37,7 +37,7 @@ export function resolveManifest(
   const manifestPath = path.resolve(path.join(localPath, manifest));
   if (fs.statSync(manifestPath).isDirectory()) {
     return {
-      error: `The path ${manifestPath} is a directory, not a manifest file. Please provide path to a valid manifest file`,
+      error: `The path ${manifestPath} is a directory, not a manifest file. Please provide a path to a valid manifest file`,
     };
   }
 
@@ -50,11 +50,11 @@ export function resolveManifest(
     const manifestValue = yaml.load(fs.readFileSync(manifestPath).toString()) as Manifest;
 
     if (!manifestValue.name) {
-      return { error: `A Squid  ${chalk.bold('name')} must be specified in manifest` };
+      return { error: `A Squid  ${chalk.bold('name')} must be specified in the manifest` };
     } else if (manifestValue.version < 1) {
       return { error: `A Squid ${chalk.bold('version')} must be greater than 0` };
     } else if (!manifestValue.version) {
-      return { error: `A Squid ${chalk.bold('version')} must be specified in manifest` };
+      return { error: `A Squid ${chalk.bold('version')} must be specified in the manifest` };
     }
 
     return {
@@ -87,13 +87,13 @@ export default class Deploy extends CliCommand {
     }),
     update: Flags.boolean({
       char: 'u',
-      description: 'Do not require confirmation if version is already exists',
+      description: 'Do not require a confirmation if the version already exists',
       required: false,
     }),
     'hard-reset': Flags.boolean({
       char: 'r',
       description:
-        'Perform a hard reset. Deletes and re-creates all resources includes disk, services, etc. Causes a downtime',
+        'Do a hard reset before deploying. Drops and re-creates all the squid resources including the database. Will cause a short API downtime',
       required: false,
     }),
     'no-stream-logs': Flags.boolean({
@@ -133,7 +133,7 @@ export default class Deploy extends CliCommand {
           {
             name: 'confirm',
             type: 'confirm',
-            message: `Version "v${manifestValue.version}" of Squid "v${manifestValue.name}" will be updated. Are you sure?`,
+            message: `Version "v${manifestValue.version}" of Squid "${manifestValue.name}" will be updated. Are you sure?`,
           },
         ]);
         if (!confirm) return;
@@ -152,6 +152,7 @@ export default class Deploy extends CliCommand {
               case 'node_modules':
               case 'builds':
               case 'lib':
+              // FIXME: .env ?
               case '.git':
               case '.github':
               case '.idea':
@@ -168,7 +169,7 @@ export default class Deploy extends CliCommand {
       });
       CliUx.ux.action.stop(`${filesCount} file(s) ✔️`);
       if (filesCount === 0) {
-        return this.error(`0 files were found in ${squidDir}. Please check directory, seems it empty`);
+        return this.error(`0 files were found in ${squidDir}. Please check the squid source, looks like it is empty`);
       }
 
       CliUx.ux.action.start(`◷ Uploading ${path.basename(squidArtifact)}`);
@@ -176,7 +177,7 @@ export default class Deploy extends CliCommand {
       if (error) {
         return this.error(error);
       } else if (!artifactUrl) {
-        return this.error('artifact url is missing');
+        return this.error('The artifact URL is missing');
       }
 
       this.log(`🦑 Releasing the squid`);
@@ -225,32 +226,32 @@ export default class Deploy extends CliCommand {
 
         switch (this.deploy.status) {
           case DeployStatus.UNPACKING:
-            CliUx.ux.action.start('◷ Preparing your squid');
+            CliUx.ux.action.start('◷ Preparing the squid');
             if (this.deploy.failed) return this.showError(`❌ An error occurred while unpacking the squid`);
 
             return false;
           case DeployStatus.RESETTING:
-            CliUx.ux.action.start('◷ Resetting squid');
+            CliUx.ux.action.start('◷ Resetting the squid');
             if (this.deploy.failed) return this.showError(`❌ An error occurred while resetting the squid`);
 
             return false;
           case DeployStatus.IMAGE_BUILDING:
-            CliUx.ux.action.start('◷ Building your squid');
+            CliUx.ux.action.start('◷ Building the squid');
             if (this.deploy.failed) return this.showError(`❌ An error occurred while building the squid`);
 
             return false;
           case DeployStatus.IMAGE_PUSHING:
-            CliUx.ux.action.start('◷ Publishing your squid');
+            CliUx.ux.action.start('◷ Pushing the image');
             if (this.deploy.failed) return this.showError(`❌ An error occurred while publishing the squid`);
 
             return false;
           case DeployStatus.DEPLOYING:
-            CliUx.ux.action.start('◷ Deploying your squid');
+            CliUx.ux.action.start('◷ Deploying the squid');
             if (this.deploy.failed) return this.showError(`❌ An error occurred while deploying the squid`);
 
             return false;
           case DeployStatus.OK:
-            this.log(`Squid is running up. Your squid will be shortly available at ${this.deploy.deploymentUrl}`);
+            this.log(`The squid is up and running. The GraphQL API will be shortly available at ${this.deploy.deploymentUrl}`);
 
             if (streamLogs && this.deploy.squidName && this.deploy.versionName) {
               CliUx.ux.action.start(`Streaming logs from the squid`);
@@ -298,6 +299,7 @@ export default class Deploy extends CliCommand {
 
   showError(text: string): boolean {
     CliUx.ux.action.stop('');
+    // FIXME: maybe we should send an error report ourselves here with more details?
     this.error(
       [
         text,

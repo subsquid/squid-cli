@@ -11,7 +11,7 @@ import { CliCommand } from '../command';
 import { Manifest } from '../manifest';
 
 const SQUID_NAME_DESC = [
-  `Squid name. Must contains only alphanumeric and "-" symbols and do not start with "-".`,
+  `The squid name. It must contain only alphanumeric or dash ("-") symbols and must not start with "-".`,
   `Squid names are ${chalk.yellow('globally unique')}.`,
 ];
 
@@ -33,10 +33,10 @@ const git = simpleGit({
 });
 
 const SQUID_TEMPLATE_DESC = [
-  `A github repository for initial files.`,
-  `Any ${chalk.bold('custom github repository URL')}, contains ${chalk.italic(
+  `A template for the squid. It can be `,
+  `any ${chalk.bold('github repository URL')} containing a valid ${chalk.italic(
     'squid.yaml',
-  )} manifest in the directory root or pre-defined alias:`,
+  )} manifest in the root folder or a pre-defined alias:`,
   ...Object.entries(TEMPLATE_ALIASES).map(([alias, { url }]) => `     - ${chalk.bold(alias)}  ${url}`),
 ];
 
@@ -56,16 +56,17 @@ export default class Init extends CliCommand {
       char: 't',
       description: SQUID_TEMPLATE_DESC.join('\n'),
       required: false,
+      // TODO: use inquerier to foce a template selection instead
       default: 'substrate',
     }),
     dir: Flags.string({
       char: 'd',
-      description: 'Target directory for new squid, by default it is same as specified NAME argument',
+      description: 'The target location for the squid. If not provided, a folder with the squid NAME is created.',
       required: false,
     }),
     remove: Flags.boolean({
       char: 'r',
-      description: 'Clean up target directory before install if exists',
+      description: 'Clean up the target directory if it exists',
       required: false,
     }),
   };
@@ -80,15 +81,22 @@ export default class Init extends CliCommand {
     const localDir = path.resolve(dir || name);
 
     if (!(await squidNameIsAvailable(name))) {
-      return this.error(`Squid name "${name}" is already exists. Please choose another one.`);
+      return this.error(`A squid with the name "${name}" already exists. Please pick a different name.`);
     }
 
-    if (remove && fs.existsSync(localDir)) {
-      fs.rmSync(localDir, { recursive: true });
+    if (fs.existsSync(localDir)) {
+      if (remove) {
+        fs.rmSync(localDir, { recursive: true });
+      } else {
+        return this.error(`The folder ${localDir} already exists. Use the "-r" flag to init the squid at the existing path (will clean the folder first).`)
+      }
     }
 
-    CliUx.ux.action.start(`◷ Downloading template from ${githubRepository}... `);
+    
+
+    CliUx.ux.action.start(`◷ Downloading the template: ${githubRepository}... `);
     try {
+      // TODO: support branches?
       await git.clone(githubRepository, localDir, {});
     } catch (e: any) {
       return this.error(e);
@@ -108,6 +116,6 @@ export default class Init extends CliCommand {
       return this.error(e);
     }
 
-    this.log(`Squid directory is ready in ${localDir}`);
+    this.log(`The squid is created in ${localDir}`);
   }
 }
