@@ -3,6 +3,7 @@ import path from 'path';
 
 import { CliUx, Flags } from '@oclif/core';
 import chalk from 'chalk';
+import inquirer from 'inquirer';
 import yaml from 'js-yaml';
 import simpleGit from 'simple-git';
 
@@ -56,8 +57,6 @@ export default class Init extends CliCommand {
       char: 't',
       description: SQUID_TEMPLATE_DESC.join('\n'),
       required: false,
-      // TODO: use inquerier to foce a template selection instead
-      default: 'substrate',
     }),
     dir: Flags.string({
       char: 'd',
@@ -77,7 +76,27 @@ export default class Init extends CliCommand {
       flags: { template, dir, remove },
     } = await this.parse(Init);
 
-    const githubRepository = TEMPLATE_ALIASES[template] ? TEMPLATE_ALIASES[template].url : template;
+    let resolvedTemplate = template || '';
+    if (!template) {
+      const { alias } = await inquirer.prompt({
+        name: 'alias',
+        message: `Please choose one of the pre-defined template for your "${name}" squid`,
+        type: 'list',
+
+        choices: Object.entries(TEMPLATE_ALIASES).map(([name, { url }]) => {
+          return {
+            name: `${name} ${chalk.dim(url)}`,
+            value: name,
+          };
+        }),
+      });
+
+      resolvedTemplate = alias;
+    }
+
+    const githubRepository = TEMPLATE_ALIASES[resolvedTemplate]
+      ? TEMPLATE_ALIASES[resolvedTemplate].url
+      : resolvedTemplate;
     const localDir = path.resolve(dir || name);
 
     if (!(await squidNameIsAvailable(name))) {
@@ -88,11 +107,11 @@ export default class Init extends CliCommand {
       if (remove) {
         fs.rmSync(localDir, { recursive: true });
       } else {
-        return this.error(`The folder ${localDir} already exists. Use the "-r" flag to init the squid at the existing path (will clean the folder first).`)
+        return this.error(
+          `The folder ${localDir} already exists. Use the "-r" flag to init the squid at the existing path (will clean the folder first).`,
+        );
       }
     }
-
-    
 
     CliUx.ux.action.start(`◷ Downloading the template: ${githubRepository}... `);
     try {
