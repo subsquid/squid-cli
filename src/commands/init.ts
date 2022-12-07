@@ -16,15 +16,22 @@ const SQUID_NAME_DESC = [
   `Squid names are ${chalk.yellow('globally unique')}.`,
 ];
 
-const TEMPLATE_ALIASES: Record<string, { url: string }> = {
-  substrate: {
-    url: 'https://github.com/subsquid/squid-substrate-template',
-  },
+const TEMPLATE_ALIASES: Record<string, { url: string, description: string }> = {
   evm: {
     url: 'https://github.com/subsquid/squid-evm-template',
+    description: `A minimal squid template for indexing EVM data.`
+  },
+  gravatar: {
+    url: 'https://github.com/subsquid/gravatar-squid',
+    description: 'A sample EVM squid indexing the Gravatar smart contract on Ethereum.'
+  },
+  substrate: {
+    url: 'https://github.com/subsquid/squid-substrate-template',
+    description: 'A template squid for indexing Substrate-based chains.'
   },
   'frontier-evm': {
     url: 'https://github.com/subsquid/squid-frontier-evm-template',
+    description: 'A template for indexing Frontier EVM chains, like Moonbeam and Astar.'
   },
 };
 
@@ -34,11 +41,12 @@ const git = simpleGit({
 });
 
 const SQUID_TEMPLATE_DESC = [
-  `A template for the squid. It can be `,
-  `any ${chalk.bold('github repository URL')} containing a valid ${chalk.italic(
+  `A template for the squid. Accepts: `,
+  `- a ${chalk.bold('github repository URL')} containing a valid ${chalk.italic(
     'squid.yaml',
-  )} manifest in the root folder or a pre-defined alias:`,
-  ...Object.entries(TEMPLATE_ALIASES).map(([alias, { url }]) => `     - ${chalk.bold(alias)}  ${url}`),
+  )} manifest in the root folder `,
+  ` or one of the pre-defined aliases:`,
+  ...Object.entries(TEMPLATE_ALIASES).map(([alias, { url, description }]) => `     - ${chalk.bold(alias)}  ${description}`),
 ];
 
 export default class Init extends CliCommand {
@@ -60,7 +68,7 @@ export default class Init extends CliCommand {
     }),
     dir: Flags.string({
       char: 'd',
-      description: 'The target location for the squid. If not provided, a folder with the squid NAME is created.',
+      description: 'The target location for the squid. If omitted, a new folder NAME is created.',
       required: false,
     }),
     remove: Flags.boolean({
@@ -80,12 +88,12 @@ export default class Init extends CliCommand {
     if (!template) {
       const { alias } = await inquirer.prompt({
         name: 'alias',
-        message: `Please choose one of the pre-defined template for your "${name}" squid`,
+        message: `Please choose one of the pre-defined templates for your "${name}" squid`,
         type: 'list',
 
-        choices: Object.entries(TEMPLATE_ALIASES).map(([name, { url }]) => {
+        choices: Object.entries(TEMPLATE_ALIASES).map(([name, { description }]) => {
           return {
-            name: `${name} ${chalk.dim(url)}`,
+            name: `${name}. ${chalk.dim(description)}`,
             value: name,
           };
         }),
