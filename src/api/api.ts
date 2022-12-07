@@ -19,10 +19,14 @@ export class ApiError extends Error {
     public status: number,
     public body: {
       error: string;
+      message?: string;
       invalidFields?: { path: string[]; message: string; type: string }[];
     },
   ) {
     super();
+    if (body.message) {
+      this.message = body.message
+    }
   }
 }
 
