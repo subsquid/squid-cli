@@ -10,6 +10,7 @@ import simpleGit from 'simple-git';
 import { squidNameIsAvailable } from '../api';
 import { CliCommand } from '../command';
 import { Manifest } from '../manifest';
+import { adjectives, animals, colors, uniqueNamesGenerator } from 'unique-names-generator';
 
 const SQUID_NAME_DESC = [
   `The squid name. It must contain only alphanumeric or dash ("-") symbols and must not start with "-".`,
@@ -88,7 +89,7 @@ export default class Init extends CliCommand {
     if (!template) {
       const { alias } = await inquirer.prompt({
         name: 'alias',
-        message: `Please choose one of the pre-defined templates for your "${name}" squid`,
+        message: `Please select one of the templates for your "${name}" squid:`,
         type: 'list',
 
         choices: Object.entries(TEMPLATE_ALIASES).map(([name, { description }]) => {
@@ -108,7 +109,13 @@ export default class Init extends CliCommand {
     const localDir = path.resolve(dir || name);
 
     if (!(await squidNameIsAvailable(name))) {
-      return this.error(`A squid with the name "${name}" already exists. Please pick a different name.`);
+      const uniqueNameSuggestion = uniqueNamesGenerator({
+        dictionaries: [adjectives, colors, animals],
+        separator: '-',
+        length: 2,
+      })
+      return this.error(`There is already a squid with name "${name}" deployed to Aquarium. Squid names are globally unique. ` +
+       `Please pick a new memorable name, e.g. "${uniqueNameSuggestion}".`);
     }
 
     if (fs.existsSync(localDir)) {
