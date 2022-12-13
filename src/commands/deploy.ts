@@ -152,6 +152,7 @@ export default class Deploy extends CliCommand {
               case 'node_modules':
               case 'builds':
               case 'lib':
+              case 'Dockerfile':
               // FIXME: .env ?
               case '.git':
               case '.github':
@@ -251,7 +252,9 @@ export default class Deploy extends CliCommand {
 
             return false;
           case DeployStatus.OK:
-            this.log(`The squid is up and running. The GraphQL API will be shortly available at ${this.deploy.deploymentUrl}`);
+            this.log(
+              `The squid is up and running. The GraphQL API will be shortly available at ${this.deploy.deploymentUrl}`,
+            );
 
             if (streamLogs && this.deploy.squidName && this.deploy.versionName) {
               CliUx.ux.action.start(`Streaming logs from the squid`);
