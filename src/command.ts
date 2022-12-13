@@ -3,6 +3,15 @@ import chalk from 'chalk';
 
 import { ApiError } from './api';
 
+export const RELEASE_DEPRECATE = [
+  chalk.yellow('*********************************************'),
+  chalk.yellow('*                                           *'),
+  chalk.yellow('* WARNING! This command has been deprecated *'),
+  chalk.yellow('* Please use "sqd deploy" instead.          *'),
+  chalk.yellow('*                                           *'),
+  chalk.yellow('*********************************************'),
+].join('\n');
+
 export abstract class CliCommand extends Command {
   async catch(error: any) {
     const { status, body } = error;
@@ -22,7 +31,11 @@ export abstract class CliCommand extends Command {
           }
           return this.error(body?.error || body.message);
         case 404:
-          return this.error(`Unknown API endpoint. Check that your are using the latest version of the Squid CLI. Message: ${body?.error || body?.message || 'API url not found'}`);
+          return this.error(
+            `Unknown API endpoint. Check that your are using the latest version of the Squid CLI. Message: ${
+              body?.error || body?.message || 'API url not found'
+            }`,
+          );
 
         case 405:
           return this.error(body?.error || body?.message || 'Method not allowed');

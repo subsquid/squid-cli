@@ -2,7 +2,7 @@ import { Flags } from '@oclif/core';
 import simpleGit, { SimpleGit, SimpleGitOptions } from 'simple-git';
 
 import { releaseSquid } from '../api';
-import { CliCommand } from '../command';
+import { CliCommand, RELEASE_DEPRECATE } from '../command';
 import { buildRemoteUrlFromGit, parseNameAndVersion, pollDeployPipelines, parseEnvs } from '../utils';
 
 const options: Partial<SimpleGitOptions> = {
@@ -12,7 +12,6 @@ const options: Partial<SimpleGitOptions> = {
 const git: SimpleGit = simpleGit(options);
 
 export default class Release extends CliCommand {
-  static state = 'deprecated';
   static aliases = ['squid:release'];
   static hidden = true;
 
@@ -53,6 +52,8 @@ export default class Release extends CliCommand {
   };
 
   async run(): Promise<void> {
+    this.log(RELEASE_DEPRECATE);
+
     const { flags, args } = await this.parse(Release);
     const description = flags.description;
     const nameAndVersion = args.nameAndVersion;
