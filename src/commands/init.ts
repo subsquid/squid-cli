@@ -139,6 +139,9 @@ export default class Init extends CliCommand {
     CliUx.ux.action.stop(`✔`);
 
     fs.rmSync(path.resolve(localDir, '.git'), { recursive: true });
+    try {
+      fs.rmSync(path.resolve(localDir, 'Dockerfile'));
+    } catch (e) {}
 
     const manifestPath = path.resolve(localDir, 'squid.yaml');
     try {

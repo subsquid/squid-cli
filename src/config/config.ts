@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
 import { resolve, dirname } from 'path';
 
-export const DEFAULT_API_URL = 'https://saas.infra.gc.subsquid.io/api';
+export const DEFAULT_API_URL = process.env.SUBSQUID_DEFAULT_API_URL || 'https://saas.infra.gc.subsquid.io/api';
 
 export type Config = {
   apiUrl: string;
