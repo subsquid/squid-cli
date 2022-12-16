@@ -1,6 +1,7 @@
-import { CliUx, Command } from '@oclif/core';
+import { CliUx, Command, Flags } from '@oclif/core';
+import inquirer from 'inquirer';
 
-import { destroyApp, destroyDeployment } from '../rest-client/routes/destroy';
+import { destroySquid, destroyVersion } from '../api';
 import { parseNameAndVersion } from '../utils';
 
 export default class Rm extends Command {
@@ -14,22 +15,53 @@ export default class Rm extends Command {
       required: true,
     },
   ];
+  static flags = {
+    force: Flags.boolean({
+      char: 'f',
+      description: 'Does not prompt before removing a squid or its version',
+      required: false,
+    }),
+  };
 
   async run(): Promise<void> {
-    const { args } = await this.parse(Rm);
-    const params: string = args.nameAndVersion;
-    let message;
+    const {
+      args: { nameAndVersion },
+      flags: { force },
+    } = await this.parse(Rm);
 
-    if (params.includes('@')) {
-      const { squidName, versionName } = parseNameAndVersion(params, this);
+    if (nameAndVersion.includes('@')) {
+      const { squidName, versionName } = parseNameAndVersion(nameAndVersion, this);
+
+      if (!force) {
+        const { confirm } = await inquirer.prompt([
+          {
+            name: 'confirm',
+            type: 'confirm',
+            message: `Your squid "${squidName}" version "${versionName}" will be completely removed. This action can not be undone. Are you sure?`,
+          },
+        ]);
+        if (!confirm) return;
+      }
+
       CliUx.ux.action.start('◷ Deleting version');
-      message = await destroyDeployment(squidName, versionName);
-    } else {
-      CliUx.ux.action.start('◷ Deleting squid');
-      message = await destroyApp(params);
+      this.log(await destroyVersion(squidName, versionName));
+      CliUx.ux.action.stop();
+      return;
     }
-    CliUx.ux.action.stop();
 
-    this.log(message);
+    if (!force) {
+      const { confirm } = await inquirer.prompt([
+        {
+          name: 'confirm',
+          type: 'confirm',
+          message: `Your squid "${nameAndVersion}" will be completely removed. This action can not be undone. Are you sure?`,
+        },
+      ]);
+      if (!confirm) return;
+    }
+
+    CliUx.ux.action.start('◷ Deleting squid');
+    this.log(await destroySquid(nameAndVersion));
+    CliUx.ux.action.stop();
   }
 }
