@@ -70,7 +70,7 @@ export function resolveManifest(
 export default class Deploy extends CliCommand {
   static aliases = ['squid:deploy'];
 
-  static description = 'Deploy a new squid version';
+  static description = 'Deploy a new or update an existing squid version';
   static args = [
     {
       name: 'source',
