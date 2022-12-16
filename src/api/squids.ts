@@ -233,3 +233,21 @@ export async function redeploySquid(
   });
   return body.payload;
 }
+
+export async function destroyVersion(squidName: string, versionName: string): Promise<string> {
+  const { body } = await api<HttpResponse<SquidResponse>>({
+    method: 'delete',
+    path: `/squids/${squidName}/version/${versionName}`,
+  });
+
+  return `Destroyed Squid "${body.payload.name}" version ${body.payload.versions?.[0]?.name}`;
+}
+
+export async function destroySquid(squidName: string): Promise<string> {
+  const { body } = await api<HttpResponse<SquidResponse>>({
+    method: 'delete',
+    path: `/squids/${squidName}`,
+  });
+
+  return `Destroyed Squid ${body.payload.name}`;
+}
