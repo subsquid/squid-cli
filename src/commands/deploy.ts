@@ -202,10 +202,6 @@ export default class Deploy extends CliCommand {
       return;
     }
 
-    this.log(
-      '◷ You may now detach from the build process by pressing Ctrl + C. The Squid deployment will continue uninterrupted.',
-    );
-    this.log('◷ The new squid will be available as soon as the deployment is complete.');
     await this.pollDeploy(deploy, { streamLogs: !disableStreamLogs });
     this.log('✔️ Done!');
   }
@@ -225,30 +221,41 @@ export default class Deploy extends CliCommand {
 
         this.printDebug();
 
+        let validatedPrinted = false;
+
         switch (this.deploy.status) {
           case DeployStatus.UNPACKING:
             CliUx.ux.action.start('◷ Preparing the squid');
-            if (this.deploy.failed) return this.showError(`❌ An error occurred while unpacking the squid`);
+            if (this.isFailed()) return this.showError(`❌ An error occurred while unpacking the squid`);
 
             return false;
           case DeployStatus.RESETTING:
             CliUx.ux.action.start('◷ Resetting the squid');
-            if (this.deploy.failed) return this.showError(`❌ An error occurred while resetting the squid`);
+            if (this.isFailed()) return this.showError(`❌ An error occurred while resetting the squid`);
 
             return false;
           case DeployStatus.IMAGE_BUILDING:
             CliUx.ux.action.start('◷ Building the squid');
-            if (this.deploy.failed) return this.showError(`❌ An error occurred while building the squid`);
+
+            if (!validatedPrinted) {
+              this.log(
+                '◷ You may now detach from the build process by pressing Ctrl + C. The Squid deployment will continue uninterrupted.',
+              );
+              this.log('◷ The new squid will be available as soon as the deployment is complete.');
+              validatedPrinted = true;
+            }
+
+            if (this.isFailed()) return this.showError(`❌ An error occurred while building the squid`);
 
             return false;
           case DeployStatus.IMAGE_PUSHING:
             CliUx.ux.action.start('◷ Pushing the image');
-            if (this.deploy.failed) return this.showError(`❌ An error occurred while publishing the squid`);
+            if (this.isFailed()) return this.showError(`❌ An error occurred while publishing the squid`);
 
             return false;
           case DeployStatus.DEPLOYING:
             CliUx.ux.action.start('◷ Deploying the squid');
-            if (this.deploy.failed) return this.showError(`❌ An error occurred while deploying the squid`);
+            if (this.isFailed()) return this.showError(`❌ An error occurred while deploying the squid`);
 
             return false;
           case DeployStatus.OK:
@@ -302,20 +309,28 @@ export default class Deploy extends CliCommand {
 
   showError(text: string): boolean {
     CliUx.ux.action.stop('');
-    // FIXME: maybe we should send an error report ourselves here with more details?
-    this.error(
-      [
-        text,
+
+    const reason = this.deploy?.failed || 'UNEXPECTED';
+    const errors: (string | null)[] = [text];
+    if (reason === 'UNEXPECTED') {
+      errors.push(
         `------`,
         'Please report to Discord https://discord.gg/KRvRcBdhEE or SquidDevs https://t.me/HydraDevs',
         `${chalk.dim('Deploy:')} ${this.deploy?.id}`,
         this.deploy?.squidName ? `${chalk.dim('Squid:')} ${this.deploy?.squidName}` : null,
         this.deploy?.versionName ? `${chalk.dim('Version:')} ${this.deploy?.versionName}` : null,
-      ]
-        .filter(Boolean)
-        .join('\n'),
-    );
+      );
+    }
+
+    // FIXME: maybe we should send an error report ourselves here with more details?
+    this.error(errors.filter(Boolean).join('\n'));
 
     return true;
+  }
+
+  isFailed() {
+    if (!this.deploy) return true;
+
+    return this.deploy.failed !== 'NO';
   }
 }

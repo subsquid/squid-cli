@@ -8,7 +8,7 @@ process.env.NODE_ENV = 'development'
 
 
 // In dev mode, always show stack traces
-oclif.settings.debug = true;
+oclif.settings.debug = false;
 
 // Start the CLI
 oclif.run().then(oclif.flush).catch(oclif.Errors.handle)
