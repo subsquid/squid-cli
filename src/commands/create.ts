@@ -1,10 +1,9 @@
 import { Flags } from '@oclif/core';
 
 import { squidCreate } from '../api';
-import { CliCommand } from '../command';
+import { CliCommand, RELEASE_DEPRECATE } from '../command';
 
 export default class Create extends CliCommand {
-  static state = 'deprecated';
   static aliases = ['squid:create'];
   static hidden = true;
 
@@ -37,6 +36,8 @@ export default class Create extends CliCommand {
   };
 
   async run(): Promise<void> {
+    this.log(RELEASE_DEPRECATE);
+
     const { flags, args } = await this.parse(Create);
     const name = args.name;
     const description = flags.description;
