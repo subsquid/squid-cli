@@ -18,7 +18,7 @@ export type DeployResponse = {
   squidName?: string;
   versionName?: string;
   deploymentUrl?: string;
-  failed: boolean;
+  failed: 'NO' | 'UNEXPECTED' | 'PERMISSIONS' | 'REQUIREMENTS';
   logs: { severity: 'debug' | 'warn' | 'info' | 'error'; message: string }[];
 };
 
