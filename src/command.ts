@@ -4,12 +4,13 @@ import chalk from 'chalk';
 import { ApiError } from './api';
 
 export const RELEASE_DEPRECATE = [
-  chalk.yellow('*********************************************'),
-  chalk.yellow('*                                           *'),
-  chalk.yellow('* WARNING! This command has been deprecated *'),
-  chalk.yellow('* Please use "sqd deploy" instead.          *'),
-  chalk.yellow('*                                           *'),
-  chalk.yellow('*********************************************'),
+  chalk.yellow('*******************************************************'),
+  chalk.yellow('*                                                     *'),
+  chalk.yellow('* WARNING! This command has been deprecated           *'),
+  chalk.yellow('* Please check the migration guide                    *'),
+  chalk.yellow('* https://docs.subsquid.io/deploy-squid/migration/    *'),
+  chalk.yellow('*                                                     *'),
+  chalk.yellow('*******************************************************'),
 ].join('\n');
 
 export abstract class CliCommand extends Command {
