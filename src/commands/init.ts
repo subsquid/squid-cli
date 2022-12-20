@@ -33,6 +33,14 @@ const TEMPLATE_ALIASES: Record<string, { url: string; description: string }> = {
     url: 'https://github.com/subsquid/squid-frontier-evm-template',
     description: 'A template for indexing Frontier EVM chains, like Moonbeam and Astar.',
   },
+  ink: {
+    url: 'https://github.com/subsquid/squid-wasm-template',
+    description: `A template for indexing Ink! smart contracts`
+  },
+  acala: {
+    url: 'https://github.com/subsquid/squid-acala-tempate',
+    description: `A template for indexing Acala EVM+ smart contracts`
+  }
 };
 
 const git = simpleGit({
