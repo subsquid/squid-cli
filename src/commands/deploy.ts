@@ -208,6 +208,7 @@ export default class Deploy extends CliCommand {
 
   async pollDeploy(deploy: DeployResponse, { streamLogs }: { streamLogs: boolean }): Promise<void> {
     let lastStatus: string;
+    let validatedPrinted = false;
 
     await doUntil(
       async () => {
@@ -220,8 +221,6 @@ export default class Deploy extends CliCommand {
         }
 
         this.printDebug();
-
-        let validatedPrinted = false;
 
         switch (this.deploy.status) {
           case DeployStatus.UNPACKING:
