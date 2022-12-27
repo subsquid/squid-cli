@@ -39,7 +39,8 @@
     "test:unit": "NODE_ENV=test jest --bail --testRegex=.unit.spec.ts$",
     "tsc": "tsc --noEmit",
     "pkg:build": "./bin/pkg-build.sh",
-    "pkg:compress": "./bin/pkg-compress.sh"
+    "pkg:compress": "./bin/pkg-compress.sh",
+    "postinstall": "./bin/run.js autocomplete -r || echo 'autocomplete failed'"
   },
   "jest": {
     "moduleFileExtensions": [
