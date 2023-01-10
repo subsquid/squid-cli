@@ -34,14 +34,20 @@ export function resolveManifest(
   localPath: string,
   manifest: string,
 ): { error: string } | { buildDir: string; squidDir: string; manifestValue: Manifest } {
-  const manifestPath = path.resolve(path.join(localPath, manifest));
-  if (fs.statSync(manifestPath).isDirectory()) {
+  const squidDir = path.resolve(localPath);
+  if (!fs.statSync(squidDir).isDirectory()) {
     return {
-      error: `The path ${manifestPath} is a directory, not a manifest file. Please provide a path to a valid manifest file`,
+      error: `The path ${squidDir} is a not a squid directory. Please provide a path to a squid root directory`,
     };
   }
 
-  const squidDir = path.dirname(manifestPath);
+  const manifestPath = path.resolve(path.join(localPath, manifest));
+  if (fs.statSync(manifestPath).isDirectory()) {
+    return {
+      error: `The path ${manifestPath} is a directory, not a manifest file. Please provide a path to a valid manifest file inside squid directory`,
+    };
+  }
+
   const buildDir = path.join(squidDir, 'builds');
 
   fs.mkdirSync(buildDir, { recursive: true, mode: 0o777 });
@@ -81,7 +87,7 @@ export default class Deploy extends CliCommand {
   static flags = {
     manifest: Flags.string({
       char: 'm',
-      description: 'A manifest file',
+      description: 'Relative path to a squid manifest file in squid source',
       required: false,
       default: 'squid.yaml',
     }),
