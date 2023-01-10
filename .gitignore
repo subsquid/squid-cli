@@ -19,3 +19,5 @@ dist/
 
 # Oclif
 oclif.manifest.json
+
+bin/dev.*

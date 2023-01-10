@@ -17,6 +17,7 @@
   "include": ["src"],
   "exclude": [
     "node_modules",
-    "resource"
+    "resource",
+    "bin",
   ]
 }
