@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
 
 import { Command, CliUx } from '@oclif/core';
+import { ConfigNotFound, getConfig } from '@subsquid/commands';
 import { dim } from 'chalk';
 import cliSelect from 'cli-select';
 import { parse } from 'dotenv';
@@ -11,6 +12,18 @@ import { DeployPipelineStatusEnum, getDeployPipeline } from './rest-client/route
 
 function buildPipelineErrorMessage(text: string, errorMessage: string): string {
   return `${text} ${errorMessage ? `: ${errorMessage}` : ''}`;
+}
+
+export async function getSquidCommands() {
+  try {
+    return await getConfig();
+  } catch (e) {
+    if (e instanceof ConfigNotFound) {
+      return null;
+    }
+
+    throw e;
+  }
 }
 
 export async function pollDeployPipelines(

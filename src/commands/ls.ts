@@ -5,7 +5,6 @@ import { CliCommand } from '../command';
 
 export default class Ls extends CliCommand {
   static aliases = ['squid:ls'];
-
   static description = 'List squids and squid versions';
 
   static flags = {
