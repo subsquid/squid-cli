@@ -15,7 +15,7 @@ export default class Release extends CliCommand {
   static aliases = ['squid:release'];
   static hidden = true;
 
-  static description = 'Create a new squid version';
+  static summary = 'Create a new squid version';
   static args = [
     {
       name: 'nameAndVersion',

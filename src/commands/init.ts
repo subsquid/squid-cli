@@ -35,12 +35,12 @@ const TEMPLATE_ALIASES: Record<string, { url: string; description: string }> = {
   },
   ink: {
     url: 'https://github.com/subsquid/squid-wasm-template',
-    description: `A template for indexing Ink! smart contracts`
+    description: `A template for indexing Ink! smart contracts`,
   },
   acala: {
     url: 'https://github.com/subsquid/squid-acala-tempate',
-    description: `A template for indexing Acala EVM+ smart contracts`
-  }
+    description: `A template for indexing Acala EVM+ smart contracts`,
+  },
 };
 
 const git = simpleGit({
@@ -58,7 +58,7 @@ const SQUID_TEMPLATE_DESC = [
 ];
 
 export default class Init extends CliCommand {
-  static description = 'Create a squid from template';
+  static summary = 'Create a squid from template';
 
   static args = [
     {

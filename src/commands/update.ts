@@ -15,7 +15,7 @@ export default class Update extends CliCommand {
   static aliases = ['squid:update'];
   static hidden = true;
 
-  static description = 'Update a version image';
+  static summary = 'Update a version image';
   static args = [
     {
       name: 'nameAndVersion',

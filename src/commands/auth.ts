@@ -5,7 +5,7 @@ import { CliCommand } from '../command';
 import { DEFAULT_API_URL, setConfig } from '../config';
 
 export default class Auth extends CliCommand {
-  static description = `Authenticate to deploy and manage squids 🦑`;
+  static summary = `Authenticate to deploy and manage squids`;
 
   static flags = {
     key: Flags.string({

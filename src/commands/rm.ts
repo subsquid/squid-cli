@@ -7,7 +7,7 @@ import { parseNameAndVersion } from '../utils';
 export default class Rm extends Command {
   static aliases = ['squid:kill', 'kill'];
 
-  static description = 'Remove a squid or a squid version';
+  static summary = 'Remove a squid or a squid version';
   static args = [
     {
       name: 'nameAndVersion',

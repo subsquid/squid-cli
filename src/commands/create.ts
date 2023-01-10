@@ -7,7 +7,7 @@ export default class Create extends CliCommand {
   static aliases = ['squid:create'];
   static hidden = true;
 
-  static description = 'Create a squid';
+  static summary = 'Create a squid';
 
   static args = [
     {

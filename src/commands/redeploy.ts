@@ -7,7 +7,7 @@ import { parseEnvs, parseNameAndVersion } from '../utils';
 export default class Redeploy extends CliCommand {
   static aliases = ['squid:redeploy'];
 
-  static description = 'Restart a squid version';
+  static summary = 'Restart a squid version';
   static args = [
     {
       name: 'nameAndVersion',
