@@ -153,7 +153,7 @@ export async function streamSquidLogs(
       });
 
       stream.on('error', async (e) => {
-        resolve(false);
+        resolve(true);
       });
     });
 
