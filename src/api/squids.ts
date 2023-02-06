@@ -138,23 +138,32 @@ export async function streamSquidLogs(
 
       if (!stream) return;
 
-      streamLines(stream, (line) => {
-        if (line.length === 0) return;
+      try {
+        streamLines(stream, (line) => {
+          if (line.length === 0) return;
 
-        try {
-          const entries: LogEntry[] = JSON.parse(line);
+          try {
+            const entries: LogEntry[] = JSON.parse(line);
 
-          pretty(entries).forEach((l) => {
-            onLog(l);
-          });
-        } catch (e) {
-          resolve(false);
+            pretty(entries).forEach((l) => {
+              onLog(l);
+            });
+          } catch (e) {
+            resolve(false);
+          }
+        });
+
+        stream.on('error', async (e) => {
+          resolve(true);
+        });
+      } catch (e: any) {
+        if (e.code === 'ERR_STREAM_PREMATURE_CLOSE') {
+          resolve(true);
+          return;
         }
-      });
 
-      stream.on('error', async (e) => {
-        resolve(true);
-      });
+        resolve(false);
+      }
     });
 
     if (!retry) return;
