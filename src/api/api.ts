@@ -24,8 +24,9 @@ export class ApiError extends Error {
     },
   ) {
     super();
-    if (body.message) {
-      this.message = body.message
+
+    if (body?.message) {
+      this.message = body.message;
     }
   }
 }

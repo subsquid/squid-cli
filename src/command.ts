@@ -24,13 +24,13 @@ export abstract class CliCommand extends Command {
             `Authentication failure. Please obtain a new deployment key at https://app.subsquid.io and follow the instructions`,
           );
         case 400:
-          if (body.invalidFields) {
+          if (body?.invalidFields) {
             const messages = body.invalidFields.map(function (obj: any, index: number) {
               return `${index + 1}) ${chalk.bold('"' + obj.path.join('.') + '"')} — ${obj.message}`;
             });
             return this.error(`Validation error:\n${messages.join('\n')}`);
           }
-          return this.error(body?.error || body.message);
+          return this.error(body?.error || body?.message || `Validation error ${body}`);
         case 404:
           return this.error(
             `Unknown API endpoint. Check that your are using the latest version of the Squid CLI. Message: ${
