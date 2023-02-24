@@ -2,7 +2,7 @@ import { createInterface } from 'readline';
 
 import { pretty } from '../logs';
 
-import { api } from './api';
+import { api, API_DEBUG } from './api';
 import {
   DeployResponse,
   HttpResponse,
@@ -14,6 +14,12 @@ import {
   UploadUrlResponse,
   VersionResponse,
 } from './types';
+
+function debugLog(...args: any[]) {
+  if (!API_DEBUG) return;
+
+  console.log(...args);
+}
 
 export async function squidCreate(
   name: string,
@@ -112,7 +118,12 @@ export function streamLines(body: NodeJS.ReadableStream, cb: (line: string) => v
   });
 
   rl.on('line', cb);
-  rl.on('close', () => {});
+  rl.on('close', () => {
+    debugLog(`stream logs read line closed`);
+  });
+  rl.on('error', (e) => {
+    debugLog(`stream logs read line error received: ${e.message}`);
+  });
 
   return rl;
 }
@@ -133,13 +144,18 @@ export async function streamSquidLogs(
          * 524 status means timeout
          */
         if (e.status === 524) {
+          debugLog(`stream logs timeout occurred`);
           return resolve(true);
         }
+
+        debugLog(`stream logs error thrown: ${e.status} ${e.message}`);
 
         return resolve(false);
       }
 
       stream.on('error', async (e) => {
+        debugLog(`stream logs error received: ${e.message}`);
+
         resolve(true);
       });
 
@@ -157,7 +173,12 @@ export async function streamSquidLogs(
       });
     });
 
-    if (!retry) return;
+    if (!retry) {
+      debugLog(`stream logs exited`);
+      return;
+    }
+
+    debugLog(`stream logs retrying...`);
   }
 }
 

@@ -6,7 +6,7 @@ import qs from 'query-string';
 
 import { getConfig } from '../config';
 
-const debug = process.env.API_DEBUG === 'true';
+export const API_DEBUG = process.env.API_DEBUG === 'true';
 
 let version = 'unknown';
 try {
@@ -56,7 +56,7 @@ export async function api<T = any>({
     'X-CLI-Version': version,
   };
 
-  if (debug) {
+  if (API_DEBUG) {
     console.log(
       chalk.cyan`[HTTP REQUEST]`,
       chalk.dim(method?.toUpperCase()),
@@ -78,7 +78,7 @@ export async function api<T = any>({
     body = responseType === 'json' ? await response.json() : response.body;
   } catch (e) {}
 
-  if (debug) {
+  if (API_DEBUG) {
     console.log(
       chalk.cyan`[HTTP RESPONSE]`,
       url,
