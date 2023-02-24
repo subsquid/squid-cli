@@ -112,6 +112,7 @@ export function streamLines(body: NodeJS.ReadableStream, cb: (line: string) => v
   });
 
   rl.on('line', cb);
+  rl.on('close', () => {});
 
   return rl;
 }
@@ -124,46 +125,36 @@ export async function streamSquidLogs(
 ) {
   while (true) {
     const retry = await new Promise(async (resolve) => {
-      const stream = await versionLogsFollow(squidName, versionName, query).catch((e) => {
+      let stream: NodeJS.ReadableStream;
+      try {
+        stream = await versionLogsFollow(squidName, versionName, query);
+      } catch (e: any) {
         /**
          * 524 status means timeout
          */
         if (e.status === 524) {
-          resolve(true);
-          return;
+          return resolve(true);
         }
 
-        resolve(false);
+        return resolve(false);
+      }
+
+      stream.on('error', async (e) => {
+        resolve(true);
       });
 
-      if (!stream) return;
+      streamLines(stream, (line) => {
+        if (line.length === 0) return;
 
-      try {
-        streamLines(stream, (line) => {
-          if (line.length === 0) return;
-
-          try {
-            const entries: LogEntry[] = JSON.parse(line);
-
-            pretty(entries).forEach((l) => {
-              onLog(l);
-            });
-          } catch (e) {
-            resolve(false);
-          }
-        });
-
-        stream.on('error', async (e) => {
-          resolve(true);
-        });
-      } catch (e: any) {
-        if (e.code === 'ERR_STREAM_PREMATURE_CLOSE') {
-          resolve(true);
-          return;
+        try {
+          const entries: LogEntry[] = JSON.parse(line);
+          pretty(entries).forEach((l) => {
+            onLog(l);
+          });
+        } catch (e) {
+          onLog(line);
         }
-
-        resolve(false);
-      }
+      });
     });
 
     if (!retry) return;
