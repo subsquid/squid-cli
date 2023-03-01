@@ -6,7 +6,7 @@ import qs from 'query-string';
 
 import { getConfig } from '../config';
 
-export const API_DEBUG = process.env.API_DEBUG === 'true';
+const API_DEBUG = process.env.API_DEBUG === 'true';
 
 let version = 'unknown';
 try {
@@ -29,6 +29,12 @@ export class ApiError extends Error {
       this.message = body.message;
     }
   }
+}
+
+export function debugLog(...args: any[]) {
+  if (!API_DEBUG) return;
+
+  console.log(chalk.dim(new Date().toISOString()), chalk.cyan`[DEBUG]`, ...args);
 }
 
 export async function api<T = any>({
@@ -58,6 +64,7 @@ export async function api<T = any>({
 
   if (API_DEBUG) {
     console.log(
+      chalk.dim(new Date().toISOString()),
       chalk.cyan`[HTTP REQUEST]`,
       chalk.dim(method?.toUpperCase()),
       url,
@@ -71,6 +78,7 @@ export async function api<T = any>({
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
+    timeout: responseType === 'stream' ? 0 : undefined,
   });
 
   let body;
@@ -80,6 +88,7 @@ export async function api<T = any>({
 
   if (API_DEBUG) {
     console.log(
+      chalk.dim(new Date().toISOString()),
       chalk.cyan`[HTTP RESPONSE]`,
       url,
       chalk.cyan(response.status),

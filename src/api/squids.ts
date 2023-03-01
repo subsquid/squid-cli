@@ -1,8 +1,8 @@
-import { createInterface } from 'readline';
+import split2 from 'split2';
 
 import { pretty } from '../logs';
 
-import { api, API_DEBUG } from './api';
+import { api, debugLog } from './api';
 import {
   DeployResponse,
   HttpResponse,
@@ -14,12 +14,6 @@ import {
   UploadUrlResponse,
   VersionResponse,
 } from './types';
-
-function debugLog(...args: any[]) {
-  if (!API_DEBUG) return;
-
-  console.log(...args);
-}
 
 export async function squidCreate(
   name: string,
@@ -111,30 +105,15 @@ export async function versionLogsFollow(
   return body;
 }
 
-export function streamLines(body: NodeJS.ReadableStream, cb: (line: string) => void) {
-  const rl = createInterface({
-    input: body,
-    crlfDelay: Infinity,
-  });
-
-  rl.on('line', cb);
-  rl.on('close', () => {
-    debugLog(`stream logs read line closed`);
-  });
-  rl.on('error', (e) => {
-    debugLog(`stream logs read line error received: ${e.message}`);
-  });
-
-  return rl;
-}
-
 export async function streamSquidLogs(
   squidName: string,
   versionName: string,
   onLog: (log: string) => unknown,
   query: { container?: string[]; level?: string[] } = {},
-) {
+): Promise<void> {
+  let attempt = 0;
   while (true) {
+    debugLog(`streaming logs`);
     const retry = await new Promise(async (resolve) => {
       let stream: NodeJS.ReadableStream;
       try {
@@ -144,41 +123,53 @@ export async function streamSquidLogs(
          * 524 status means timeout
          */
         if (e.status === 524) {
-          debugLog(`stream logs timeout occurred`);
+          debugLog(`streaming logs timeout occurred`);
           return resolve(true);
         }
 
-        debugLog(`stream logs error thrown: ${e.status} ${e.message}`);
+        debugLog(`streaming logs error thrown: ${e.status} ${e.message}`);
 
         return resolve(false);
       }
 
-      stream.on('error', async (e) => {
-        debugLog(`stream logs error received: ${e.message}`);
+      stream
+        .pipe(split2())
+        .on('error', async (e) => {
+          debugLog(`streaming logs error received: ${e.message}`);
 
-        resolve(true);
-      });
+          resolve(true);
+        })
+        .on('data', (line) => {
+          if (line.length === 0) return;
 
-      streamLines(stream, (line) => {
-        if (line.length === 0) return;
+          try {
+            const entries: LogEntry[] = JSON.parse(line);
+            pretty(entries).forEach((l) => {
+              onLog(l);
+            });
+          } catch (e) {
+            onLog(line);
+          }
+        })
+        .on('close', async () => {
+          debugLog(`streaming logs stream closed`);
 
-        try {
-          const entries: LogEntry[] = JSON.parse(line);
-          pretty(entries).forEach((l) => {
-            onLog(l);
-          });
-        } catch (e) {
-          onLog(line);
-        }
-      });
+          resolve(true);
+        })
+        .on('end', async () => {
+          debugLog(`streaming logs stream ended`);
+
+          resolve(true);
+        });
     });
 
     if (!retry) {
-      debugLog(`stream logs exited`);
+      debugLog(`streaming logs exited`);
       return;
     }
 
-    debugLog(`stream logs retrying...`);
+    attempt++;
+    debugLog(`streaming logs retrying, ${attempt} attempt...`);
   }
 }
 

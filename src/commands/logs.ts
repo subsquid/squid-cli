@@ -1,7 +1,7 @@
 import { CliUx, Flags } from '@oclif/core';
 import ms from 'ms';
 
-import { streamSquidLogs, versionHistoryLogs } from '../api';
+import { debugLog, streamSquidLogs, versionHistoryLogs } from '../api';
 import { CliCommand } from '../command';
 import { pretty } from '../logs';
 import { parseNameAndVersion } from '../utils';
@@ -87,6 +87,7 @@ export default class Logs extends CliCommand {
         level,
       });
       await streamSquidLogs(squidName, versionName, (l) => this.log(l), { container, level });
+      debugLog(`done`);
       return;
     }
 
