@@ -110,67 +110,76 @@ export async function streamSquidLogs(
   versionName: string,
   onLog: (log: string) => unknown,
   query: { container?: string[]; level?: string[] } = {},
-): Promise<void> {
+): Promise<() => void> {
   let attempt = 0;
-  while (true) {
-    debugLog(`streaming logs`);
-    const retry = await new Promise(async (resolve) => {
-      let stream: NodeJS.ReadableStream;
-      try {
-        stream = await versionLogsFollow(squidName, versionName, query);
-      } catch (e: any) {
-        /**
-         * 524 status means timeout
-         */
-        if (e.status === 524) {
-          debugLog(`streaming logs timeout occurred`);
-          return resolve(true);
+  let cancelled = false;
+  let stream: NodeJS.ReadableStream;
+
+  process.nextTick(async () => {
+    while (!cancelled) {
+      debugLog(`streaming logs`);
+      const retry = await new Promise(async (resolve) => {
+        try {
+          stream = await versionLogsFollow(squidName, versionName, query);
+        } catch (e: any) {
+          /**
+           * 524 status means timeout
+           */
+          if (e.status === 524) {
+            debugLog(`streaming logs timeout occurred`);
+            return resolve(true);
+          }
+
+          debugLog(`streaming logs error thrown: ${e.status} ${e.message}`);
+
+          return resolve(false);
         }
 
-        debugLog(`streaming logs error thrown: ${e.status} ${e.message}`);
+        stream
+          .pipe(split2())
+          .on('error', async (e: any) => {
+            debugLog(`streaming logs error received: ${e.message}`);
 
-        return resolve(false);
+            resolve(true);
+          })
+          .on('data', (line: string) => {
+            if (line.length === 0) return;
+
+            try {
+              const entries: LogEntry[] = JSON.parse(line);
+              pretty(entries).forEach((l) => {
+                onLog(l);
+              });
+            } catch (e) {
+              onLog(line);
+            }
+          })
+          .on('close', async () => {
+            debugLog(`streaming logs stream closed`);
+
+            resolve(true);
+          })
+          .on('end', async () => {
+            debugLog(`streaming logs stream ended`);
+
+            resolve(true);
+          });
+      });
+
+      if (!retry) {
+        debugLog(`streaming logs exited`);
+        return;
       }
 
-      stream
-        .pipe(split2())
-        .on('error', async (e) => {
-          debugLog(`streaming logs error received: ${e.message}`);
-
-          resolve(true);
-        })
-        .on('data', (line) => {
-          if (line.length === 0) return;
-
-          try {
-            const entries: LogEntry[] = JSON.parse(line);
-            pretty(entries).forEach((l) => {
-              onLog(l);
-            });
-          } catch (e) {
-            onLog(line);
-          }
-        })
-        .on('close', async () => {
-          debugLog(`streaming logs stream closed`);
-
-          resolve(true);
-        })
-        .on('end', async () => {
-          debugLog(`streaming logs stream ended`);
-
-          resolve(true);
-        });
-    });
-
-    if (!retry) {
-      debugLog(`streaming logs exited`);
-      return;
+      attempt++;
+      debugLog(`streaming logs retrying, ${attempt} attempt...`);
     }
+  });
 
-    attempt++;
-    debugLog(`streaming logs retrying, ${attempt} attempt...`);
-  }
+  return () => {
+    cancelled = true;
+    stream.emit('end');
+  };
 }
 
 export async function releaseSquid(

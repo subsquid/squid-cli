@@ -1,0 +1,13 @@
+import { Widgets } from 'blessed';
+
+declare module 'reblessed' {
+  export * from 'blessed'
+
+  export class Element extends Widgets.BoxElement {}
+  export class TextElement extends Widgets.TextElement {}
+  export class ListTable extends Widgets.ListTableElement {}
+  export class List extends Widgets.ListElement  {}
+  export class BigText extends Widgets.BoxElement {}
+
+  export function image(options?: Widgets.BoxOptions): Widgets.BoxElement;
+};
