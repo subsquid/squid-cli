@@ -4,10 +4,20 @@ import { mainColor } from '../theme';
 
 import { SquidVersion } from './types';
 
+interface VersionTabConstructor {
+  new (): VersionTab;
+}
+
+export type Cancellable = void | (() => void) | undefined;
+
+export interface VersionTab {
+  append(holder: Element, squid: SquidVersion): Promise<Cancellable>;
+}
+
 export type Tab = {
   name: string;
   keys: string[];
-  render: (holder: Element, squid: SquidVersion) => void;
+  renderer: VersionTabConstructor;
 };
 
 export class Tabs extends Element {
@@ -15,6 +25,7 @@ export class Tabs extends Element {
   squid: SquidVersion | undefined;
   selectedTab = 0;
   wrapper: Element | undefined;
+  cancel: Cancellable | undefined;
 
   constructor(tabs: Tab[], options: Widgets.BoxOptions = {}) {
     super(options);
@@ -24,9 +35,15 @@ export class Tabs extends Element {
         ...res,
         [tab.name]: {
           keys: tab.keys,
-          callback: () => {
+          callback: async () => {
+            // if (this.selectedTab === currentIndex) return;
+            if (!this.squid) return;
             if (this.squid?.isHibernated()) {
               return;
+            }
+
+            if (typeof this.cancel === 'function') {
+              this.cancel();
             }
 
             this.selectedTab = currentIndex;
@@ -36,10 +53,13 @@ export class Tabs extends Element {
               left: '15',
             });
 
-            if (!this.squid) return;
-
-            tab.render(this.wrapper, this.squid);
             this.append(this.wrapper);
+
+            const renderer = new tab.renderer();
+
+            try {
+              this.cancel = await renderer.append(this.wrapper, this.squid);
+            } catch (e) {}
           },
         },
       };
@@ -73,6 +93,8 @@ export class Tabs extends Element {
   }
 
   setVersion(squid: SquidVersion) {
+    // if (squid === this.squid) return;
+    this.screen.debug('set version');
     this.squid = squid;
 
     if (squid.isHibernated()) {

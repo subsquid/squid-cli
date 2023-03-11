@@ -44,6 +44,7 @@ export async function api<T = any>({
   query,
   auth,
   responseType = 'json',
+  abortController,
 }: {
   method: 'get' | 'post' | 'put' | 'delete' | 'patch';
   path: string;
@@ -51,6 +52,7 @@ export async function api<T = any>({
   data?: unknown;
   auth?: { apiUrl: string; credentials: string };
   responseType?: 'json' | 'stream';
+  abortController?: AbortController;
 }): Promise<{ body: T }> {
   const config = auth || getConfig();
 
@@ -79,6 +81,7 @@ export async function api<T = any>({
     headers,
     body: data ? JSON.stringify(data) : undefined,
     timeout: responseType === 'stream' ? 0 : undefined,
+    signal: abortController ? (abortController.signal as any) : undefined,
   });
 
   let body;

@@ -15,7 +15,7 @@ export default class Explorer extends Command {
       smartCSR: true,
       fastCSR: true,
       // dockBorders: true,
-      debug: false,
+      debug: true,
       // autoPadding: true,
       fullUnicode: true,
     });
@@ -41,12 +41,6 @@ export default class Explorer extends Command {
     await loader.destroyWithTimeout();
 
     manager.show();
-
-    screen.on('resize', () => {
-      screen.debug(`resize ${screen.width}`);
-
-      // manager.recalculateTable();
-    });
 
     screen.key(['C-c'], () => {
       return process.exit(0);

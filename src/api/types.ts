@@ -20,6 +20,7 @@ export type DeployResponse = {
   deploymentUrl?: string;
   failed: 'NO' | 'UNEXPECTED' | 'PERMISSIONS' | 'REQUIREMENTS';
   logs: { severity: 'debug' | 'warn' | 'info' | 'error'; message: string }[];
+  createdAt: string;
 };
 
 export type UploadUrlResponse = {
@@ -33,6 +34,7 @@ export type DeploymentStatus = 'CREATED' | 'DEPLOYING' | 'DEPLOY_ERROR' | 'DEPLO
 export type SecretsStatus = 'UP_TO_DATE' | 'NONE' | 'OUTDATED';
 
 export type VersionResponse = {
+  id: number;
   name: string;
   artifactUrl: string;
   deploymentUrl: string;

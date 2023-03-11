@@ -7,6 +7,7 @@ declare module 'reblessed' {
   export class TextElement extends Widgets.TextElement {}
   export class ListTable extends Widgets.ListTableElement {}
   export class List extends Widgets.ListElement  {}
+  export class Log extends Widgets.Log  {}
   export class BigText extends Widgets.BoxElement {}
 
   export function image(options?: Widgets.BoxOptions): Widgets.BoxElement;

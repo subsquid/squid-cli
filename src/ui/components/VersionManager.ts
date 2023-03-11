@@ -69,8 +69,6 @@ export class VersionManager extends List {
   }
 
   async updateCurrentSquidByIndex(index: number) {
-    // this.screen.debug(`cur index ${index}`);
-
     const squid = this.squids[index];
     if (!squid) return;
 

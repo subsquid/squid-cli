@@ -76,6 +76,7 @@ function versionStatus(status: VersionResponse['deploy']['status']) {
 export class SquidList extends List {
   rows: List;
   text: TextElement;
+  squids: SquidVersion[] = [];
 
   constructor(options: Widgets.BoxOptions) {
     super(
@@ -127,6 +128,13 @@ export class SquidList extends List {
 
     this.append(this.rows);
     this.append(this.text);
+
+    this.screen.on('resize', () => {
+      this.screen.debug(`resize ${this.screen.width}`);
+
+      this.recalculateTable(this.squids);
+      this.screen.render();
+    });
   }
 
   calculateRows(headers: string[], data: string[][], maxWidth = Infinity) {
@@ -156,7 +164,7 @@ export class SquidList extends List {
     };
   }
 
-  async recalculateTable(squids: SquidVersion[]) {
+  recalculateTable(squids: SquidVersion[]) {
     this.screen.debug('recalculate table');
 
     const data: string[][] = squids.map((s) => {
@@ -183,6 +191,8 @@ export class SquidList extends List {
     this.setLabel(`Squids (${squids.length})`);
     this.text.setContent(header);
     this.rows.setItems(rows.map((r, i) => this.colorize(r, squids[i])));
+
+    this.squids = squids;
   }
 
   colorize(data: string, squid: SquidVersion) {

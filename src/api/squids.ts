@@ -76,6 +76,7 @@ export async function versionHistoryLogs(
     container?: string[];
     level?: string[];
   },
+  { abortController }: { abortController?: AbortController } = {},
 ): Promise<LogsResponse> {
   const { body } = await api<LogsResponse>({
     method: 'get',
@@ -85,6 +86,7 @@ export async function versionHistoryLogs(
       from: query.from.toISOString(),
       level: query.level?.map((l) => l.toUpperCase()),
     },
+    abortController,
   });
 
   return body || { logs: [], nextPage: null };
@@ -94,12 +96,14 @@ export async function versionLogsFollow(
   squidName: string,
   versionName: string,
   query: { container?: string[]; level?: string[] },
+  abortController?: AbortController,
 ) {
   const { body } = await api<NodeJS.ReadableStream>({
     method: 'get',
     path: `/client/squid/${squidName}/versions/${versionName}/logs/follow`,
     query,
     responseType: 'stream',
+    abortController: abortController,
   });
 
   return body;
@@ -110,76 +114,69 @@ export async function streamSquidLogs(
   versionName: string,
   onLog: (log: string) => unknown,
   query: { container?: string[]; level?: string[] } = {},
-): Promise<() => void> {
+  { abortController }: { abortController?: AbortController } = {},
+) {
   let attempt = 0;
-  let cancelled = false;
   let stream: NodeJS.ReadableStream;
 
-  process.nextTick(async () => {
-    while (!cancelled) {
-      debugLog(`streaming logs`);
-      const retry = await new Promise(async (resolve) => {
-        try {
-          stream = await versionLogsFollow(squidName, versionName, query);
-        } catch (e: any) {
-          /**
-           * 524 status means timeout
-           */
-          if (e.status === 524) {
-            debugLog(`streaming logs timeout occurred`);
-            return resolve(true);
-          }
-
-          debugLog(`streaming logs error thrown: ${e.status} ${e.message}`);
-
-          return resolve(false);
+  while (true) {
+    debugLog(`streaming logs`);
+    const retry = await new Promise(async (resolve) => {
+      try {
+        stream = await versionLogsFollow(squidName, versionName, query, abortController);
+      } catch (e: any) {
+        /**
+         * 524 status means timeout
+         */
+        if (e.status === 524) {
+          debugLog(`streaming logs timeout occurred`);
+          return resolve(true);
         }
 
-        stream
-          .pipe(split2())
-          .on('error', async (e: any) => {
-            debugLog(`streaming logs error received: ${e.message}`);
+        debugLog(`streaming logs error thrown: ${e.status} ${e.message}`);
 
-            resolve(true);
-          })
-          .on('data', (line: string) => {
-            if (line.length === 0) return;
-
-            try {
-              const entries: LogEntry[] = JSON.parse(line);
-              pretty(entries).forEach((l) => {
-                onLog(l);
-              });
-            } catch (e) {
-              onLog(line);
-            }
-          })
-          .on('close', async () => {
-            debugLog(`streaming logs stream closed`);
-
-            resolve(true);
-          })
-          .on('end', async () => {
-            debugLog(`streaming logs stream ended`);
-
-            resolve(true);
-          });
-      });
-
-      if (!retry) {
-        debugLog(`streaming logs exited`);
-        return;
+        return resolve(false);
       }
 
-      attempt++;
-      debugLog(`streaming logs retrying, ${attempt} attempt...`);
-    }
-  });
+      stream
+        .pipe(split2())
+        .on('error', async (e: any) => {
+          debugLog(`streaming logs error received: ${e.message}`);
 
-  return () => {
-    cancelled = true;
-    stream.emit('end');
-  };
+          resolve(true);
+        })
+        .on('data', (line: string) => {
+          if (line.length === 0) return;
+
+          try {
+            const entries: LogEntry[] = JSON.parse(line);
+            pretty(entries).forEach((l) => {
+              onLog(l);
+            });
+          } catch (e) {
+            onLog(line);
+          }
+        })
+        .on('close', async () => {
+          debugLog(`streaming logs stream closed`);
+
+          resolve(true);
+        })
+        .on('end', async () => {
+          debugLog(`streaming logs stream ended`);
+
+          resolve(true);
+        });
+    });
+
+    if (!retry) {
+      debugLog(`streaming logs exited`);
+      return;
+    }
+
+    attempt++;
+    debugLog(`streaming logs retrying, ${attempt} attempt...`);
+  }
 }
 
 export async function releaseSquid(
@@ -246,12 +243,13 @@ export async function redeploySquid(
   squidName: string,
   versionName: string,
   envs?: Record<string, string>,
-): Promise<SquidResponse> {
-  const { body } = await api<HttpResponse<SquidResponse>>({
+): Promise<DeployResponse> {
+  const { body } = await api<HttpResponse<DeployResponse>>({
     method: 'put',
-    path: `/client/squid/${squidName}/version/${versionName}/redeploy`,
+    path: `/squids/${squidName}/version/${versionName}/redeploy`,
     data: { envs },
   });
+
   return body.payload;
 }
 

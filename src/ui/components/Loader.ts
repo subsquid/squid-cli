@@ -12,7 +12,7 @@ export class Loader extends blessed.Element {
   renderedAt = Date.now();
   interval;
 
-  constructor(options: Widgets.BoxOptions) {
+  constructor(options: Widgets.BoxOptions = {}) {
     options = defaultsDeep(options, {
       top: '50%',
       left: '50%',
