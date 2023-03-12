@@ -63,3 +63,24 @@ jobs:
         run: npm publish --tag ${{ github.event.inputs.tag }} --access public
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Build packages
+        run: |
+          yarn pkg:build
+          yarn pkg:compress
+
+      - name: Get version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@main
+      
+      - name: Tag release
+        uses: tvdias/github-tagger@v0.0.1
+        with:
+          repo-token: ${{ github.token }}
+          tag: v${{ steps.package-version.outputs.current-version}}
+
+      - name: Create release page
+        uses: softprops/action-gh-release@v1
+        with:
+          files: 'package/*'
+          tag_name: v${{ steps.package-version.outputs.current-version}}
