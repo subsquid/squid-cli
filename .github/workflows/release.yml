@@ -1,14 +1,16 @@
 name: Release
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        type: choice
-        description: Tag
-        required: true
-        options:
-          - beta
-          - latest
+  # workflow_dispatch:
+  #   inputs:
+  #     tag:
+  #       type: choice
+  #       description: Tag
+  #       required: true
+  #       options:
+  #         - beta
+  #         - latest
+  pull_request:
+    
 
 #  pull_request:
 #    branches:
@@ -24,20 +26,20 @@ jobs:
     name: Build & publish
     runs-on: ubuntu-latest
     steps:
-      - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.5.0
-        with:
-          access_token: ${{ github.token }}
+      # - name: Cancel previous runs
+      #   uses: styfle/cancel-workflow-action@0.5.0
+      #   with:
+      #     access_token: ${{ github.token }}
 
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Write npm credentials
-        run: |
-          echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
-          npm whoami
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      # - name: Write npm credentials
+      #   run: |
+      #     echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
+      #     npm whoami
+      #   env:
+      #     NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -59,10 +61,10 @@ jobs:
       - name: Build
         run: yarn build
 
-      - name: Release
-        run: npm publish --tag ${{ github.event.inputs.tag }} --access public
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      # - name: Release
+      #   run: npm publish --tag ${{ github.event.inputs.tag }} --access public
+      #   env:
+      #     NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: Build packages
         run: |
@@ -73,14 +75,40 @@ jobs:
         id: package-version
         uses: martinbeentjes/npm-get-version-action@main
       
-      - name: Tag release
-        uses: tvdias/github-tagger@v0.0.1
-        with:
-          repo-token: ${{ github.token }}
-          tag: v${{ steps.package-version.outputs.current-version}}
+      # - name: Tag release
+      #   uses: tvdias/github-tagger@v0.0.1
+      #   with:
+      #     repo-token: ${{ github.token }}
+      #     tag: v${{ steps.package-version.outputs.current-version }}
 
-      - name: Create release page
-        uses: softprops/action-gh-release@v1
+      # - name: Create release page
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     files: 'package/*'
+      #     tag_name: v${{ steps.package-version.outputs.current-version }}
+
+      - name: Checkout homebrew
+        uses: actions/checkout@v3
         with:
-          files: 'package/*'
-          tag_name: v${{ steps.package-version.outputs.current-version}}
+          repository: subsquid/homebrew-cli
+          path: homebrew-cli
+
+      - name: Gen Formula
+        run: |
+          export pkg_macos_shasum=$(shasum -a256 ./package/subsquid-cli-$npm_package_version-macos-x64.tar.gz | cut -f 1 -d " ")
+          export pkg_linux_shasum=$(shasum -a256 ./package/subsquid-cli-$npm_package_version-linux-x64.tar.gz | cut -f 1 -d " ")
+          source ./homebrew-cli/gen-formula.sh
+          mv sqd.rb ./homebrew-cli/Formula/sqd.rb
+        env:
+          npm_package_version: ${{ steps.package-version.outputs.current-version }}
+      
+      - name: Push Formula
+        run: |
+          cd ./homebrew-cli
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "release: v$npm_package_version"
+          git log
+        env:
+          npm_package_version: ${{ steps.package-version.outputs.current-version }}
