@@ -97,9 +97,12 @@ jobs:
           export pkg_macos_shasum=$(shasum -a256 ./package/subsquid-cli-$npm_package_version-macos-x64.tar.gz | cut -f 1 -d " ")
           export pkg_linux_shasum=$(shasum -a256 ./package/subsquid-cli-$npm_package_version-linux-x64.tar.gz | cut -f 1 -d " ")
           source ./homebrew-cli/gen-formula.sh
-          mv sqd.rb ./homebrew-cli/Formula/sqd.rb
+          cp sqd.rb ./homebrew-cli/Formula/sqd@$npm_package_version.rb
+          cp sqd.rb ./homebrew-cli/Formula/sqd@$version_tag.rb
+          [ "$version_tag" = "latest" ] && cp sqd.rb ./homebrew-cli/Formula/sqd.rb
         env:
           npm_package_version: ${{ steps.package-version.outputs.current-version }}
+          version_tag: ${{ github.event.inputs.tag }}
       
       - name: Push Formula
         run: |
