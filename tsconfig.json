@@ -14,10 +14,10 @@
     "emitDecoratorMetadata": true,
     "skipLibCheck": true
   },
-  "include": ["src"],
+  "include": ["types","src"],
   "exclude": [
     "node_modules",
     "resource",
-    "bin",
-  ]
+    "bin"
+  ],
 }
