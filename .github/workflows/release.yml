@@ -1,15 +1,14 @@
 name: Release
 on:
-  # workflow_dispatch:
-  #   inputs:
-  #     tag:
-  #       type: choice
-  #       description: Tag
-  #       required: true
-  #       options:
-  #         - beta
-  #         - latest
-  pull_request:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: choice
+        description: Tag
+        required: true
+        options:
+          - beta
+          - latest
     
 
 #  pull_request:
@@ -26,20 +25,20 @@ jobs:
     name: Build & publish
     runs-on: ubuntu-latest
     steps:
-      # - name: Cancel previous runs
-      #   uses: styfle/cancel-workflow-action@0.5.0
-      #   with:
-      #     access_token: ${{ github.token }}
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{ github.token }}
 
       - name: Checkout
         uses: actions/checkout@v3
 
-      # - name: Write npm credentials
-      #   run: |
-      #     echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
-      #     npm whoami
-      #   env:
-      #     NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: Write npm credentials
+        run: |
+          echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
+          npm whoami
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -61,10 +60,10 @@ jobs:
       - name: Build
         run: yarn build
 
-      # - name: Release
-      #   run: npm publish --tag ${{ github.event.inputs.tag }} --access public
-      #   env:
-      #     NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: Release
+        run: npm publish --tag ${{ github.event.inputs.tag }} --access public
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
       - name: Build packages
         run: |
@@ -75,19 +74,19 @@ jobs:
         id: package-version
         uses: martinbeentjes/npm-get-version-action@main
       
-      # - name: Tag release
-      #   uses: tvdias/github-tagger@v0.0.1
-      #   with:
-      #     repo-token: ${{ github.token }}
-      #     tag: v${{ steps.package-version.outputs.current-version }}
+      - name: Tag release
+        uses: tvdias/github-tagger@v0.0.1
+        with:
+          repo-token: ${{ github.token }}
+          tag: v${{ steps.package-version.outputs.current-version }}
 
-      # - name: Create release page
-      #   uses: softprops/action-gh-release@v1
-      #   with:
-      #     files: 'package/*'
-      #     tag_name: v${{ steps.package-version.outputs.current-version }}
+      - name: Create release page
+        uses: softprops/action-gh-release@v1
+        with:
+          files: 'package/*'
+          tag_name: v${{ steps.package-version.outputs.current-version }}
 
-      - name: Checkout homebrew
+      - name: Checkout subsquid/homebrew-cli
         uses: actions/checkout@v3
         with:
           repository: subsquid/homebrew-cli
@@ -109,6 +108,6 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git commit -m "release: v$npm_package_version"
-          git log
+          git push
         env:
           npm_package_version: ${{ steps.package-version.outputs.current-version }}
