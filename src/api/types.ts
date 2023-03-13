@@ -20,6 +20,7 @@ export type DeployResponse = {
   deploymentUrl?: string;
   failed: 'NO' | 'UNEXPECTED' | 'PERMISSIONS' | 'REQUIREMENTS';
   logs: { severity: 'debug' | 'warn' | 'info' | 'error'; message: string }[];
+  createdAt: string;
 };
 
 export type UploadUrlResponse = {
@@ -33,24 +34,42 @@ export type DeploymentStatus = 'CREATED' | 'DEPLOYING' | 'DEPLOY_ERROR' | 'DEPLO
 export type SecretsStatus = 'UP_TO_DATE' | 'NONE' | 'OUTDATED';
 
 export type VersionResponse = {
+  id: number;
   name: string;
   artifactUrl: string;
   deploymentUrl: string;
   description: string;
   status: DeploymentStatus;
   secretStatus: SecretsStatus;
+  deploy: {
+    status: 'HIBERNATED' | 'DEPLOYED' | 'DEPLOYING';
+  };
   api: {
-    status: string;
+    status: 'NOT_AVAILABLE' | 'AVAILABLE';
   };
   processor: {
-    status: string;
+    status: 'SYNCING' | 'UNKNOWN' | 'STARTING' | 'SYNCED';
     syncState: {
       currentBlock: number;
       totalBlocks: number;
     };
   };
-  alias: string;
-  createdAt: number;
+  db: {
+    disk: {
+      totalBytes: number;
+      usedBytes: number;
+      usageStatus: 'LOW' | 'NORMAL' | 'WARNING' | 'CRITICAL' | 'UNKNOWN';
+    };
+    ingress: {
+      url: number;
+      db: string;
+      user: string;
+      password: string;
+    };
+  };
+  aliases: { name: string }[];
+  deployedAt: Date;
+  createdAt: Date;
 };
 
 export type SquidResponse = {

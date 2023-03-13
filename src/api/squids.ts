@@ -76,6 +76,7 @@ export async function versionHistoryLogs(
     container?: string[];
     level?: string[];
   },
+  { abortController }: { abortController?: AbortController } = {},
 ): Promise<LogsResponse> {
   const { body } = await api<LogsResponse>({
     method: 'get',
@@ -85,6 +86,7 @@ export async function versionHistoryLogs(
       from: query.from.toISOString(),
       level: query.level?.map((l) => l.toUpperCase()),
     },
+    abortController,
   });
 
   return body || { logs: [], nextPage: null };
@@ -94,12 +96,14 @@ export async function versionLogsFollow(
   squidName: string,
   versionName: string,
   query: { container?: string[]; level?: string[] },
+  abortController?: AbortController,
 ) {
   const { body } = await api<NodeJS.ReadableStream>({
     method: 'get',
     path: `/client/squid/${squidName}/versions/${versionName}/logs/follow`,
     query,
     responseType: 'stream',
+    abortController: abortController,
   });
 
   return body;
@@ -110,14 +114,16 @@ export async function streamSquidLogs(
   versionName: string,
   onLog: (log: string) => unknown,
   query: { container?: string[]; level?: string[] } = {},
-): Promise<void> {
+  { abortController }: { abortController?: AbortController } = {},
+) {
   let attempt = 0;
+  let stream: NodeJS.ReadableStream;
+
   while (true) {
     debugLog(`streaming logs`);
     const retry = await new Promise(async (resolve) => {
-      let stream: NodeJS.ReadableStream;
       try {
-        stream = await versionLogsFollow(squidName, versionName, query);
+        stream = await versionLogsFollow(squidName, versionName, query, abortController);
       } catch (e: any) {
         /**
          * 524 status means timeout
@@ -134,12 +140,12 @@ export async function streamSquidLogs(
 
       stream
         .pipe(split2())
-        .on('error', async (e) => {
+        .on('error', async (e: any) => {
           debugLog(`streaming logs error received: ${e.message}`);
 
           resolve(true);
         })
-        .on('data', (line) => {
+        .on('data', (line: string) => {
           if (line.length === 0) return;
 
           try {
@@ -237,12 +243,13 @@ export async function redeploySquid(
   squidName: string,
   versionName: string,
   envs?: Record<string, string>,
-): Promise<SquidResponse> {
-  const { body } = await api<HttpResponse<SquidResponse>>({
+): Promise<DeployResponse> {
+  const { body } = await api<HttpResponse<DeployResponse>>({
     method: 'put',
-    path: `/client/squid/${squidName}/version/${versionName}/redeploy`,
+    path: `/squids/${squidName}/version/${versionName}/redeploy`,
     data: { envs },
   });
+
   return body.payload;
 }
 
