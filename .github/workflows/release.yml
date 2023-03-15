@@ -90,31 +90,29 @@ jobs:
         with:
           repository: subsquid/homebrew-cli
           path: homebrew-cli
+          token: ${{ secrets.HOMEBREW_GITHUB_TOKEN }}
 
-      - name: Set Envs
+      - name: Gen Formula
         run: |
-          echo 'pkg_macos_shasum=$(shasum -a256 ./package/subsquid-cli-$npm_package_version-macos-x64.tar.gz | cut -f 1 -d " ")' >> $GITHUB_ENV
-          echo 'pkg_linux_shasum=$(shasum -a256 ./package/subsquid-cli-$npm_package_version-linux-x64.tar.gz | cut -f 1 -d " ")' >> $GITHUB_ENV
-        env:
-          npm_package_version: ${{ steps.package-version.outputs.current-version }}
-
-      - name: Gen Forumula
-        run: |
+          echo pkg_macos_shasum=$(shasum -a256 ./package/subsquid-cli-$npm_package_version-macos-x64.tar.gz | cut -f 1 -d " ") >> $GITHUB_ENV
+          echo pkg_linux_shasum=$(shasum -a256 ./package/subsquid-cli-$npm_package_version-linux-x64.tar.gz | cut -f 1 -d " ") >> $GITHUB_ENV
           source ./homebrew-cli/gen-formula.sh
           cp sqd@$npm_package_version.rb ./homebrew-cli/Formula
           cp sqd@$version_tag.rb ./homebrew-cli/Formula
-          [ "$version_tag" = "latest" ] && cp sqd.rb ./homebrew-cli/Formula
+          if [ "$version_tag" = "latest" ]; then cp sqd.rb ./homebrew-cli/Formula; fi
         env:
           npm_package_version: ${{ steps.package-version.outputs.current-version }}
           version_tag: ${{ github.event.inputs.tag }}
-      
-      - name: Push Formula
-        run: |
-          cd ./homebrew-cli
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add .
-          git commit -m "release: v$npm_package_version"
-          git push
+
+      - name: Pushes to another repository
+        uses: cpina/github-action-push-to-another-repository@main
         env:
-          npm_package_version: ${{ steps.package-version.outputs.current-version }}
+          API_TOKEN_GITHUB: ${{ secrets.HOMEBREW_GITHUB_TOKEN }}
+        with:
+          source-directory: 'homebrew-cli'
+          destination-github-username: 'subsquid'
+          destination-repository-name: 'homebrew-cli'
+          user-name: 'github-actions'
+          user-email: 'github-actions@github.com'
+          target-branch: master
+          commit-message: 'release: v${{ steps.package-version.outputs.current-version }}'
