@@ -102,12 +102,18 @@ jobs:
       - name: Gen Formula
         run: |
           source ./homebrew-cli/gen-formula.sh
+        env:
+          npm_package_version: ${{ steps.package-version.outputs.current-version }}
+          version_tag: ${{ github.event.inputs.tag || "beta" }}
+
+      - name: Move Formulas
+        run: |
           cp sqd@$npm_package_version.rb ./homebrew-cli/Formula
           cp sqd@$version_tag.rb ./homebrew-cli/Formula
           [ "$version_tag" = "latest" ] && cp sqd.rb ./homebrew-cli/Formula
         env:
           npm_package_version: ${{ steps.package-version.outputs.current-version }}
-          version_tag: ${{ github.event.inputs.tag }}
+          version_tag: ${{ github.event.inputs.tag || "beta" }}
       
       - name: Push Formula
         run: |
