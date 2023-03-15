@@ -6,7 +6,7 @@ import { VersionManager } from '../ui/components/VersionManager';
 
 export default class Explorer extends Command {
   static description = '';
-  static hidden = true;
+  // static hidden = true;
 
   async run(): Promise<void> {
     await this.parse(Explorer);
