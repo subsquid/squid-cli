@@ -30,7 +30,7 @@ export class VersionDbAccessTab implements VersionTab {
     lines.push(chalkMainColor(`PSQL command`));
     lines.push(
       chalk.bgBlackBright(
-        `PGPASSWORD=${squid.version.db.ingress.password} pqsl -h ${squid.version.db.ingress.url} -d ${squid.version.db.ingress.db} -U ${squid.version.db.ingress.user}`,
+        `PGPASSWORD=${squid.version.db.ingress.password} psql -h ${squid.version.db.ingress.url} -d ${squid.version.db.ingress.db} -U ${squid.version.db.ingress.user}`,
       ),
     );
     lines.push('');
