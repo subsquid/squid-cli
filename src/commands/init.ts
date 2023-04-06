@@ -25,6 +25,10 @@ const TEMPLATE_ALIASES: Record<string, { url: string; description: string }> = {
     url: 'https://github.com/subsquid/squid-abi-template',
     description: `A template to auto-generate a squid indexing events and txs from a contract ABI`
   },
+  'ink-abi': {
+    url: 'https://github.com/subsquid-labs/squid-ink-abi-template',
+    description: `A template to auto-generate a squid from an ink! contract ABI`
+  },
   gravatar: {
     url: 'https://github.com/subsquid/gravatar-squid',
     description: 'A sample EVM squid indexing the Gravatar smart contract on Ethereum.',
