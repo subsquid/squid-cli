@@ -72,6 +72,7 @@ export class Tabs extends Element {
 
       autoCommandKeys: false,
       keys: true,
+      mouse: true,
 
       style: {
         item: {

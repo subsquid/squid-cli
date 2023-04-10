@@ -3,7 +3,7 @@ import blessed, { Element, List, Log } from 'reblessed';
 
 import { streamSquidLogs, versionHistoryLogs } from '../../api';
 import { pretty } from '../../logs';
-import { mainColor } from '../theme';
+import { mainColor, scrollBarTheme } from '../theme';
 
 import { Loader } from './Loader';
 import { VersionTab } from './Tabs';
@@ -17,7 +17,7 @@ export class VersionLogTab implements VersionTab {
       width: '100%',
       height: '100%',
       scrollable: true,
-      scrollbar: true,
+      scrollbar: scrollBarTheme,
       alwaysScroll: true,
       mouse: true,
       style: {
