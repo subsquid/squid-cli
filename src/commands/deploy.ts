@@ -8,19 +8,9 @@ import inquirer from 'inquirer';
 import yaml from 'js-yaml';
 import targz from 'targz';
 
-import {
-  DeployResponse,
-  deploySquid,
-  DeployStatus,
-  getDeploy,
-  isVersionExists,
-  streamSquidLogs,
-  uploadFile,
-} from '../api';
-import { CliCommand } from '../command';
+import { deploySquid, isVersionExists, uploadFile } from '../api';
 import { DeployCommand } from '../deploy-command';
 import { Manifest } from '../manifest';
-import { doUntil } from '../utils';
 
 const compressAsync = promisify(targz.compress);
 

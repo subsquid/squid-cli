@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import bytes from 'pretty-bytes';
 import blessed, { Element } from 'reblessed';
 
-import { chalkMainColor } from '../theme';
+import { chalkMainColor, scrollBarTheme } from '../theme';
 
 import { VersionTab } from './Tabs';
 import { SquidVersion } from './types';
@@ -45,6 +45,9 @@ export class VersionSummaryTab implements VersionTab {
     parent.append(
       blessed.box({
         content: lines.join('\n'),
+        scrollable: true,
+        mouse: true,
+        scrollbar: scrollBarTheme,
       }),
     );
   }
