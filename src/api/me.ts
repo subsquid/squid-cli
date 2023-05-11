@@ -7,7 +7,7 @@ export async function me(auth?: { apiUrl: string; credentials: string }): Promis
     path: `/client/me`,
   });
 
-  if (!body || !body.username) {
+  if (!body) {
     throw new ApiError(401, { error: 'username is missing' });
   }
 

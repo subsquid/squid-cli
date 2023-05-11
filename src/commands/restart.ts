@@ -4,10 +4,10 @@ import { redeploySquid } from '../api';
 import { DeployCommand } from '../deploy-command';
 import { parseEnvs, parseNameAndVersion } from '../utils';
 
-export default class Redeploy extends DeployCommand {
-  static aliases = ['squid:redeploy'];
+export default class Restart extends DeployCommand {
+  static aliases = ['squid:redeploy', 'redeploy'];
 
-  static description = 'Restart a squid version';
+  static description = 'Restart a squid';
   static args = [
     {
       name: 'nameAndVersion',
@@ -39,7 +39,7 @@ export default class Redeploy extends DeployCommand {
     const {
       flags,
       args: { nameAndVersion, 'no-stream-logs': disableStreamLogs },
-    } = await this.parse(Redeploy);
+    } = await this.parse(Restart);
     const { squidName, versionName } = parseNameAndVersion(nameAndVersion, this);
 
     const envs = parseEnvs(flags.env, flags.envFile);
