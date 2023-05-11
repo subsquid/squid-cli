@@ -26,13 +26,13 @@ export default class Auth extends CliCommand {
       flags: { key, host },
     } = await this.parse(Auth);
 
-    const { username } = await me({
+    const { username, email } = await me({
       apiUrl: host,
       credentials: key,
     });
 
     setConfig(key, host);
 
-    this.log(`Successfully logged as ${username}`);
+    this.log(`Successfully logged as ${email || username}`);
   }
 }
