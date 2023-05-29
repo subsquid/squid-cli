@@ -1,16 +1,29 @@
-import { Command } from '@oclif/core';
+import { Command, Flags } from '@oclif/core';
 import blessed from 'reblessed';
 
 import { Loader } from '../ui/components/Loader';
 import { VersionManager } from '../ui/components/VersionManager';
 
+import { chooseProjectIfRequired } from './projects';
+
 export default class Explorer extends Command {
   static description = 'Squid explorer';
   // static hidden = true;
+  static flags = {
+    project: Flags.string({
+      char: 'p',
+      description: 'Project',
+      required: false,
+      hidden: false,
+    }),
+  };
 
   async run(): Promise<void> {
-    await this.parse(Explorer);
+    const {
+      flags: { project },
+    } = await this.parse(Explorer);
 
+    const projectCode = await chooseProjectIfRequired(project);
     const screen = blessed.screen({
       smartCSR: true,
       fastCSR: true,
@@ -20,7 +33,7 @@ export default class Explorer extends Command {
       fullUnicode: true,
     });
 
-    const manager = new VersionManager({
+    const manager = new VersionManager(projectCode, {
       top: '0',
       left: '0',
       width: '100%',

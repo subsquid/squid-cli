@@ -1,5 +1,10 @@
+import { Flags } from '@oclif/core';
+
 import { setSecret } from '../../api';
 import { CliCommand } from '../../command';
+import { chooseProjectIfRequired } from '../projects';
+
+// TODO move to new API using put method
 
 export default class Set extends CliCommand {
   static description = [
@@ -20,14 +25,24 @@ export default class Set extends CliCommand {
       required: true,
     },
   ];
-  static flags = {};
+  static flags = {
+    project: Flags.string({
+      char: 'p',
+      description: 'Project',
+      required: false,
+      hidden: false,
+    }),
+  };
 
   async run(): Promise<void> {
     const {
-      flags: {},
+      flags: { project },
       args: { name, value },
     } = await this.parse(Set);
-    await setSecret({ [name]: value });
+
+    const projectCode = await chooseProjectIfRequired(project);
+    await setSecret({ name, value, projectCode });
+
     this.log(`Secret '${name}' set`);
   }
 }

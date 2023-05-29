@@ -8,9 +8,11 @@ import inquirer from 'inquirer';
 import yaml from 'js-yaml';
 import targz from 'targz';
 
-import { deploySquid, isVersionExists, uploadFile } from '../api';
+import { deploySquid, fetchVersion, uploadFile } from '../api';
 import { DeployCommand } from '../deploy-command';
 import { Manifest } from '../manifest';
+
+import { chooseProjectIfRequired } from './projects';
 
 const compressAsync = promisify(targz.compress);
 
@@ -98,16 +100,23 @@ export default class Deploy extends DeployCommand {
       required: false,
       default: false,
     }),
+    project: Flags.string({
+      char: 'p',
+      description: 'Project',
+      required: false,
+    }),
   };
 
   async run(): Promise<void> {
     const {
       args: { source },
-      flags: { manifest, 'hard-reset': hardReset, update, 'no-stream-logs': disableStreamLogs },
+      flags: { manifest, 'hard-reset': hardReset, update, 'no-stream-logs': disableStreamLogs, project },
     } = await this.parse(Deploy);
 
     const isUrl = source.startsWith('http://') || source.startsWith('https://');
     let deploy;
+    let projectCode = await chooseProjectIfRequired(project);
+
     if (!isUrl) {
       const res = resolveManifest(source, manifest);
       if ('error' in res) return this.error(res.error);
@@ -121,16 +130,35 @@ export default class Deploy extends DeployCommand {
       this.log(chalk.dim(`Build directory: ${buildDir}`));
       this.log(chalk.dim(`Manifest: ${manifest}`));
 
-      const foundVersion = await isVersionExists(manifestValue.name, `v${manifestValue.version}`);
-      if (foundVersion && !update) {
-        const { confirm } = await inquirer.prompt([
-          {
-            name: 'confirm',
-            type: 'confirm',
-            message: `Version "v${manifestValue.version}" of Squid "${manifestValue.name}" will be updated. Are you sure?`,
-          },
-        ]);
-        if (!confirm) return;
+      const foundSquid = await fetchVersion({
+        squidName: manifestValue.name,
+        versionName: `v${manifestValue.version}`,
+      });
+
+      if (foundSquid) {
+        if (projectCode && projectCode !== foundSquid.project?.code) {
+          const { confirm } = await inquirer.prompt([
+            {
+              name: 'confirm',
+              type: 'confirm',
+              message: `Version "v${manifestValue.version}" of Squid "${manifestValue.name}" belongs to "${foundSquid.project?.code}". Update a squid in "${foundSquid.project?.code}" project?`,
+            },
+          ]);
+          if (!confirm) return;
+
+          projectCode = foundSquid.project?.code;
+        }
+
+        if (foundSquid.versions.length && !update) {
+          const { confirm } = await inquirer.prompt([
+            {
+              name: 'confirm',
+              type: 'confirm',
+              message: `Version "v${manifestValue.version}" of Squid "${manifestValue.name}" will be updated. Are you sure?`,
+            },
+          ]);
+          if (!confirm) return;
+        }
       }
 
       CliUx.ux.action.start(`◷ Compressing the squid to ${archiveName} `);
@@ -181,6 +209,7 @@ export default class Deploy extends DeployCommand {
         hardReset,
         artifactUrl,
         manifestPath: manifest,
+        project,
       });
     } else {
       this.log(`🦑 Releasing the squid`);
@@ -189,6 +218,7 @@ export default class Deploy extends DeployCommand {
         hardReset,
         artifactUrl: source,
         manifestPath: manifest,
+        project,
       });
     }
 
