@@ -1,6 +1,6 @@
 import { Flags } from '@oclif/core';
 
-import { me } from '../api/me';
+import { profile } from '../api/profile';
 import { CliCommand } from '../command';
 import { DEFAULT_API_URL, setConfig } from '../config';
 
@@ -26,9 +26,11 @@ export default class Auth extends CliCommand {
       flags: { key, host },
     } = await this.parse(Auth);
 
-    const { username, email } = await me({
-      apiUrl: host,
-      credentials: key,
+    const { username, email } = await profile({
+      auth: {
+        apiUrl: host,
+        credentials: key,
+      },
     });
 
     setConfig(key, host);

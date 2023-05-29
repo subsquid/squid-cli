@@ -1,4 +1,6 @@
-import { removeSecret } from '../../api';
+import { Flags } from '@oclif/core';
+
+import { removeSecret, promptOrganization } from '../../api';
 import { CliCommand } from '../../command';
 
 export default class Rm extends CliCommand {
@@ -10,14 +12,23 @@ export default class Rm extends CliCommand {
       required: true,
     },
   ];
-  static flags = {};
+  static flags = {
+    org: Flags.string({
+      char: 'o',
+      description: 'Organization',
+      required: false,
+    }),
+  };
 
   async run(): Promise<void> {
     const {
-      flags: {},
+      flags: { org },
       args: { name },
     } = await this.parse(Rm);
-    await removeSecret(name);
+
+    const organization = await promptOrganization(org);
+    await removeSecret({ name, organization });
+
     this.log(`Secret '${name}' removed`);
   }
 }
