@@ -19,6 +19,12 @@ export default class Ls extends CliCommand {
       required: false,
       default: false,
     }),
+    projectCode: Flags.string({
+      char: 'p',
+      description: 'Project',
+      required: false,
+      hidden: true,
+    }),
   };
 
   async run(): Promise<void> {
