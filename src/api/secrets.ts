@@ -1,27 +1,55 @@
 import { api } from './api';
 import { HttpResponse, SecretsListResponse } from './types';
 
-export async function listSecrets(): Promise<SecretsListResponse> {
+export async function listSecrets({ organization }: { organization?: string }): Promise<SecretsListResponse> {
   const { body } = await api<HttpResponse<SecretsListResponse>>({
     method: 'get',
-    path: '/secrets',
-  });
-  return body.payload;
-}
-
-export async function removeSecret(name: string): Promise<SecretsListResponse> {
-  const { body } = await api<HttpResponse<SecretsListResponse>>({
-    method: 'delete',
-    path: `/secrets/${name}`,
-  });
-  return body.payload;
-}
-
-export async function setSecret(secrets: Record<string, string>): Promise<SecretsListResponse> {
-  const { body } = await api<HttpResponse<SecretsListResponse>>({
-    method: 'patch',
+    query: organization
+      ? {
+          organization,
+        }
+      : undefined,
     path: `/secrets`,
-    data: { secrets: secrets },
   });
+  return body.payload;
+}
+
+export async function removeSecret({
+  name,
+  organization,
+}: {
+  name: string;
+  organization?: string;
+}): Promise<SecretsListResponse> {
+  const { body } = await api<HttpResponse<SecretsListResponse>>({
+    method: 'put',
+    path: `/secrets`,
+    data: {
+      organization,
+      secrets: [{ action: 'DELETE', name }],
+    },
+  });
+
+  return body.payload;
+}
+
+export async function setSecret({
+  name,
+  value,
+  organization,
+}: {
+  name: string;
+  value: string;
+  organization?: string;
+}): Promise<SecretsListResponse> {
+  const { body } = await api<HttpResponse<SecretsListResponse>>({
+    method: 'put',
+    path: `/secrets`,
+    data: {
+      organization,
+      secrets: [{ action: 'UPDATE', name, value }],
+    },
+  });
+
   return body.payload;
 }

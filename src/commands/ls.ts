@@ -1,6 +1,6 @@
 import { CliUx, Flags } from '@oclif/core';
 
-import { getSquid, squidList } from '../api';
+import { getSquid, squidList, promptOrganization } from '../api';
 import { CliCommand } from '../command';
 
 export default class Ls extends CliCommand {
@@ -19,15 +19,24 @@ export default class Ls extends CliCommand {
       required: false,
       default: false,
     }),
+    org: Flags.string({
+      char: 'o',
+      description: 'Organization',
+      required: false,
+    }),
   };
 
   async run(): Promise<void> {
-    const { flags } = await this.parse(Ls);
-    const noTruncate = !flags.truncate;
-    const squidName = flags.name;
+    const {
+      flags: { org, truncate, name },
+    } = await this.parse(Ls);
+    const noTruncate = !truncate;
 
-    if (squidName) {
-      const squid = await getSquid(squidName);
+    const organization = await promptOrganization(org);
+
+    if (name) {
+      const squid = await getSquid({ squidName: name });
+
       if (squid.versions) {
         CliUx.ux.table(
           squid.versions,
@@ -43,7 +52,7 @@ export default class Ls extends CliCommand {
         );
       }
     } else {
-      const squids = await squidList();
+      const squids = await squidList({ organization });
       if (squids) {
         CliUx.ux.table(
           squids,

@@ -22,8 +22,7 @@ export default class DefaultCommand extends Command {
 
     const squidCmdConfig = await getSquidCommands();
     if (squidCmdConfig?.commands?.[id]) {
-      await squidCommandRun(squidCmdConfig, id, this.argv.slice(1));
-      return;
+      process.exit(await squidCommandRun(squidCmdConfig, id, this.argv.slice(1)));
     }
 
     const squidCommands = await help.getVisibleSquidCommands();

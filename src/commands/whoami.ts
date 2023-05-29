@@ -1,4 +1,4 @@
-import { me } from '../api/me';
+import { profile } from '../api/profile';
 import { CliCommand } from '../command';
 import { getConfig } from '../config';
 
@@ -8,10 +8,15 @@ export default class Whoami extends CliCommand {
   async run(): Promise<void> {
     await this.parse(Whoami);
 
-    const { username } = await me();
+    const { username, email } = await profile();
     const { apiUrl, credentials } = getConfig();
 
-    this.log(`Username: ${username}`);
+    if (email) {
+      this.log(`Email: ${email}`);
+    }
+    if (username) {
+      this.log(`Username: ${username}`);
+    }
     this.log(`API URL: ${apiUrl}`);
     this.log(`Token: ${credentials}`);
   }

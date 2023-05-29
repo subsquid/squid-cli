@@ -1,5 +1,9 @@
-import { setSecret } from '../../api';
+import { Flags } from '@oclif/core';
+
+import { setSecret, promptOrganization } from '../../api';
 import { CliCommand } from '../../command';
+
+// TODO move to new API using put method
 
 export default class Set extends CliCommand {
   static description = [
@@ -20,14 +24,23 @@ export default class Set extends CliCommand {
       required: true,
     },
   ];
-  static flags = {};
+  static flags = {
+    org: Flags.string({
+      char: 'o',
+      description: 'Organization',
+      required: false,
+    }),
+  };
 
   async run(): Promise<void> {
     const {
-      flags: {},
+      flags: { org },
       args: { name, value },
     } = await this.parse(Set);
-    await setSecret({ [name]: value });
+
+    const organization = await promptOrganization(org);
+    await setSecret({ name, value, organization });
+
     this.log(`Secret '${name}' set`);
   }
 }

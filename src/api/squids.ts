@@ -15,36 +15,25 @@ import {
   VersionResponse,
 } from './types';
 
-export async function squidCreate(
-  name: string,
-  description?: string,
-  logoUrl?: string,
-  websiteUrl?: string,
-): Promise<SquidResponse> {
-  const { body } = await api<SquidResponse>({
-    method: 'post',
-    path: '/client/squid',
-    data: {
-      name: name,
-      description: description,
-      logoUrl: logoUrl,
-      websiteUrl: websiteUrl,
-    },
-  });
-
-  return body;
-}
-
-export async function squidList(): Promise<SquidResponse[]> {
+export async function squidList({ organization }: { organization?: string } = {}): Promise<SquidResponse[]> {
   const { body } = await api<HttpResponse<SquidResponse[]>>({
     method: 'get',
     path: '/squids',
+    query: {
+      organization,
+    },
   });
 
   return body.payload;
 }
 
-export async function getSquid(squidName: string, versionName?: string): Promise<SquidResponse> {
+export async function getSquid({
+  squidName,
+  versionName,
+}: {
+  squidName: string;
+  versionName?: string;
+}): Promise<SquidResponse> {
   const { body } = await api<SquidResponse>({
     method: 'get',
     path: `/client/squid/${squidName}`,
@@ -199,6 +188,7 @@ export async function deploySquid(data: {
   hardReset: boolean;
   artifactUrl: string;
   manifestPath: string;
+  organization?: string;
 }): Promise<DeployResponse> {
   const { body } = await api<HttpResponse<DeployResponse>>({
     method: 'post',
@@ -207,12 +197,6 @@ export async function deploySquid(data: {
   });
 
   return body.payload;
-}
-
-export async function isVersionExists(squid: string, version: string) {
-  const squids = await squidList();
-
-  return squids.find((s) => s.name === squid)?.versions?.find((v) => v.name === version);
 }
 
 export async function getUploadUrl(): Promise<UploadUrlResponse> {
@@ -239,15 +223,10 @@ export async function updateSquid(
   return body;
 }
 
-export async function redeploySquid(
-  squidName: string,
-  versionName: string,
-  envs?: Record<string, string>,
-): Promise<DeployResponse> {
+export async function restartSquid(squidName: string, versionName: string): Promise<DeployResponse> {
   const { body } = await api<HttpResponse<DeployResponse>>({
     method: 'put',
     path: `/squids/${squidName}/version/${versionName}/redeploy`,
-    data: { envs },
   });
 
   return body.payload;
