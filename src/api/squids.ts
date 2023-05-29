@@ -35,10 +35,13 @@ export async function squidCreate(
   return body;
 }
 
-export async function squidList(): Promise<SquidResponse[]> {
+export async function squidList({ projectCode }: { projectCode?: string } = {}): Promise<SquidResponse[]> {
   const { body } = await api<HttpResponse<SquidResponse[]>>({
     method: 'get',
     path: '/squids',
+    query: {
+      projectCode,
+    },
   });
 
   return body.payload;
@@ -199,6 +202,7 @@ export async function deploySquid(data: {
   hardReset: boolean;
   artifactUrl: string;
   manifestPath: string;
+  project?: string;
 }): Promise<DeployResponse> {
   const { body } = await api<HttpResponse<DeployResponse>>({
     method: 'post',
@@ -209,10 +213,23 @@ export async function deploySquid(data: {
   return body.payload;
 }
 
-export async function isVersionExists(squid: string, version: string) {
-  const squids = await squidList();
+export async function fetchVersion({
+  squidName,
+  versionName,
+  projectCode,
+}: {
+  squidName: string;
+  versionName: string;
+  projectCode?: string;
+}) {
+  const squids = await squidList({ projectCode });
 
-  return squids.find((s) => s.name === squid)?.versions?.find((v) => v.name === version);
+  const squid = squids.find((s) => s.name === squidName);
+  if (!squid) return null;
+
+  squid.versions = squid.versions.filter((v) => v.name === versionName);
+
+  return squid;
 }
 
 export async function getUploadUrl(): Promise<UploadUrlResponse> {

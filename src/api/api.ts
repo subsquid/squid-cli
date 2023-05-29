@@ -1,6 +1,7 @@
 import path from 'path';
 
 import chalk from 'chalk';
+import { pickBy } from 'lodash';
 import fetch from 'node-fetch';
 import qs from 'query-string';
 
@@ -41,7 +42,7 @@ export async function api<T = any>({
   method,
   path,
   data,
-  query,
+  query = {},
   auth,
   responseType = 'json',
   abortController,
@@ -56,7 +57,10 @@ export async function api<T = any>({
 }): Promise<{ body: T }> {
   const config = auth || getConfig();
 
-  const url = `${config.apiUrl}${path}${query ? `?${qs.stringify(query)}` : ''}`;
+  const sanitizedQuery = pickBy(query, (v) => v);
+  const queryString = Object.keys(sanitizedQuery).length ? `?${qs.stringify(sanitizedQuery)}` : '';
+
+  const url = `${config.apiUrl}${path}${queryString}`;
 
   const headers = {
     'Content-Type': 'application/json',

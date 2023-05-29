@@ -84,6 +84,7 @@ export type SquidResponse = {
   isPublic: boolean;
   deploy?: DeployResponse;
   createdAt: Date;
+  project?: { id: string; code: string };
 };
 
 export type SquidNameIsAvailableResponse = {
