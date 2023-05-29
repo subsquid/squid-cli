@@ -8,7 +8,7 @@ import inquirer from 'inquirer';
 import yaml from 'js-yaml';
 import targz from 'targz';
 
-import { deploySquid, isVersionExists, uploadFile } from '../api';
+import { deploySquid, uploadFile, promptOrganization } from '../api';
 import { DeployCommand } from '../deploy-command';
 import { Manifest } from '../manifest';
 
@@ -98,16 +98,24 @@ export default class Deploy extends DeployCommand {
       required: false,
       default: false,
     }),
+    org: Flags.string({
+      char: 'o',
+      description: 'Organization',
+      required: false,
+    }),
   };
 
   async run(): Promise<void> {
     const {
       args: { source },
-      flags: { manifest, 'hard-reset': hardReset, update, 'no-stream-logs': disableStreamLogs },
+      flags: { manifest, 'hard-reset': hardReset, update, 'no-stream-logs': disableStreamLogs, org },
     } = await this.parse(Deploy);
 
     const isUrl = source.startsWith('http://') || source.startsWith('https://');
     let deploy;
+
+    let organization = org;
+
     if (!isUrl) {
       const res = resolveManifest(source, manifest);
       if ('error' in res) return this.error(res.error);
@@ -121,16 +129,48 @@ export default class Deploy extends DeployCommand {
       this.log(chalk.dim(`Build directory: ${buildDir}`));
       this.log(chalk.dim(`Manifest: ${manifest}`));
 
-      const foundVersion = await isVersionExists(manifestValue.name, `v${manifestValue.version}`);
-      if (foundVersion && !update) {
-        const { confirm } = await inquirer.prompt([
-          {
-            name: 'confirm',
-            type: 'confirm',
-            message: `Version "v${manifestValue.version}" of Squid "${manifestValue.name}" will be updated. Are you sure?`,
-          },
-        ]);
-        if (!confirm) return;
+      const squid = await this.findSquid({ squidName: manifestValue.name });
+      if (squid) {
+        const version = squid.versions.find((v) => v.name === `v${manifestValue.version}`);
+
+        if (version) {
+          /**
+           * Version exists we should check running deploys
+           */
+          const attached = await this.attachToParallelDeploy(squid, version);
+          if (attached) return;
+        }
+
+        if (squid.organization?.code) {
+          if (organization && organization !== squid.organization.code) {
+            const { confirm } = await inquirer.prompt([
+              {
+                name: 'confirm',
+                type: 'confirm',
+                message: `Version "v${manifestValue.version}" of Squid "${manifestValue.name}" belongs to "${squid.organization?.code}". Update a squid in "${squid.organization?.code}" project?`,
+              },
+            ]);
+            if (!confirm) return;
+          }
+
+          organization = squid.organization.code;
+        }
+
+        if (version && !update) {
+          const { confirm } = await inquirer.prompt([
+            {
+              name: 'confirm',
+              type: 'confirm',
+              message: `Version "v${manifestValue.version}" of Squid "${manifestValue.name}" will be updated. Are you sure?`,
+            },
+          ]);
+          if (!confirm) return;
+        }
+      } else {
+        /**
+         * It is a new squid need to check project code is specified
+         */
+        organization = await promptOrganization(organization);
       }
 
       CliUx.ux.action.start(`◷ Compressing the squid to ${archiveName} `);
@@ -168,27 +208,28 @@ export default class Deploy extends DeployCommand {
       }
 
       CliUx.ux.action.start(`◷ Uploading ${path.basename(squidArtifact)}`);
-      const { error, fileUrl: artifactUrl } = await uploadFile(squidArtifact);
-      if (error) {
-        return this.error(error);
-      } else if (!artifactUrl) {
-        return this.error('The artifact URL is missing');
-      }
 
-      this.log(`🦑 Releasing the squid`);
+      const { error, fileUrl: artifactUrl } = await uploadFile(squidArtifact);
+      if (error) return this.error(error);
+      else if (!artifactUrl) return this.error('The artifact URL is missing');
+
+      this.log(`🦑 Releasing the squid from local folder`);
 
       deploy = await deploySquid({
         hardReset,
         artifactUrl,
         manifestPath: manifest,
+        organization,
       });
     } else {
-      this.log(`🦑 Releasing the squid`);
+      organization = await promptOrganization(organization);
+      this.log(`🦑 Releasing the squid from remote`);
 
       deploy = await deploySquid({
         hardReset,
         artifactUrl: source,
         manifestPath: manifest,
+        organization,
       });
     }
 
@@ -196,7 +237,8 @@ export default class Deploy extends DeployCommand {
       return;
     }
 
-    await this.pollDeploy(deploy, { streamLogs: !disableStreamLogs });
+    await this.pollDeploy({ deployId: deploy.id, streamLogs: !disableStreamLogs });
+
     this.log('✔️ Done!');
   }
 }

@@ -1,16 +1,27 @@
-import { Command } from '@oclif/core';
+import { Command, Flags } from '@oclif/core';
 import blessed from 'reblessed';
 
+import { promptOrganization } from '../api';
 import { Loader } from '../ui/components/Loader';
 import { VersionManager } from '../ui/components/VersionManager';
 
 export default class Explorer extends Command {
   static description = 'Squid explorer';
   // static hidden = true;
+  static flags = {
+    org: Flags.string({
+      char: 'o',
+      description: 'Organization',
+      required: false,
+    }),
+  };
 
   async run(): Promise<void> {
-    await this.parse(Explorer);
+    const {
+      flags: { org },
+    } = await this.parse(Explorer);
 
+    const organization = await promptOrganization(org);
     const screen = blessed.screen({
       smartCSR: true,
       fastCSR: true,
@@ -20,7 +31,7 @@ export default class Explorer extends Command {
       fullUnicode: true,
     });
 
-    const manager = new VersionManager({
+    const manager = new VersionManager(organization, {
       top: '0',
       left: '0',
       width: '100%',

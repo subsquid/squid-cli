@@ -67,6 +67,11 @@ export type VersionResponse = {
       password: string;
     };
   };
+  runningDeploy?: {
+    id: string;
+    type: 'DELETE' | 'DEPLOY' | 'RESTART' | 'HIBERNATE';
+  };
+
   aliases: { name: string }[];
   deployedAt: Date;
   createdAt: Date;
@@ -84,6 +89,7 @@ export type SquidResponse = {
   isPublic: boolean;
   deploy?: DeployResponse;
   createdAt: Date;
+  organization?: { id: string; code: string };
 };
 
 export type SquidNameIsAvailableResponse = {
