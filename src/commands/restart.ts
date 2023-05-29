@@ -1,6 +1,6 @@
 import { Flags } from '@oclif/core';
 
-import { redeploySquid } from '../api';
+import { restartSquid } from '../api';
 import { DeployCommand } from '../deploy-command';
 import { parseEnvs, parseNameAndVersion } from '../utils';
 
@@ -42,11 +42,9 @@ export default class Restart extends DeployCommand {
     } = await this.parse(Restart);
     const { squidName, versionName } = parseNameAndVersion(nameAndVersion, this);
 
-    const envs = parseEnvs(flags.env, flags.envFile);
+    const deploy = await restartSquid(squidName, versionName);
 
-    const deploy = await redeploySquid(squidName, versionName, envs);
-
-    await this.pollDeploy(deploy, { streamLogs: !disableStreamLogs });
+    await this.pollDeploy({ deployId: deploy.id, streamLogs: !disableStreamLogs });
 
     this.log('✔️ Done!');
   }

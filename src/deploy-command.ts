@@ -1,7 +1,16 @@
-import { CliUx, Command } from '@oclif/core';
+import { CliUx } from '@oclif/core';
 import chalk from 'chalk';
+import inquirer from 'inquirer';
 
-import { ApiError, DeployResponse, DeployStatus, getDeploy, streamSquidLogs } from './api';
+import {
+  DeployResponse,
+  DeployStatus,
+  getDeploy,
+  getSquid,
+  SquidResponse,
+  streamSquidLogs,
+  VersionResponse,
+} from './api';
 import { CliCommand } from './command';
 import { doUntil } from './utils';
 
@@ -9,13 +18,48 @@ export abstract class DeployCommand extends CliCommand {
   deploy: DeployResponse | undefined;
   logsPrinted = 0;
 
-  async pollDeploy(deploy: DeployResponse, { streamLogs }: { streamLogs: boolean }): Promise<void> {
+  async findSquid({ squidName }: { squidName: string }) {
+    try {
+      return await getSquid({ squidName });
+    } catch (e: any) {
+      if (e.status === 404) {
+        return null;
+      }
+
+      throw e;
+    }
+  }
+
+  async attachToParallelDeploy(squid: SquidResponse, version: VersionResponse) {
+    if (!version || !version.runningDeploy) return false;
+
+    switch (version.runningDeploy.type) {
+      // we should react only for running deploy
+      case 'DEPLOY':
+        const { confirm } = await inquirer.prompt([
+          {
+            name: 'confirm',
+            type: 'confirm',
+            message: `Squid "${squid.name}@${version.name}" is being deploying. 
+You can not run deploys on the same squid in parallel.
+Do you want to attach to the running deploy process?`,
+          },
+        ]);
+        if (!confirm) return false;
+
+        await this.pollDeploy({ deployId: version.runningDeploy.id, streamLogs: true });
+
+        return true;
+    }
+  }
+
+  async pollDeploy({ deployId, streamLogs }: { deployId: string; streamLogs: boolean }): Promise<void> {
     let lastStatus: string;
     let validatedPrinted = false;
 
     await doUntil(
       async () => {
-        this.deploy = await getDeploy(deploy.id);
+        this.deploy = await getDeploy(deployId);
 
         if (!this.deploy) return true;
         if (this.deploy.status !== lastStatus) {
