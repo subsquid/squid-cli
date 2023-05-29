@@ -13,7 +13,7 @@ export class VersionManager extends List {
   squids: SquidVersion[] = [];
   currentIndex?: number;
 
-  constructor(options: Widgets.BoxOptions) {
+  constructor(public projectCode: string | undefined, options: Widgets.BoxOptions) {
     super(
       defaultsDeep(options, {
         vi: true,
@@ -49,7 +49,7 @@ export class VersionManager extends List {
   }
 
   async load() {
-    const squids = await squidList();
+    const squids = await squidList({ projectCode: this.projectCode });
 
     this.squids = flatten(
       squids.map((squid) =>
