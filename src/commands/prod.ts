@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import inquirer from 'inquirer';
 
-import { setProduction } from '../api';
+import { getSquid, setProduction } from '../api';
 import { DeployCommand } from '../deploy-command';
 import { parseNameAndVersion } from '../utils';
 
@@ -23,7 +23,13 @@ export default class Prod extends DeployCommand {
 
     const { squidName, versionName } = parseNameAndVersion(args.nameAndVersion, this);
 
-    const newUrl = inferProdUrl(squidName, versionName);
+    const foundSquid = await getSquid({ squidName, versionName });
+    if (!foundSquid.versions.length) {
+      this.log(`Cannot find a squid version "${versionName}". Please make sure the spelling is correct.`);
+      return;
+    }
+
+    const newUrl = inferProdUrl(foundSquid.versions[0].deploymentUrl, versionName);
     const { confirm } = await inquirer.prompt([
       {
         name: 'confirm',
