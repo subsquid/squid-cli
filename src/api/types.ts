@@ -33,6 +33,15 @@ export type UploadUrlResponse = {
 export type DeploymentStatus = 'CREATED' | 'DEPLOYING' | 'DEPLOY_ERROR' | 'DEPLOYED';
 export type SecretsStatus = 'UP_TO_DATE' | 'NONE' | 'OUTDATED';
 
+export type SquidProcessor = {
+  name: string;
+  status: 'SYNCING' | 'UNKNOWN' | 'STARTING' | 'SYNCED';
+  syncState: {
+    currentBlock: number;
+    totalBlocks: number;
+  };
+};
+
 export type VersionResponse = {
   id: number;
   name: string;
@@ -47,13 +56,7 @@ export type VersionResponse = {
   api: {
     status: 'NOT_AVAILABLE' | 'AVAILABLE';
   };
-  processor: {
-    status: 'SYNCING' | 'UNKNOWN' | 'STARTING' | 'SYNCED';
-    syncState: {
-      currentBlock: number;
-      totalBlocks: number;
-    };
-  };
+  processors: SquidProcessor[];
   db: {
     disk: {
       totalBytes: number;
