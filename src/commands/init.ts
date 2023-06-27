@@ -148,17 +148,19 @@ export default class Init extends CliCommand {
       ? TEMPLATE_ALIASES[resolvedTemplate].url
       : resolvedTemplate;
 
-    if (!(await squidNameIsAvailable(name))) {
-      const uniqueNameSuggestion = uniqueNamesGenerator({
-        dictionaries: [adjectives, colors, animals],
-        separator: '-',
-        length: 2,
-      });
-      return this.error(
-        `There is already a squid with name "${name}" deployed to Aquarium. Squid names are globally unique. ` +
-          `Please pick a new memorable name, e.g. "${uniqueNameSuggestion}".`,
-      );
-    }
+    try {
+      if (!(await squidNameIsAvailable(name))) {
+        const uniqueNameSuggestion = uniqueNamesGenerator({
+          dictionaries: [adjectives, colors, animals],
+          separator: '-',
+          length: 2,
+        });
+        return this.error(
+          `There is already a squid with name "${name}" deployed to Aquarium. Squid names are globally unique. ` +
+            `Please pick a new memorable name, e.g. "${uniqueNameSuggestion}".`,
+        );
+      }
+    } catch (e) {}
 
     CliUx.ux.action.start(`◷ Downloading the template: ${githubRepository}... `);
     try {
