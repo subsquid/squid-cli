@@ -33,13 +33,16 @@ function apiStatus(status: VersionResponse['api']['status']) {
 }
 
 function processorStatus(version: VersionResponse) {
-  switch (version.processor.status) {
+  const processor = version.processors[0];
+  if (!processor) return '';
+
+  switch (processor.status) {
     case 'SYNCING':
     case 'SYNCED':
-      const percent = (100 * version.processor.syncState.currentBlock) / version.processor.syncState.totalBlocks;
+      const percent = (100 * processor.syncState.currentBlock) / processor.syncState.totalBlocks;
       return `${percent.toFixed(2)}%`;
     default:
-      return version.processor.status;
+      return processor.status;
   }
 }
 
