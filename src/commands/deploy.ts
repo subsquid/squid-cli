@@ -11,6 +11,7 @@ import targz from 'targz';
 import { deploySquid, uploadFile, promptOrganization } from '../api';
 import { DeployCommand } from '../deploy-command';
 import { Manifest } from '../manifest';
+import { loadManifestFile } from '../manifest/loadManifestFile';
 
 const compressAsync = promisify(targz.compress);
 
@@ -23,50 +24,25 @@ const SQUID_PATH_DESC = [
 
 export function resolveManifest(
   localPath: string,
-  manifest: string,
-): { error: string } | { buildDir: string; squidDir: string; manifestValue: Manifest } {
-  const squidDir = path.resolve(localPath);
-  if (!fs.statSync(squidDir).isDirectory()) {
-    return {
-      error: `The path ${squidDir} is a not a squid directory. Please provide a path to a squid root directory`,
-    };
-  }
-
-  const manifestPath = path.resolve(path.join(localPath, manifest));
-  if (fs.statSync(manifestPath).isDirectory()) {
-    return {
-      error: `The path ${manifestPath} is a directory, not a manifest file. Please provide a path to a valid manifest file inside squid directory`,
-    };
-  }
-
-  const buildDir = path.join(squidDir, 'builds');
-
-  fs.mkdirSync(buildDir, { recursive: true, mode: 0o777 });
-
+  manifestPath: string,
+): { error: string } | { buildDir: string; squidDir: string; manifest: Manifest } {
   try {
-    const manifestValue = yaml.load(fs.readFileSync(manifestPath).toString()) as Manifest;
+    const { squidDir, manifest } = loadManifestFile(localPath, manifestPath);
 
-    if (!manifestValue.name) {
-      return { error: `A Squid  ${chalk.bold('name')} must be specified in the manifest` };
-    } else if (manifestValue.version < 1) {
-      return { error: `A Squid ${chalk.bold('version')} must be greater than 0` };
-    } else if (!manifestValue.version) {
-      return { error: `A Squid ${chalk.bold('version')} must be specified in the manifest` };
-    }
+    const buildDir = path.join(squidDir, 'builds');
+    fs.mkdirSync(buildDir, { recursive: true, mode: 0o777 });
 
     return {
       squidDir,
       buildDir,
-      manifestValue,
+      manifest,
     };
   } catch (e: any) {
-    return { error: `The manifest file on ${manifestPath} can not be parsed: ${e.message}` };
+    return { error: e.message };
   }
 }
 
 export default class Deploy extends DeployCommand {
-  static aliases = ['squid:deploy'];
-
   static description = 'Deploy a new or update an existing squid version';
   static args = [
     {
@@ -108,7 +84,7 @@ export default class Deploy extends DeployCommand {
   async run(): Promise<void> {
     const {
       args: { source },
-      flags: { manifest, 'hard-reset': hardReset, update, 'no-stream-logs': disableStreamLogs, org },
+      flags: { manifest: manifestPath, 'hard-reset': hardReset, update, 'no-stream-logs': disableStreamLogs, org },
     } = await this.parse(Deploy);
 
     const isUrl = source.startsWith('http://') || source.startsWith('https://');
@@ -117,21 +93,21 @@ export default class Deploy extends DeployCommand {
     let organization = org;
 
     if (!isUrl) {
-      const res = resolveManifest(source, manifest);
+      const res = resolveManifest(source, manifestPath);
       if ('error' in res) return this.error(res.error);
 
-      const { buildDir, squidDir, manifestValue } = res;
+      const { buildDir, squidDir, manifest } = res;
 
-      const archiveName = `${manifestValue.name}-v${manifestValue.version}.tar.gz`;
+      const archiveName = `${manifest.name}-v${manifest.version}.tar.gz`;
       const squidArtifact = path.join(buildDir, archiveName);
 
       this.log(chalk.dim(`Squid directory: ${squidDir}`));
       this.log(chalk.dim(`Build directory: ${buildDir}`));
-      this.log(chalk.dim(`Manifest: ${manifest}`));
+      this.log(chalk.dim(`Manifest: ${manifestPath}`));
 
-      const squid = await this.findSquid({ squidName: manifestValue.name });
+      const squid = await this.findSquid({ squidName: manifest.name });
       if (squid) {
-        const version = squid.versions.find((v) => v.name === `v${manifestValue.version}`);
+        const version = squid.versions.find((v) => v.name === `v${manifest.version}`);
 
         if (version) {
           /**
@@ -147,7 +123,7 @@ export default class Deploy extends DeployCommand {
               {
                 name: 'confirm',
                 type: 'confirm',
-                message: `Version "v${manifestValue.version}" of Squid "${manifestValue.name}" belongs to "${squid.organization?.code}". Update a squid in "${squid.organization?.code}" project?`,
+                message: `Version "v${manifest.version}" of Squid "${manifest.name}" belongs to "${squid.organization?.code}". Update a squid in "${squid.organization?.code}" project?`,
               },
             ]);
             if (!confirm) return;
@@ -161,7 +137,7 @@ export default class Deploy extends DeployCommand {
             {
               name: 'confirm',
               type: 'confirm',
-              message: `Version "v${manifestValue.version}" of Squid "${manifestValue.name}" will be updated. Are you sure?`,
+              message: `Version "v${manifest.version}" of Squid "${manifest.name}" will be updated. Are you sure?`,
             },
           ]);
           if (!confirm) return;
@@ -218,7 +194,7 @@ export default class Deploy extends DeployCommand {
       deploy = await deploySquid({
         hardReset,
         artifactUrl,
-        manifestPath: manifest,
+        manifestPath,
         organization,
       });
     } else {
@@ -228,7 +204,7 @@ export default class Deploy extends DeployCommand {
       deploy = await deploySquid({
         hardReset,
         artifactUrl: source,
-        manifestPath: manifest,
+        manifestPath,
         organization,
       });
     }
