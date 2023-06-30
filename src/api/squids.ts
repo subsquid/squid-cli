@@ -34,15 +34,15 @@ export async function getSquid({
   squidName: string;
   versionName?: string;
 }): Promise<SquidResponse> {
-  const { body } = await api<SquidResponse>({
+  const { body } = await api<HttpResponse<SquidResponse>>({
     method: 'get',
-    path: `/client/squid/${squidName}`,
+    path: `/squids/${squidName}`,
     query: {
       versionName,
     },
   });
 
-  return body;
+  return body.payload;
 }
 
 export async function squidNameIsAvailable(squidName: string): Promise<boolean> {

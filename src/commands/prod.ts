@@ -24,7 +24,7 @@ export default class Prod extends DeployCommand {
     const { squidName, versionName } = parseNameAndVersion(args.nameAndVersion, this);
 
     const foundSquid = await getSquid({ squidName, versionName });
-    if (!foundSquid.versions.length) {
+    if (!foundSquid.versions?.length) {
       this.log(`Cannot find a squid version "${versionName}". Please make sure the spelling is correct.`);
       return;
     }
