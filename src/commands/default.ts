@@ -1,6 +1,6 @@
-import { color } from '@oclif/color';
 import { Command, toConfiguredId } from '@oclif/core';
 import { run as squidCommandRun } from '@subsquid/commands';
+import chalk from 'chalk';
 import Levenshtein from 'fast-levenshtein';
 import { minBy } from 'lodash';
 
@@ -36,7 +36,7 @@ export default class DefaultCommand extends Command {
 
     this.log(`"${originalCmd}" is not a ${this.config.bin} command.`);
     this.log(`Did you mean "${readableSuggestion}"?`);
-    this.log(color.dim(`Run "${this.config.bin} help" for a list of available commands.`));
+    this.log(chalk.dim(`Run "${this.config.bin} help" for a list of available commands.`));
   }
 
   closestCommand(cmd: string, commands: string[]) {

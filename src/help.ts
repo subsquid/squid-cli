@@ -1,5 +1,5 @@
-import { color } from '@oclif/color';
 import { CliUx, Help as OclifHelp } from '@oclif/core';
+import chalk from 'chalk';
 
 import DefaultCommand from './commands/default';
 import { getSquidCommands } from './utils';
@@ -53,7 +53,7 @@ export default class Help extends OclifHelp {
 
     this.log();
     this.helpHeader('VERSION');
-    this.log(this.config.pjson.name, color.dim(`(${this.config.pjson.version})`));
+    this.log(this.config.pjson.name, chalk.dim(`(${this.config.pjson.version})`));
 
     this.log();
     this.helpHeader('CLOUD COMMANDS');
@@ -117,6 +117,6 @@ export default class Help extends OclifHelp {
   }
 
   helpHeader(str: string) {
-    this.log(color.bold(str.toUpperCase()));
+    this.log(chalk.bold(str.toUpperCase()));
   }
 }
