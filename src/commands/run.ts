@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import path from 'path';
 import * as readline from 'readline';
 import { Writable } from 'stream';
@@ -6,9 +6,35 @@ import { Writable } from 'stream';
 import { Flags } from '@oclif/core';
 import chalk from 'chalk';
 import dotenv from 'dotenv';
+// import terminate from 'terminate';
+import tkill from 'tree-kill';
 
 import { CliCommand } from '../command';
 import { loadManifestFile } from '../manifest/loadManifestFile';
+
+const chalkColors = [chalk.green, chalk.yellow, chalk.blue, chalk.magenta, chalk.cyan];
+
+function* chalkColorGenerator() {
+  let n = 0;
+  while (true) {
+    const color = chalkColors[n];
+    n++;
+    if (n == chalkColors.length) n = 0;
+    yield color;
+  }
+}
+
+const cGen = chalkColorGenerator();
+
+interface SquidProcess {
+  manifestProcess: {
+    name: string;
+    cmd: string[];
+    env: Record<string, string>;
+  };
+  process: ChildProcessWithoutNullStreams;
+  restartsCount: number;
+}
 
 function runProcess(
   { cwd, output }: { cwd: string; output: Writable },
@@ -28,7 +54,7 @@ function runProcess(
     shell: process.platform === 'win32',
   });
 
-  const prefix = chalk.magenta(`[${name}] `);
+  const prefix = (cGen.next().value as chalk.Chalk)(`[${name}] `);
 
   readline
     .createInterface({
@@ -44,10 +70,6 @@ function runProcess(
     .on('line', (line) => {
       output.write(`${prefix}${line}\n`);
     });
-
-  child.once('exit', (code) => {
-    process.exit(code || 0);
-  });
 
   return child;
 }
@@ -88,26 +110,35 @@ export default class Run extends CliCommand {
       multiple: true,
       exclusive: ['exclude'],
     }),
+    retries: Flags.integer({
+      char: 'r',
+      description: 'Attepms to restart failed or stopped services',
+      required: false,
+      default: 5,
+    }),
   };
 
   static args = [
     {
       name: 'path',
       required: true,
-      hidden: true,
+      hidden: false,
       default: '.',
     },
   ];
 
   async run(): Promise<void> {
     const {
-      flags: { manifest: manifestPath, envFile, exclude, include },
+      flags: { manifest: manifestPath, envFile, exclude, include, retries },
       args: { path: squidPath },
     } = await this.parse(Run);
 
     try {
       const { squidDir, manifest } = loadManifestFile(squidPath, manifestPath);
+
       const runner = { cwd: squidDir, output: process.stdout };
+
+      const children: SquidProcess[] = [];
 
       if (envFile) {
         const { error } = dotenv.config({
@@ -119,21 +150,56 @@ export default class Run extends CliCommand {
       }
 
       if (manifest.deploy?.api && !isSkipped({ include, exclude }, 'api')) {
-        runProcess(runner, {
+        const manifestProcess = {
           name: 'api',
           ...manifest.deploy.api,
+        };
+
+        children.push({
+          manifestProcess,
+          process: runProcess(runner, manifestProcess),
+          restartsCount: 0,
         });
       }
 
       if (manifest.deploy?.processor) {
-        for (const processor of manifest.deploy?.processor) {
+        const processors = Array.isArray(manifest.deploy.processor)
+          ? manifest.deploy.processor
+          : [manifest.deploy.processor];
+
+        for (const processor of processors) {
           if (isSkipped({ include, exclude }, processor.name)) {
             continue;
           }
 
-          runProcess(runner, processor);
+          children.push({
+            manifestProcess: processor,
+            process: runProcess(runner, processor),
+            restartsCount: 0,
+          });
         }
       }
+
+      children.forEach((c) => {
+        const onProcessExit = (code: number) => {
+          if (code != null) console.log(`${c.manifestProcess.name} exited with code ${code}`);
+          if (code === 0) return;
+          if (c.restartsCount < retries) {
+            c.process = runProcess(runner, c.manifestProcess);
+            c.process.on('exit', onProcessExit);
+            c.restartsCount++;
+          } else {
+            children.forEach((cc) => {
+              cc.restartsCount = retries;
+              if (cc.process.pid) {
+                tkill(cc.process.pid, 'SIGKILL');
+              }
+            });
+          }
+        };
+
+        c.process.on('exit', onProcessExit);
+      });
     } catch (e: any) {
       this.error(e.message);
     }
