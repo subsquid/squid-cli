@@ -142,7 +142,7 @@ export default class Run extends CliCommand {
 
       if (envFile) {
         const { error } = dotenv.config({
-          path: path.join(squidDir, '/', envFile),
+          path: path.isAbsolute(envFile) ? envFile : path.join(squidDir, '/', envFile),
         });
         if (error) {
           this.error(error);
