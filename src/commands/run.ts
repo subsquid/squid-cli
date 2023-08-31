@@ -17,10 +17,7 @@ const chalkColors = [chalk.green, chalk.yellow, chalk.blue, chalk.magenta, chalk
 function* chalkColorGenerator() {
   let n = 0;
   while (true) {
-    const color = chalkColors[n];
-    n++;
-    if (n == chalkColors.length) n = 0;
-    yield color;
+    yield chalkColors[n++ % chalkColors.length];
   }
 }
 
