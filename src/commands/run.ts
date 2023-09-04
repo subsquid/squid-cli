@@ -6,7 +6,6 @@ import { Writable } from 'stream';
 import { Flags } from '@oclif/core';
 import chalk from 'chalk';
 import dotenv from 'dotenv';
-// import terminate from 'terminate';
 import tkill from 'tree-kill';
 
 import { CliCommand } from '../command';
@@ -14,14 +13,13 @@ import { loadManifestFile } from '../manifest/loadManifestFile';
 
 const chalkColors = [chalk.green, chalk.yellow, chalk.blue, chalk.magenta, chalk.cyan];
 
-function* chalkColorGenerator() {
+function chalkColorGenerator() {
   let n = 0;
-  while (true) {
-    yield chalkColors[n++ % chalkColors.length];
-  }
+
+  return () => chalkColors[n++ % chalkColors.length];
 }
 
-const cGen = chalkColorGenerator();
+const procColor = chalkColorGenerator();
 
 interface SquidProcess {
   manifestProcess: {
@@ -51,7 +49,7 @@ function runProcess(
     shell: process.platform === 'win32',
   });
 
-  const prefix = (cGen.next().value as chalk.Chalk)(`[${name}] `);
+  const prefix = procColor()(`[${name}] `);
 
   readline
     .createInterface({
