@@ -28,7 +28,7 @@ export interface RawManifest {
 export interface Manifest extends RawManifest {
   deploy?: {
     api?: ManifestApi;
-    processor?: ManifestProcessor[];
+    processor?: ManifestProcessor | ManifestProcessor[];
   };
 }
 
@@ -36,13 +36,18 @@ export function readManifest(path: string, normalize = true): Manifest {
   const manifest = yaml.load(fs.readFileSync(path).toString()) as RawManifest;
 
   if (normalize) {
-    if (manifest.deploy?.processor && isPlainObject(manifest.deploy.processor)) {
-      const processor = manifest.deploy.processor as ManifestProcessor;
-      if (!processor.name) {
-        processor.name = 'processor';
-      }
+    if (manifest.deploy?.processor) {
+      if (isPlainObject(manifest.deploy.processor)) {
+        const processor = manifest.deploy.processor as ManifestProcessor;
+        if (!processor.name) {
+          processor.name = 'processor';
+        }
 
-      manifest.deploy.processor = [processor];
+        manifest.deploy.processor = [processor];
+      } else {
+        const processors = manifest.deploy.processor as ManifestProcessor[];
+        manifest.deploy.processor = processors.map((p, i) => (p.name ? p : { ...p, name: `processor${i + 1}` }));
+      }
     }
   }
 
