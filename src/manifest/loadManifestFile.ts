@@ -12,7 +12,9 @@ export function loadManifestFile(localPath: string, manifestPath: string): { squ
     throw new Error(`The path ${squidDir} is a not a squid directory. Please provide a path to a squid root directory`);
   }
 
-  const manifestFullPath = path.resolve(path.join(localPath, manifestPath));
+  const manifestFullPath = path.isAbsolute(manifestPath)
+    ? manifestPath
+    : path.resolve(path.join(localPath, manifestPath));
   if (fs.statSync(manifestFullPath).isDirectory()) {
     throw new Error(
       `The path ${manifestFullPath} is a directory, not a manifest file. Please provide a path to a valid manifest file inside squid directory`,

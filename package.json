@@ -1,7 +1,7 @@
 {
   "name": "@subsquid/cli",
   "description": "squid cli tool",
-  "version": "2.5.0-beta.5",
+  "version": "2.5.0-beta.6",
   "license": "GPL-3.0-or-later",
   "repository": "git@github.com:subsquid/squid-cli.git",
   "publishConfig": {
@@ -87,6 +87,7 @@
     "simple-git": "^3.15.1",
     "split2": "^4.1.0",
     "targz": "^1.0.1",
+    "tree-kill": "^1.2.2",
     "unique-names-generator": "^4.7.1"
   },
   "devDependencies": {
