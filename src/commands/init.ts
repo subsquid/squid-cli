@@ -25,9 +25,9 @@ const TEMPLATE_ALIASES: Record<string, { url: string; description: string }> = {
     url: 'https://github.com/subsquid/squid-abi-template',
     description: `A template to auto-generate a squid indexing events and txs from a contract ABI`,
   },
-  'ink-abi': {
-    url: 'https://github.com/subsquid-labs/squid-ink-abi-template',
-    description: `A template to auto-generate a squid from an ink! contract ABI`,
+  multichain: {
+    url: 'https://github.com/subsquid-labs/squid-multichain-template',
+    description: `A template for indexing data from multiple chains`,
   },
   gravatar: {
     url: 'https://github.com/subsquid/gravatar-squid',
@@ -37,17 +37,17 @@ const TEMPLATE_ALIASES: Record<string, { url: string; description: string }> = {
     url: 'https://github.com/subsquid/squid-substrate-template',
     description: 'A template squid for indexing Substrate-based chains.',
   },
-  'frontier-evm': {
-    url: 'https://github.com/subsquid/squid-frontier-evm-template',
-    description: 'A template for indexing Frontier EVM chains, like Moonbeam and Astar.',
-  },
   ink: {
     url: 'https://github.com/subsquid/squid-wasm-template',
     description: `A template for indexing Ink! smart contracts`,
   },
-  acala: {
-    url: 'https://github.com/subsquid/squid-acala-tempate',
-    description: `A template for indexing Acala EVM+ smart contracts`,
+  'ink-abi': {
+    url: 'https://github.com/subsquid-labs/squid-ink-abi-template',
+    description: `A template to auto-generate a squid from an ink! contract ABI`,
+  },
+  'frontier-evm': {
+    url: 'https://github.com/subsquid/squid-frontier-evm-template',
+    description: 'A template for indexing Frontier EVM chains, like Moonbeam and Astar.',
   },
 };
 
