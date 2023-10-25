@@ -77,7 +77,7 @@ function isSkipped({ include, exclude }: { include?: string[]; exclude?: string[
 }
 
 export default class Run extends CliCommand {
-  static description = 'Run a squid';
+  static description = 'Run a squid project locally';
 
   static flags = {
     manifest: Flags.string({

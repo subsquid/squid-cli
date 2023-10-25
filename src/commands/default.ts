@@ -10,7 +10,7 @@ import { getSquidCommands } from '../utils';
 export default class DefaultCommand extends Command {
   static hidden = true;
 
-  static description = 'Display help or run squid commands';
+  static description = 'Display help or run commands defined by Squid CLI or in commands.json';
   static strict = false;
 
   async run(): Promise<void> {
