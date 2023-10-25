@@ -4,7 +4,7 @@ import { listSecrets, promptOrganization } from '../../api';
 import { CliCommand } from '../../command';
 
 export default class Ls extends CliCommand {
-  static description = 'List all secrets for the current Aquarium account';
+  static description = 'List secrets set in the Cloud';
   static args = [];
   static flags = {
     org: Flags.string({

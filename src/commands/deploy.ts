@@ -43,7 +43,7 @@ export function resolveManifest(
 }
 
 export default class Deploy extends DeployCommand {
-  static description = 'Deploy a new or update an existing squid version';
+  static description = 'Deploy new or update an existing squid in the Cloud';
   static args = [
     {
       name: 'source',
@@ -54,7 +54,7 @@ export default class Deploy extends DeployCommand {
   static flags = {
     manifest: Flags.string({
       char: 'm',
-      description: 'Relative path to a squid manifest file in squid source',
+      description: 'Relative local path to a squid manifest file in squid source',
       required: false,
       default: 'squid.yaml',
     }),

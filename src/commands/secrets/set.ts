@@ -7,7 +7,7 @@ import { CliCommand } from '../../command';
 
 export default class Set extends CliCommand {
   static description = [
-    'Create or update a secret',
+    'Add or update a secret in the Cloud',
     `The secret will be exposed as an environment variable with the given name to all the squids.`,
     `NOTE: The changes take affect only after a squid is restarted or updated.`,
   ].join('\n');

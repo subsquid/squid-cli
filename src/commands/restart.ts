@@ -7,7 +7,7 @@ import { parseEnvs, parseNameAndVersion } from '../utils';
 export default class Restart extends DeployCommand {
   static aliases = ['squid:redeploy', 'redeploy'];
 
-  static description = 'Restart a squid';
+  static description = 'Restart a squid deployed to the Cloud';
   static args = [
     {
       name: 'nameAndVersion',

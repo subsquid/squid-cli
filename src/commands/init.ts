@@ -80,7 +80,7 @@ const SQUID_TEMPLATE_DESC = [
 ];
 
 export default class Init extends CliCommand {
-  static description = 'Create a squid from template';
+  static description = 'Setup a new squid project from a template or github repo';
 
   static args = [
     {
@@ -156,7 +156,7 @@ export default class Init extends CliCommand {
           length: 2,
         });
         return this.error(
-          `There is already a squid with name "${name}" deployed to Aquarium. Squid names are globally unique. ` +
+          `There is already a squid with name "${name}" deployed to the Cloud. Squid names are globally unique. ` +
             `Please pick a new memorable name, e.g. "${uniqueNameSuggestion}".`,
         );
       }

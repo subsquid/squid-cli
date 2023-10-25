@@ -9,7 +9,7 @@ import { parseNameAndVersion } from '../utils';
 export default class Prod extends DeployCommand {
   static aliases = ['squid:prod'];
 
-  static description = 'Assign a squid version to the production endpoint';
+  static description = 'Assign the canonical production API alias for a squid deployed to the Cloud';
   static args = [
     {
       name: 'nameAndVersion',

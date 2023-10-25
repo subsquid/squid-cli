@@ -3,7 +3,7 @@ import { CliCommand } from '../command';
 import { getConfig } from '../config';
 
 export default class Whoami extends CliCommand {
-  static description = `Return user and context`;
+  static description = `Show the user details for the current Cloud account`;
 
   async run(): Promise<void> {
     await this.parse(Whoami);

@@ -4,7 +4,7 @@ import { removeSecret, promptOrganization } from '../../api';
 import { CliCommand } from '../../command';
 
 export default class Rm extends CliCommand {
-  static description = 'Remove a secret';
+  static description = 'Delete a secret in the Cloud';
   static args = [
     {
       name: 'name',

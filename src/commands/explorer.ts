@@ -6,7 +6,7 @@ import { Loader } from '../ui/components/Loader';
 import { VersionManager } from '../ui/components/VersionManager';
 
 export default class Explorer extends Command {
-  static description = 'Squid explorer';
+  static description = 'Open a visual explorer for the Cloud deployments';
   // static hidden = true;
   static flags = {
     org: Flags.string({
