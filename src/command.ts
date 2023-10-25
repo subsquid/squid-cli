@@ -46,7 +46,12 @@ export abstract class CliCommand extends Command {
           return this.error('The API is currently unavailable. Please try again later');
         default:
           return this.error(
-            'Unknown server error. Please check that your are using the latest version of the Squid CLI. If the error persists please open an issue at https://github.com/subsquid/subsquid-cli and report to t.me/HydraDevs',
+            [
+              `Unknown network error occurred`,
+              `==================`,
+              `Status: ${status}`,
+              `Body:\n${JSON.stringify(body)}`,
+            ].join('\n'),
           );
       }
     }

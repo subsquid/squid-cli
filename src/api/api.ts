@@ -60,7 +60,7 @@ export async function api<T = any>({
   const sanitizedQuery = pickBy(query, (v) => v);
   const queryString = Object.keys(sanitizedQuery).length ? `?${qs.stringify(sanitizedQuery)}` : '';
 
-  const url = `${config.apiUrl}${path}${queryString}`;
+  const url = !path.startsWith('https') ? `${config.apiUrl}${path}${queryString}` : `${path}${queryString}`;
 
   const headers = {
     'Content-Type': 'application/json',
@@ -89,9 +89,16 @@ export async function api<T = any>({
   });
 
   let body;
-  try {
-    body = responseType === 'json' ? await response.json() : response.body;
-  } catch (e) {}
+  if (responseType === 'json') {
+    const rawBody = await response.text();
+    try {
+      body = responseType === 'json' ? JSON.parse(rawBody) : response.body;
+    } catch (e) {
+      body = rawBody;
+    }
+  } else {
+    body = response.body;
+  }
 
   if (API_DEBUG) {
     console.log(
