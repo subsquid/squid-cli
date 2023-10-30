@@ -6,6 +6,7 @@ import { Writable } from 'stream';
 import { Flags } from '@oclif/core';
 import chalk from 'chalk';
 import dotenv from 'dotenv';
+import { mapValues, omitBy } from 'lodash';
 import tkill from 'tree-kill';
 
 import { CliCommand } from '../command';
@@ -29,44 +30,6 @@ interface SquidProcess {
   };
   process: ChildProcessWithoutNullStreams;
   restartsCount: number;
-}
-
-function runProcess(
-  { cwd, output }: { cwd: string; output: Writable },
-  { name, cmd, env }: { name: string; cmd: string[]; env: Record<string, string> },
-) {
-  const [command, ...args] = cmd;
-  const { PROCESSOR_PROMETHEUS_PORT, ...childEnv } = process.env;
-
-  const child = spawn(command, args, {
-    env: {
-      ...childEnv,
-      ...env,
-      FORCE_COLOR: 'true',
-      FORCE_PRETTY_LOGGER: 'true',
-    },
-    cwd,
-    shell: process.platform === 'win32',
-  });
-
-  const prefix = procColor()(`[${name}] `);
-
-  readline
-    .createInterface({
-      input: child.stderr,
-    })
-    .on('line', (line) => {
-      output.write(`${prefix}${line}\n`);
-    });
-  readline
-    .createInterface({
-      input: child.stdout,
-    })
-    .on('line', (line) => {
-      output.write(`${prefix}${line}\n`);
-    });
-
-  return child;
 }
 
 function isSkipped({ include, exclude }: { include?: string[]; exclude?: string[] }, haystack: string) {
@@ -146,8 +109,9 @@ export default class Run extends CliCommand {
 
       if (manifest.deploy?.api && !isSkipped({ include, exclude }, 'api')) {
         const manifestProcess = {
-          name: 'api',
           ...manifest.deploy.api,
+          name: 'api',
+          env: evalEnv(manifest.deploy.api.env, { secrets: process.env }),
         };
 
         children.push({
@@ -167,9 +131,14 @@ export default class Run extends CliCommand {
             continue;
           }
 
+          const manifestProcess = {
+            ...processor,
+            env: evalEnv(processor.env, { secrets: process.env }),
+          };
+
           children.push({
-            manifestProcess: processor,
-            process: runProcess(runner, processor),
+            manifestProcess,
+            process: runProcess(runner, manifestProcess),
             restartsCount: 0,
           });
         }
@@ -199,4 +168,75 @@ export default class Run extends CliCommand {
       this.error(e.message);
     }
   }
+}
+
+function runProcess(
+  { cwd, output }: { cwd: string; output: Writable },
+  { name, cmd, env }: { name: string; cmd: string[]; env: Record<string, string> },
+) {
+  const [command, ...args] = cmd;
+  const { PROCESSOR_PROMETHEUS_PORT, ...childEnv } = process.env;
+
+  const child = spawn(command, args, {
+    env: {
+      ...childEnv,
+      ...env,
+      FORCE_COLOR: 'true',
+      FORCE_PRETTY_LOGGER: 'true',
+    },
+    cwd,
+    shell: process.platform === 'win32',
+  });
+
+  const prefix = procColor()(`[${name}] `);
+
+  readline
+    .createInterface({
+      input: child.stderr,
+    })
+    .on('line', (line) => {
+      output.write(`${prefix}${line}\n`);
+    });
+  readline
+    .createInterface({
+      input: child.stdout,
+    })
+    .on('line', (line) => {
+      output.write(`${prefix}${line}\n`);
+    });
+
+  return child;
+}
+
+function evalEnv(env: Record<string, string>, context: Record<string, any>) {
+  return omitBy(
+    mapValues(env, (value) =>
+      value.replace(/\${{([^}]*)}}/g, (sub, ...args: string[]) => {
+        const v = args[0].trim();
+
+        // just stupid validation
+        if (!/^[A-Za-z0-9_\-.]*$/.test(v)) {
+          throw new Error(`Parsing error: invalid expression "${v}"`);
+        }
+
+        const tokens = v.split('.');
+        if (tokens.length === 0) {
+          return '';
+        } else {
+          try {
+            return (
+              tokens
+                .reduce((r, t, i) => {
+                  return r[t];
+                }, context)
+                ?.toString() || ''
+            );
+          } catch (e: any) {
+            throw new Error(`Parsing error: ${e instanceof Error ? e.message : e}`);
+          }
+        }
+      }),
+    ),
+    (v) => !v,
+  );
 }
