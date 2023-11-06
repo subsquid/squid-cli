@@ -32,6 +32,44 @@ interface SquidProcess {
   restartsCount: number;
 }
 
+function runProcess(
+  { cwd, output }: { cwd: string; output: Writable },
+  { name, cmd, env }: { name: string; cmd: string[]; env: Record<string, string> },
+) {
+  const [command, ...args] = cmd;
+  const { PROCESSOR_PROMETHEUS_PORT, ...childEnv } = process.env;
+
+  const child = spawn(command, args, {
+    env: {
+      ...childEnv,
+      ...env,
+      FORCE_COLOR: 'true',
+      FORCE_PRETTY_LOGGER: 'true',
+    },
+    cwd,
+    shell: process.platform === 'win32',
+  });
+
+  const prefix = procColor()(`[${name}] `);
+
+  readline
+    .createInterface({
+      input: child.stderr,
+    })
+    .on('line', (line) => {
+      output.write(`${prefix}${line}\n`);
+    });
+  readline
+    .createInterface({
+      input: child.stdout,
+    })
+    .on('line', (line) => {
+      output.write(`${prefix}${line}\n`);
+    });
+
+  return child;
+}
+
 function isSkipped({ include, exclude }: { include?: string[]; exclude?: string[] }, haystack: string) {
   if (exclude?.length && exclude.includes(haystack)) return true;
   else if (include?.length && !include.includes(haystack)) return true;
@@ -107,11 +145,16 @@ export default class Run extends CliCommand {
         }
       }
 
+      const env = evalEnv({ ...manifest.deploy?.env }, { secrets: process.env });
+
       if (manifest.deploy?.api && !isSkipped({ include, exclude }, 'api')) {
         const manifestProcess = {
           ...manifest.deploy.api,
           name: 'api',
-          env: evalEnv(manifest.deploy.api.env, { secrets: process.env }),
+          env: {
+            ...env,
+            ...evalEnv({ ...manifest.deploy.api.env }, { secrets: process.env }),
+          },
         };
 
         children.push({
@@ -133,7 +176,7 @@ export default class Run extends CliCommand {
 
           const manifestProcess = {
             ...processor,
-            env: evalEnv(processor.env, { secrets: process.env }),
+            env: { ...env, ...evalEnv({ ...processor.env }, { secrets: process.env }) },
           };
 
           children.push({
@@ -168,44 +211,6 @@ export default class Run extends CliCommand {
       this.error(e.message);
     }
   }
-}
-
-function runProcess(
-  { cwd, output }: { cwd: string; output: Writable },
-  { name, cmd, env }: { name: string; cmd: string[]; env: Record<string, string> },
-) {
-  const [command, ...args] = cmd;
-  const { PROCESSOR_PROMETHEUS_PORT, ...childEnv } = process.env;
-
-  const child = spawn(command, args, {
-    env: {
-      ...childEnv,
-      ...env,
-      FORCE_COLOR: 'true',
-      FORCE_PRETTY_LOGGER: 'true',
-    },
-    cwd,
-    shell: process.platform === 'win32',
-  });
-
-  const prefix = procColor()(`[${name}] `);
-
-  readline
-    .createInterface({
-      input: child.stderr,
-    })
-    .on('line', (line) => {
-      output.write(`${prefix}${line}\n`);
-    });
-  readline
-    .createInterface({
-      input: child.stdout,
-    })
-    .on('line', (line) => {
-      output.write(`${prefix}${line}\n`);
-    });
-
-  return child;
 }
 
 const EXPR_PATTERN = /(\${{[^}]*}})/;

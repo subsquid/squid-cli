@@ -6,13 +6,13 @@ import { isPlainObject } from 'lodash';
 type ManifestApi = {
   name?: string;
   cmd: string[];
-  env: Record<string, string>;
+  env?: Record<string, string>;
 };
 
 type ManifestProcessor = {
   name: string;
   cmd: string[];
-  env: Record<string, string>;
+  env?: Record<string, string>;
 };
 
 export interface RawManifest {
@@ -20,17 +20,13 @@ export interface RawManifest {
   version: number;
   build: null;
   deploy?: {
+    env?: Record<string, string>;
     processor?: ManifestProcessor | ManifestProcessor[];
     api?: ManifestApi;
   };
 }
 
-export interface Manifest extends RawManifest {
-  deploy?: {
-    api?: ManifestApi;
-    processor?: ManifestProcessor | ManifestProcessor[];
-  };
-}
+export type Manifest = RawManifest;
 
 export function readManifest(path: string, normalize = true): Manifest {
   const manifest = yaml.load(fs.readFileSync(path).toString()) as RawManifest;
