@@ -208,35 +208,133 @@ function runProcess(
   return child;
 }
 
+const EXPR_PATTERN = /(\${{[^}]*}})/;
+
 function evalEnv(env: Record<string, string>, context: Record<string, any>) {
-  return omitBy(
-    mapValues(env, (value) =>
-      value.replace(/\${{([^}]*)}}/g, (sub, ...args: string[]) => {
-        const v = args[0].trim();
+  const error: string[] = [];
 
-        // just stupid validation
-        if (!/^[A-Za-z0-9_\-.]*$/.test(v)) {
-          throw new Error(`Parsing error: invalid expression "${v}"`);
-        }
-
-        const tokens = v.split('.');
-        if (tokens.length === 0) {
-          return '';
-        } else {
+  return mapValues(env, (value) =>
+    value
+      .split(EXPR_PATTERN)
+      .map((i) => {
+        if (EXPR_PATTERN.test(i)) {
           try {
-            return (
-              tokens
-                .reduce((r, t, i) => {
-                  return r[t];
-                }, context)
-                ?.toString() || ''
-            );
+            const exp = SimpleParser.parse(i.slice(3, i.length - 2));
+            return exp.eval(context)?.toString() ?? '';
           } catch (e: any) {
-            throw new Error(`Parsing error: ${e instanceof Error ? e.message : e}`);
+            error.push(e instanceof Error ? e.message : e.toString());
+            return i;
           }
+        } else {
+          return i;
         }
-      }),
-    ),
-    (v) => !v,
+      })
+      .join(''),
   );
+}
+
+export class SimpleParser {
+  static parse(str: string) {
+    return new SimpleParser(str).tokenize();
+  }
+
+  private pos = 0;
+
+  constructor(private str: string) {}
+
+  tokenize(): Expression {
+    let expr: Expression | undefined;
+
+    while (this.str[this.pos]) {
+      while (this.str[this.pos] === ' ') {
+        this.pos++;
+      }
+
+      switch (this.str[this.pos]) {
+        case undefined:
+          break;
+        case '.':
+          if (expr) {
+            this.pos++;
+            expr = new Expression(['.', expr, this.tokenize()]);
+          } else {
+            throw new ParsingError("Unexpected '.'", [0, this.pos]);
+          }
+          break;
+        default:
+          const v = this.token();
+          if (v) {
+            expr = new Expression(v);
+          } else {
+            throw new ParsingError(`Bad char '${this.str[this.pos]}'`, [0, this.pos]);
+          }
+          break;
+      }
+    }
+
+    if (!expr) {
+      throw new ParsingError(`Unexpected EOF`, [0, this.pos]);
+    }
+
+    return expr;
+  }
+
+  token() {
+    const start = this.pos;
+    while (
+      this.str[this.pos] &&
+      (/[a-zA-Z_$]/.test(this.str[this.pos]) || (this.pos > start && /[0-9]/.test(this.str[this.pos])))
+    ) {
+      this.pos++;
+    }
+
+    return this.pos > start ? this.str.slice(start, this.pos) : undefined;
+  }
+}
+
+export class ParsingError extends Error {
+  constructor(message: string, pos: [number, number]) {
+    super(message + ` [${pos}]`);
+  }
+}
+
+export class Expression {
+  constructor(readonly tokens: string | [string, ...Expression[]]) {}
+
+  eval(context?: Record<string, any>): any {
+    if (typeof this.tokens === 'string') {
+      return context?.[this.tokens];
+    }
+
+    switch (this.tokens[0]) {
+      case '.':
+        const obj = this.tokens[1].eval(context);
+        return this.tokens[2].eval(obj);
+      default:
+        // some unknown token, let's skip it for now
+        return undefined;
+    }
+  }
+
+  variables(path: string[] = []) {
+    if (typeof this.tokens === 'string') {
+      return path.length === 0 ? [this.tokens] : [];
+    }
+
+    const res: Set<string> = new Set();
+    switch (this.tokens[0]) {
+      case '.':
+        const obj = this.tokens[1].variables()[0];
+        if (obj && path.length === 0) {
+          res.add(obj);
+        } else if (obj === path[0]) {
+          this.tokens[2].variables(path.slice(1)).forEach((v) => res.add(v));
+        }
+        break;
+      default:
+        // some unknown token, let's skip it for now
+        break;
+    }
+    return [...res];
+  }
 }
