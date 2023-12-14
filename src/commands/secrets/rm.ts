@@ -26,7 +26,7 @@ export default class Rm extends CliCommand {
       args: { name },
     } = await this.parse(Rm);
 
-    const organization = await this.promptOrganization(org);
+    const organization = await this.promptOrganization(org, 'using -o flag');
     await removeSecret({ name, organization });
 
     this.log(`Secret '${name}' removed`);

@@ -20,13 +20,11 @@ const { ttyFdIn, ttyFdOut } = getTTY();
 let stdin: tty.ReadStream | undefined = undefined;
 let stdout: tty.WriteStream | undefined = undefined;
 
-if (ttyFdIn !== undefined) {
-  assert(tty.isatty(ttyFdIn));
+if (ttyFdIn !== undefined && tty.isatty(ttyFdIn)) {
   stdin = new tty.ReadStream(ttyFdIn);
 }
 
-if (ttyFdOut !== undefined) {
-  assert(tty.isatty(ttyFdOut));
+if (ttyFdOut !== undefined && tty.isatty(ttyFdOut)) {
   stdout = new tty.WriteStream(ttyFdOut);
 }
 

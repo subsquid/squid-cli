@@ -32,7 +32,7 @@ export default class Ls extends CliCommand {
     } = await this.parse(Ls);
     const noTruncate = !truncate;
 
-    const organization = await this.promptOrganization(org);
+    const organization = await this.promptOrganization(org, 'using -o flag');
 
     if (name) {
       const squid = await getSquid({ squidName: name });
