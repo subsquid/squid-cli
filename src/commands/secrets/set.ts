@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs';
+
 import { Flags } from '@oclif/core';
 
 import { setSecret, promptOrganization } from '../../api';
@@ -42,23 +44,11 @@ export default class Set extends CliCommand {
 
     let v = value;
     if (!v) {
-      v = await readFromStdin();
+      v = readFileSync(process.stdin.fd).toString();
     }
 
     await setSecret({ name, value: v, organization });
 
     this.log(`Secret '${name}' set`);
   }
-}
-
-async function readFromStdin() {
-  let v = '';
-  return await new Promise((res, rej) => {
-    process.stdin.on('data', (data) => {
-      v += data.toString('utf-8');
-    });
-    process.stdin.on('end', () => {
-      res(v);
-    });
-  });
 }
