@@ -1,6 +1,6 @@
 import { CliUx, Flags } from '@oclif/core';
 
-import { listSecrets, promptOrganization } from '../../api';
+import { listSecrets } from '../../api';
 import { CliCommand } from '../../command';
 
 export default class Ls extends CliCommand {
@@ -20,7 +20,7 @@ export default class Ls extends CliCommand {
       args: {},
     } = await this.parse(Ls);
 
-    const organization = await promptOrganization(org);
+    const organization = await this.promptOrganization(org);
     const response = await listSecrets({ organization });
 
     if (!Object.keys(response.secrets).length) {

@@ -1,7 +1,9 @@
 import { Command } from '@oclif/core';
 import chalk from 'chalk';
+import inquirer from 'inquirer';
 
-import { ApiError } from './api';
+import { ApiError, listOrganizations } from './api';
+import { stdin, stdout } from './tty';
 
 export const RELEASE_DEPRECATE = [
   chalk.yellow('*******************************************************'),
@@ -57,5 +59,39 @@ export abstract class CliCommand extends Command {
     }
 
     throw error;
+  }
+
+  async promptOrganization(organizationCode?: string) {
+    if (organizationCode) return organizationCode;
+
+    const organizations = await listOrganizations();
+
+    if (organizations.length === 0) return;
+    else if (organizations.length === 1) return organizations[0].code;
+
+    if (stdin && stdout) {
+      const prompt = inquirer.createPromptModule({ input: stdin, output: stdout });
+
+      const { organization } = await prompt([
+        {
+          name: 'organization',
+          type: 'list',
+          message: `Please choose an organization:`,
+          choices: organizations.map((o) => {
+            return {
+              name: o.name ? `${o.name} (${o.code})` : o.code,
+              value: o.code,
+            };
+          }),
+        },
+      ]);
+
+      // Hack to pervent opened decriptors to block event loop before exit
+      stdin.destroy();
+      stdout.destroy();
+
+      return organization;
+    }
+    this.error('Organization not specified');
   }
 }

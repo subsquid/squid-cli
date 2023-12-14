@@ -11,17 +11,23 @@ function getTTY() {
     };
   }
   return {
-    ttyFdIn: fs.openSync('/dev/tty', 'r'),
-    ttyFdOut: fs.openSync('/dev/tty', 'w'),
+    ttyFdIn: fs.existsSync('/dev/tty') ? fs.openSync('/dev/tty', 'r') : undefined,
+    ttyFdOut: fs.existsSync('/dev/tty') ? fs.openSync('/dev/tty', 'w') : undefined,
   };
 }
 
 const { ttyFdIn, ttyFdOut } = getTTY();
+let stdin: tty.ReadStream | undefined = undefined;
+let stdout: tty.WriteStream | undefined = undefined;
 
-assert(tty.isatty(ttyFdIn));
-const stdin = new tty.ReadStream(ttyFdIn);
+if (ttyFdIn !== undefined) {
+  assert(tty.isatty(ttyFdIn));
+  stdin = new tty.ReadStream(ttyFdIn);
+}
 
-assert(tty.isatty(ttyFdOut));
-const stdout = new tty.WriteStream(ttyFdOut);
+if (ttyFdOut !== undefined) {
+  assert(tty.isatty(ttyFdOut));
+  stdout = new tty.WriteStream(ttyFdOut);
+}
 
 export { stdin, stdout };

@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 
 import { Flags } from '@oclif/core';
 
-import { setSecret, promptOrganization } from '../../api';
+import { setSecret } from '../../api';
 import { CliCommand } from '../../command';
 
 // TODO move to new API using put method
@@ -40,7 +40,7 @@ export default class Set extends CliCommand {
       args: { name, value },
     } = await this.parse(Set);
 
-    const organization = await promptOrganization(org);
+    const organization = await this.promptOrganization(org);
 
     let v = value;
     if (!v) {
