@@ -7,7 +7,7 @@ import { CliCommand } from '../../command';
 
 export default class Set extends CliCommand {
   static description = [
-    'Create or update a secret',
+    'Create or update a secret. If value is not specified, reads from stadard input.',
     `The secret will be exposed as an environment variable with the given name to all the squids.`,
     `NOTE: The changes take affect only after a squid is restarted or updated.`,
   ].join('\n');
@@ -21,7 +21,7 @@ export default class Set extends CliCommand {
     {
       name: 'value',
       description: 'The secret value',
-      required: true,
+      required: false,
     },
   ];
   static flags = {
@@ -39,8 +39,26 @@ export default class Set extends CliCommand {
     } = await this.parse(Set);
 
     const organization = await promptOrganization(org);
-    await setSecret({ name, value, organization });
+
+    let v = value;
+    if (!v) {
+      v = await readFromStdin();
+    }
+
+    await setSecret({ name, value: v, organization });
 
     this.log(`Secret '${name}' set`);
   }
+}
+
+async function readFromStdin() {
+  let v = '';
+  return await new Promise((res, rej) => {
+    process.stdin.on('data', (data) => {
+      v += data.toString('utf-8');
+    });
+    process.stdin.on('end', () => {
+      res(v);
+    });
+  });
 }

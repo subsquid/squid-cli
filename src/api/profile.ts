@@ -1,5 +1,7 @@
 import inquirer from 'inquirer';
 
+import { stdin, stdout } from '../tty';
+
 import { api, ApiError } from './api';
 import { HttpResponse } from './types';
 
@@ -44,7 +46,9 @@ export async function promptOrganization(organizationCode?: string) {
   if (organizations.length === 0) return;
   else if (organizations.length === 1) return organizations[0].code;
 
-  const { organization } = await inquirer.prompt([
+  const prompt = inquirer.createPromptModule({ input: stdin, output: stdout });
+
+  const { organization } = await prompt([
     {
       name: 'organization',
       type: 'list',
@@ -57,6 +61,10 @@ export async function promptOrganization(organizationCode?: string) {
       }),
     },
   ]);
+
+  // Hack to pervent opened decriptors to block event loop before exit
+  stdin.destroy();
+  stdout.destroy();
 
   return organization;
 }
