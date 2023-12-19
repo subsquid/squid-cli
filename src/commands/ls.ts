@@ -1,6 +1,6 @@
 import { CliUx, Flags } from '@oclif/core';
 
-import { getSquid, squidList, promptOrganization } from '../api';
+import { getSquid, squidList } from '../api';
 import { CliCommand } from '../command';
 
 export default class Ls extends CliCommand {
@@ -32,7 +32,7 @@ export default class Ls extends CliCommand {
     } = await this.parse(Ls);
     const noTruncate = !truncate;
 
-    const organization = await promptOrganization(org);
+    const organization = await this.promptOrganization(org, 'using "-o" flag');
 
     if (name) {
       const squid = await getSquid({ squidName: name });

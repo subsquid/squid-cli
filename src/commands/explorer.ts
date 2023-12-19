@@ -1,11 +1,11 @@
-import { Command, Flags } from '@oclif/core';
+import { Flags } from '@oclif/core';
 import blessed from 'reblessed';
 
-import { promptOrganization } from '../api';
+import { CliCommand } from '../command';
 import { Loader } from '../ui/components/Loader';
 import { VersionManager } from '../ui/components/VersionManager';
 
-export default class Explorer extends Command {
+export default class Explorer extends CliCommand {
   static description = 'Open a visual explorer for the Cloud deployments';
   // static hidden = true;
   static flags = {
@@ -21,7 +21,7 @@ export default class Explorer extends Command {
       flags: { org },
     } = await this.parse(Explorer);
 
-    const organization = await promptOrganization(org);
+    const organization = await this.promptOrganization(org, 'using "-o" flag');
     const screen = blessed.screen({
       smartCSR: true,
       fastCSR: true,
