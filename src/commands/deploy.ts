@@ -5,10 +5,9 @@ import { promisify } from 'util';
 import { CliUx, Flags } from '@oclif/core';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
-import yaml from 'js-yaml';
 import targz from 'targz';
 
-import { deploySquid, uploadFile, promptOrganization } from '../api';
+import { deploySquid, uploadFile } from '../api';
 import { DeployCommand } from '../deploy-command';
 import { Manifest } from '../manifest';
 import { loadManifestFile } from '../manifest/loadManifestFile';
@@ -146,7 +145,7 @@ export default class Deploy extends DeployCommand {
         /**
          * It is a new squid need to check project code is specified
          */
-        organization = await promptOrganization(organization);
+        organization = await this.promptOrganization(organization, 'using "-o" flag');
       }
 
       CliUx.ux.action.start(`◷ Compressing the squid to ${archiveName} `);
@@ -198,7 +197,7 @@ export default class Deploy extends DeployCommand {
         organization,
       });
     } else {
-      organization = await promptOrganization(organization);
+      organization = await this.promptOrganization(organization, 'using "-o" flag');
       this.log(`🦑 Releasing the squid from remote`);
 
       deploy = await deploySquid({
