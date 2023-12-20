@@ -16,6 +16,18 @@ export const RELEASE_DEPRECATE = [
 ].join('\n');
 
 export abstract class CliCommand extends Command {
+  logSuccess(message: string) {
+    this.log(chalk.green(`✓ `) + message);
+  }
+
+  logQuestion(message: string) {
+    this.log(chalk.green(`? `) + message);
+  }
+
+  logDimmed(message: string) {
+    this.log(chalk.dim(message));
+  }
+
   async catch(error: any) {
     const { status, body } = error;
 
@@ -92,7 +104,7 @@ export abstract class CliCommand extends Command {
       },
     ]);
 
-    // Hack to pervent opened decriptors to block event loop before exit
+    // Hack to prevent opened descriptors to block event loop before exit
     stdin.destroy();
     stdout.destroy();
 
