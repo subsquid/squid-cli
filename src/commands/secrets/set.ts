@@ -1,5 +1,3 @@
-import { readFileSync } from 'fs';
-
 import { Flags } from '@oclif/core';
 
 import { setSecret } from '../../api';
@@ -42,13 +40,28 @@ export default class Set extends CliCommand {
 
     const organization = await this.promptOrganization(org, 'using "-o" flag');
 
-    let v = value;
-    if (!v) {
-      v = readFileSync(process.stdin.fd).toString();
+    let secretValue = value;
+    if (!secretValue) {
+      this.logQuestion('Reading plaintext input from stdin.');
+      this.logDimmed('Use ctrl-d to end input, twice if secret does not have a newline. Ctrl+c to cancel');
+      secretValue = await readFromStdin().catch((e) => console.log(e));
     }
 
-    await setSecret({ name, value: v, organization });
+    await setSecret({ name, value: secretValue, organization });
 
-    this.log(`Secret '${name}' set`);
+    this.logSuccess(`Set secret ${name} for organization ${organization}`);
   }
+}
+
+async function readFromStdin() {
+  let res = '';
+  return await new Promise((resolve, reject) => {
+    process.stdin.on('data', (data) => {
+      res += data.toString('utf-8');
+    });
+    process.stdin.on('end', () => {
+      resolve(res);
+    });
+    process.stdin.on('error', reject);
+  });
 }
