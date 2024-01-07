@@ -179,6 +179,19 @@ export default class Run extends CliCommand {
         ...evalManifestEnv(manifest.deploy?.env ?? {}, context),
       };
 
+      const init = manifest.deploy?.init;
+      if (init && !isSkipped({ include, exclude }, 'init')) {
+        const p = new SquidProcess('init', init.cmd, {
+          env: {
+            ...env,
+            ...evalManifestEnv(init.env ?? {}, context),
+          },
+          cwd: squidDir,
+        });
+
+        await p.run({ retries });
+      }
+
       const api = manifest.deploy?.api;
       if (api && !isSkipped({ include, exclude }, 'api')) {
         children.push(

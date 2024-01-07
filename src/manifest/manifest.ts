@@ -16,6 +16,12 @@ type ManifestProcessor = {
   env: Record<string, unknown>;
 };
 
+type ManifestInit = {
+  name?: string;
+  cmd: string[];
+  env: Record<string, unknown>;
+};
+
 export interface RawManifest {
   name: string;
   version: number;
@@ -24,6 +30,7 @@ export interface RawManifest {
     env?: Record<string, unknown>;
     processor?: ManifestProcessor | ManifestProcessor[];
     api?: ManifestApi;
+    init?: ManifestInit;
   };
 }
 
