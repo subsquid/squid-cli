@@ -1,7 +1,8 @@
 import fs from 'fs';
 
+import { Expression, Parser } from '@subsquid/manifest-expr';
 import yaml from 'js-yaml';
-import { isPlainObject } from 'lodash';
+import { isPlainObject, mapValues } from 'lodash';
 
 type ManifestApi = {
   name?: string;
@@ -60,4 +61,16 @@ export function formatManifest(manifest: RawManifest): string {
 
 export function saveManifest(path: string, manifest: RawManifest) {
   fs.writeFileSync(path, formatManifest(manifest));
+}
+
+export function evalManifestEnv(env: Record<string, any>, context: Record<string, any>) {
+  const parsed = parseManifestEnv(env);
+
+  return mapValues(parsed, (value) => (value instanceof Expression ? value.eval(context) : value));
+}
+
+export function parseManifestEnv(env: Record<string, any>) {
+  const parser = new Parser();
+
+  return mapValues(env, (value) => (typeof value === 'string' ? parser.parse(value) : value));
 }
