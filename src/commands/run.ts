@@ -111,7 +111,10 @@ class SquidProcess {
 }
 
 function isSkipped({ include, exclude }: { include?: string[]; exclude?: string[] }, haystack: string) {
-  return (exclude?.length && exclude.includes(haystack)) || (include?.length && !include.includes(haystack));
+  if (exclude?.length && exclude.includes(haystack)) return true;
+  else if (include?.length && !include.includes(haystack)) return true;
+
+  return false;
 }
 
 export default class Run extends CliCommand {
