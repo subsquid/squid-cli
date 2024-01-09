@@ -1,72 +1,113 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import assert from 'assert';
+import { ChildProcess } from 'child_process';
 import path from 'path';
 import * as readline from 'readline';
-import { Writable } from 'stream';
 
 import { Flags } from '@oclif/core';
+import retryAsync from 'async-retry';
 import chalk from 'chalk';
+import crossSpawn from 'cross-spawn';
 import dotenv from 'dotenv';
-import tkill from 'tree-kill';
+import { defaults, omit } from 'lodash';
+import treeKill from 'tree-kill';
 
 import { CliCommand } from '../command';
+import { evalManifestEnv } from '../manifest';
 import { loadManifestFile } from '../manifest/loadManifestFile';
 
 const chalkColors = [chalk.green, chalk.yellow, chalk.blue, chalk.magenta, chalk.cyan];
 
-function chalkColorGenerator() {
+const chalkColorGenerator = (() => {
   let n = 0;
-
   return () => chalkColors[n++ % chalkColors.length];
-}
+})();
 
-const procColor = chalkColorGenerator();
+type SquidProcessOptions = {
+  env?: Record<string, string>;
+  cwd?: string;
+  stdin: NodeJS.ReadableStream;
+  stdout: NodeJS.WritableStream;
+  stderr: NodeJS.WritableStream;
+};
 
-interface SquidProcess {
-  manifestProcess: {
-    name: string;
-    cmd: string[];
-    env: Record<string, string>;
-  };
-  process: ChildProcessWithoutNullStreams;
-  restartsCount: number;
-}
+class SquidProcess {
+  private readonly prefix: string;
+  private child?: ChildProcess;
+  private options: SquidProcessOptions;
 
-function runProcess(
-  { cwd, output }: { cwd: string; output: Writable },
-  { name, cmd, env }: { name: string; cmd: string[]; env: Record<string, string> },
-) {
-  const [command, ...args] = cmd;
-  const { PROCESSOR_PROMETHEUS_PORT, ...childEnv } = process.env;
-
-  const child = spawn(command, args, {
-    env: {
-      ...childEnv,
-      ...env,
-      FORCE_COLOR: 'true',
-      FORCE_PRETTY_LOGGER: 'true',
-    },
-    cwd,
-    shell: process.platform === 'win32',
-  });
-
-  const prefix = procColor()(`[${name}] `);
-
-  readline
-    .createInterface({
-      input: child.stderr,
-    })
-    .on('line', (line) => {
-      output.write(`${prefix}${line}\n`);
+  constructor(readonly name: string, private cmd: string[], options: Partial<SquidProcessOptions>) {
+    this.prefix = chalkColorGenerator()(`[${name}]`);
+    this.options = defaults(options, {
+      stdin: process.stdin,
+      stdout: process.stdout,
+      stderr: process.stderr,
     });
-  readline
-    .createInterface({
-      input: child.stdout,
-    })
-    .on('line', (line) => {
-      output.write(`${prefix}${line}\n`);
-    });
+  }
 
-  return child;
+  async run({ retries }: { retries: number }) {
+    await retryAsync(
+      async () => {
+        const result = await this.spawn();
+        if (result.code && result.code > 0) {
+          throw new Error(`Process ${this.prefix} failed with exit code: ${result.code}`);
+        } else {
+          return;
+        }
+      },
+      {
+        retries,
+        factor: 1,
+        onRetry: (e) => {
+          console.log(e.message);
+          console.log(`Process ${this.prefix} restarting...`);
+        },
+      },
+    );
+  }
+
+  kill(signal?: string | number) {
+    if (this.child?.pid) {
+      treeKill(this.child.pid, signal);
+      this.child = undefined;
+    }
+  }
+
+  private spawn() {
+    assert(!this.child, `process "${this.name}" has been already started`);
+
+    const [command, ...args] = this.cmd;
+
+    return new Promise<{ code: number | null; signal: string | null }>((resolve, reject) => {
+      const child = crossSpawn(command, args, {
+        cwd: this.options.cwd,
+        env: this.options.env,
+      });
+      this.child = child;
+
+      child.once('error', (error: Error) => {
+        this.child = undefined;
+        reject(error);
+      });
+
+      child.once('close', (code: number | null, signal: string | null) => {
+        this.child = undefined;
+        resolve({ code, signal });
+      });
+
+      if (this.child.stderr) {
+        this.pipe(this.child.stderr, this.options.stderr);
+      }
+      if (this.child.stdout) {
+        this.pipe(this.child.stdout, this.options.stdout);
+      }
+    });
+  }
+
+  private pipe(input: NodeJS.ReadableStream, output: NodeJS.WritableStream) {
+    readline.createInterface({ input }).on('line', (line) => {
+      output.write(`${this.prefix} ${line}\n`);
+    });
+  }
 }
 
 function isSkipped({ include, exclude }: { include?: string[]; exclude?: string[] }, haystack: string) {
@@ -82,22 +123,17 @@ export default class Run extends CliCommand {
   static flags = {
     manifest: Flags.string({
       char: 'm',
-      description: 'Relative path to a squid manifest file in squid source',
+      description: 'Relative path to a squid manifest file',
       required: false,
       default: 'squid.yaml',
     }),
     envFile: Flags.string({
       char: 'f',
-      description: 'Relative path to an additional environment file in squid source',
+      description: 'Relative path to an additional environment file',
       required: false,
       default: '.env',
     }),
-    exclude: Flags.string({
-      char: 'e',
-      description: 'Do not run specified services',
-      required: false,
-      multiple: true,
-    }),
+    exclude: Flags.string({ char: 'e', description: 'Do not run specified services', required: false, multiple: true }),
     include: Flags.string({
       char: 'i',
       description: 'Run only specified services',
@@ -107,7 +143,7 @@ export default class Run extends CliCommand {
     }),
     retries: Flags.integer({
       char: 'r',
-      description: 'Attepms to restart failed or stopped services',
+      description: 'Attempts to restart failed or stopped services',
       required: false,
       default: 5,
     }),
@@ -123,38 +159,58 @@ export default class Run extends CliCommand {
   ];
 
   async run(): Promise<void> {
-    const {
-      flags: { manifest: manifestPath, envFile, exclude, include, retries },
-      args: { path: squidPath },
-    } = await this.parse(Run);
-
     try {
+      const {
+        flags: { manifest: manifestPath, envFile, exclude, include, retries },
+        args: { path: squidPath },
+      } = await this.parse(Run);
+
       const { squidDir, manifest } = loadManifestFile(squidPath, manifestPath);
-
-      const runner = { cwd: squidDir, output: process.stdout };
-
       const children: SquidProcess[] = [];
 
       if (envFile) {
         const { error } = dotenv.config({
-          path: path.isAbsolute(envFile) ? envFile : path.join(squidDir, '/', envFile),
+          path: path.isAbsolute(envFile) ? envFile : path.join(squidDir, envFile),
         });
         if (error) {
-          this.error(error);
+          return this.error(error);
         }
       }
 
-      if (manifest.deploy?.api && !isSkipped({ include, exclude }, 'api')) {
-        const manifestProcess = {
-          name: 'api',
-          ...manifest.deploy.api,
-        };
+      const context = { secrets: process.env };
 
-        children.push({
-          manifestProcess,
-          process: runProcess(runner, manifestProcess),
-          restartsCount: 0,
+      const processEnv = omit(process.env, ['PROCESSOR_PROMETHEUS_PORT']);
+      const env = {
+        FORCE_COLOR: 'true',
+        FORCE_PRETTY_LOGGER: 'true',
+        ...processEnv,
+        ...evalManifestEnv(manifest.deploy?.env ?? {}, context),
+      };
+
+      const init = manifest.deploy?.init;
+      if (init && !isSkipped({ include, exclude }, 'init')) {
+        const p = new SquidProcess('init', init.cmd, {
+          env: {
+            ...env,
+            ...evalManifestEnv(init.env ?? {}, context),
+          },
+          cwd: squidDir,
         });
+
+        await p.run({ retries });
+      }
+
+      const api = manifest.deploy?.api;
+      if (api && !isSkipped({ include, exclude }, 'api')) {
+        children.push(
+          new SquidProcess('api', api.cmd, {
+            env: {
+              ...env,
+              ...evalManifestEnv(api.env ?? {}, context),
+            },
+            cwd: squidDir,
+          }),
+        );
       }
 
       if (manifest.deploy?.processor) {
@@ -163,40 +219,33 @@ export default class Run extends CliCommand {
           : [manifest.deploy.processor];
 
         for (const processor of processors) {
-          if (isSkipped({ include, exclude }, processor.name)) {
-            continue;
-          }
+          if (isSkipped({ include, exclude }, processor.name)) continue;
 
-          children.push({
-            manifestProcess: processor,
-            process: runProcess(runner, processor),
-            restartsCount: 0,
-          });
+          children.push(
+            new SquidProcess(processor.name, processor.cmd, {
+              env: {
+                ...env,
+                ...evalManifestEnv(processor.env ?? {}, context),
+              },
+              cwd: squidDir,
+            }),
+          );
         }
       }
 
-      children.forEach((c) => {
-        const onProcessExit = (code: number) => {
-          if (code != null) console.log(`${c.manifestProcess.name} exited with code ${code}`);
-          if (code === 0) return;
-          if (c.restartsCount < retries) {
-            c.process = runProcess(runner, c.manifestProcess);
-            c.process.on('exit', onProcessExit);
-            c.restartsCount++;
-          } else {
-            children.forEach((cc) => {
-              cc.restartsCount = retries;
-              if (cc.process.pid) {
-                tkill(cc.process.pid, 'SIGKILL');
-              }
-            });
-          }
-        };
+      let error: Error | undefined;
+      const abort = (e: Error) => {
+        if (error) return;
+        error = e;
 
-        c.process.on('exit', onProcessExit);
-      });
+        children.map((c) => c.kill());
+      };
+
+      await Promise.allSettled(children.map((c) => c.run({ retries }).catch(abort)));
+
+      if (error) this.error(error);
     } catch (e: any) {
-      this.error(e.message);
+      this.error(e instanceof Error ? e.message : e);
     }
   }
 }

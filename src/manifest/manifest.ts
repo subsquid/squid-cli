@@ -1,18 +1,25 @@
 import fs from 'fs';
 
+import { Expression, Parser } from '@subsquid/manifest-expr';
 import yaml from 'js-yaml';
-import { isPlainObject } from 'lodash';
+import { isPlainObject, mapValues } from 'lodash';
 
 type ManifestApi = {
   name?: string;
   cmd: string[];
-  env: Record<string, string>;
+  env: Record<string, unknown>;
 };
 
 type ManifestProcessor = {
   name: string;
   cmd: string[];
-  env: Record<string, string>;
+  env: Record<string, unknown>;
+};
+
+type ManifestInit = {
+  name?: string;
+  cmd: string[];
+  env: Record<string, unknown>;
 };
 
 export interface RawManifest {
@@ -20,17 +27,14 @@ export interface RawManifest {
   version: number;
   build: null;
   deploy?: {
+    env?: Record<string, unknown>;
     processor?: ManifestProcessor | ManifestProcessor[];
     api?: ManifestApi;
+    init?: ManifestInit;
   };
 }
 
-export interface Manifest extends RawManifest {
-  deploy?: {
-    api?: ManifestApi;
-    processor?: ManifestProcessor | ManifestProcessor[];
-  };
-}
+export type Manifest = RawManifest;
 
 export function readManifest(path: string, normalize = true): Manifest {
   const manifest = yaml.load(fs.readFileSync(path).toString()) as RawManifest;
@@ -64,4 +68,16 @@ export function formatManifest(manifest: RawManifest): string {
 
 export function saveManifest(path: string, manifest: RawManifest) {
   fs.writeFileSync(path, formatManifest(manifest));
+}
+
+export function evalManifestEnv(env: Record<string, any>, context: Record<string, any>) {
+  const parsed = parseManifestEnv(env);
+
+  return mapValues(parsed, (value) => (value instanceof Expression ? value.eval(context) : value));
+}
+
+export function parseManifestEnv(env: Record<string, any>) {
+  const parser = new Parser();
+
+  return mapValues(env, (value) => (typeof value === 'string' ? parser.parse(value) : value));
 }
