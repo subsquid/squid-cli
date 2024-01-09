@@ -8,7 +8,7 @@ import retryAsync from 'async-retry';
 import chalk from 'chalk';
 import crossSpawn from 'cross-spawn';
 import dotenv from 'dotenv';
-import { defaults } from 'lodash';
+import { defaults, omit } from 'lodash';
 import treeKill from 'tree-kill';
 
 import { CliCommand } from '../command';
@@ -31,7 +31,7 @@ type SquidProcessOptions = {
 };
 
 class SquidProcess {
-  private prefix: string;
+  private readonly prefix: string;
   private child?: ChildProcess;
   private options: SquidProcessOptions;
 
@@ -73,13 +73,15 @@ class SquidProcess {
   }
 
   private spawn() {
-    assert(!this.child);
+    assert(!this.child, `process "${this.name}" has been already started`);
 
     const [command, ...args] = this.cmd;
-    const { PROCESSOR_PROMETHEUS_PORT, ...childEnv } = process.env;
 
     return new Promise<{ code: number | null; signal: string | null }>((resolve, reject) => {
-      const child = crossSpawn(command, args, { env: { ...childEnv, ...this.options.env } });
+      const child = crossSpawn(command, args, {
+        cwd: this.options.cwd,
+        env: this.options.env,
+      });
       this.child = child;
 
       child.once('error', (error: Error) => {
@@ -95,7 +97,6 @@ class SquidProcess {
       if (this.child.stderr) {
         this.pipe(this.child.stderr, this.options.stderr);
       }
-
       if (this.child.stdout) {
         this.pipe(this.child.stdout, this.options.stdout);
       }
@@ -165,13 +166,17 @@ export default class Run extends CliCommand {
       const children: SquidProcess[] = [];
 
       if (envFile) {
-        const { error } = dotenv.config({ path: path.isAbsolute(envFile) ? envFile : path.join(squidDir, envFile) });
-        if (error) this.error(error);
+        const { error } = dotenv.config({
+          path: path.isAbsolute(envFile) ? envFile : path.join(squidDir, envFile),
+        });
+        if (error) {
+          return this.error(error);
+        }
       }
 
       const context = { secrets: process.env };
 
-      const { PROCESSOR_PROMETHEUS_PORT, ...processEnv } = process.env;
+      const processEnv = omit(process.env, ['PROCESSOR_PROMETHEUS_PORT']);
       const env = {
         FORCE_COLOR: 'true',
         FORCE_PRETTY_LOGGER: 'true',
