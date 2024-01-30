@@ -55,6 +55,7 @@ class SquidProcess {
         }
       },
       {
+        forever: retries < 0,
         retries,
         factor: 1,
         onRetry: (e) => {
