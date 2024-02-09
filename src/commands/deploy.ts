@@ -6,6 +6,7 @@ import { CliUx, Flags } from '@oclif/core';
 import { ManifestValue } from '@subsquid/manifest';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
+import { get } from 'lodash';
 import targz from 'targz';
 
 import { deploySquid, uploadFile } from '../api';
@@ -20,6 +21,12 @@ const SQUID_PATH_DESC = [
   `  - a URL to a .tar.gz archive`,
   `  - a github URL to a git repo with a branch or commit tag`,
 ];
+
+const lockFiles = {
+  npm: 'package-lock.json',
+  yarn: 'yarn.lock',
+  pnpm: 'pnpm-lock.yaml',
+};
 
 export function resolveManifest(
   localPath: string,
@@ -149,6 +156,16 @@ export default class Deploy extends DeployCommand {
       }
 
       CliUx.ux.action.start(`◷ Compressing the squid to ${archiveName} `);
+
+      if (!hasPackageJson(squidDir)) {
+        return this.error(`package.json was not found in ${squidDir}`);
+      }
+
+      const lockFile = get(lockFiles, manifest.build.package_manager);
+      if (!hasLockFile(squidDir, lockFile)) {
+        return this.error(`${lockFile || 'Lockfile'} was not found in ${squidDir}`);
+      }
+
       let filesCount = 0;
       await compressAsync({
         src: squidDir,
@@ -215,5 +232,17 @@ export default class Deploy extends DeployCommand {
     await this.pollDeploy({ deployId: deploy.id, streamLogs: !disableStreamLogs });
 
     this.log('✔️ Done!');
+  }
+}
+
+function hasPackageJson(squidDir: string) {
+  return fs.existsSync(path.join(squidDir, 'package.json'));
+}
+
+function hasLockFile(squidDir: string, lockFile?: string) {
+  if (lockFile) {
+    return fs.existsSync(path.join(squidDir, lockFile));
+  } else {
+    return Object.values(lockFiles).some((lf) => fs.existsSync(path.join(squidDir, lf)));
   }
 }
