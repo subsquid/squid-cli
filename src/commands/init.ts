@@ -181,7 +181,7 @@ export default class Init extends CliCommand {
 
     const manifestPath = path.resolve(localDir, 'squid.yaml');
     try {
-      const manifest = readManifest(manifestPath, false);
+      const manifest = readManifest(manifestPath);
 
       /** Override name in squid manifest **/
       manifest.name = name;

@@ -1,73 +1,25 @@
 import fs from 'fs';
+import path from 'path';
 
+import { Manifest, ManifestValue } from '@subsquid/manifest';
 import { Expression, Parser } from '@subsquid/manifest-expr';
 import yaml from 'js-yaml';
 import { isPlainObject, mapValues } from 'lodash';
 
-type ManifestApi = {
-  name?: string;
-  cmd: string[];
-  env: Record<string, unknown>;
-};
-
-type ManifestProcessor = {
-  name: string;
-  cmd: string[];
-  env: Record<string, unknown>;
-};
-
-type ManifestInit = {
-  name?: string;
-  cmd: string[];
-  env: Record<string, unknown>;
-};
-
-export interface RawManifest {
-  name: string;
-  version: number;
-  build: null;
-  deploy?: {
-    env?: Record<string, unknown>;
-    processor?: ManifestProcessor | ManifestProcessor[];
-    api?: ManifestApi;
-    init?: ManifestInit;
-  };
+export function readManifest(path: string) {
+  return yaml.load(fs.readFileSync(path).toString()) as Partial<ManifestValue>;
 }
 
-export type Manifest = RawManifest;
-
-export function readManifest(path: string, normalize = true): Manifest {
-  const manifest = yaml.load(fs.readFileSync(path).toString()) as RawManifest;
-
-  if (normalize) {
-    if (manifest.deploy?.processor) {
-      if (isPlainObject(manifest.deploy.processor)) {
-        const processor = manifest.deploy.processor as ManifestProcessor;
-        if (!processor.name) {
-          processor.name = 'processor';
-        }
-
-        manifest.deploy.processor = [processor];
-      } else {
-        const processors = manifest.deploy.processor as ManifestProcessor[];
-        manifest.deploy.processor = processors.map((p, i) => (p.name ? p : { ...p, name: `processor${i + 1}` }));
-      }
-    }
-  }
-
-  return manifest as Manifest;
+export function saveManifest(path: string, manifest: Partial<ManifestValue>) {
+  fs.writeFileSync(path, formatManifest(manifest));
 }
 
-export function formatManifest(manifest: RawManifest): string {
+export function formatManifest(manifest: Partial<ManifestValue>): string {
   return yaml.dump(manifest, {
     styles: {
       'tag:yaml.org,2002:null': 'empty',
     },
   });
-}
-
-export function saveManifest(path: string, manifest: RawManifest) {
-  fs.writeFileSync(path, formatManifest(manifest));
 }
 
 export function evalManifestEnv(env: Record<string, any>, context: Record<string, any>) {
@@ -80,4 +32,43 @@ export function parseManifestEnv(env: Record<string, any>) {
   const parser = new Parser();
 
   return mapValues(env, (value) => (typeof value === 'string' ? parser.parse(value) : value));
+}
+
+export function loadManifestFile(
+  localPath: string,
+  manifestPath: string,
+): { squidDir: string; manifest: ManifestValue } {
+  const squidDir = path.resolve(localPath);
+
+  if (!fs.statSync(squidDir).isDirectory()) {
+    throw new Error(`The path ${squidDir} is a not a squid directory. Please provide a path to a squid root directory`);
+  }
+
+  const manifestFullPath = path.isAbsolute(manifestPath)
+    ? manifestPath
+    : path.resolve(path.join(localPath, manifestPath));
+  if (fs.statSync(manifestFullPath).isDirectory()) {
+    throw new Error(
+      `The path ${manifestFullPath} is a directory, not a manifest file. Please provide a path to a valid manifest file inside squid directory`,
+    );
+  }
+
+  let manifest;
+  try {
+    const raw = fs.readFileSync(manifestFullPath).toString();
+    manifest = Manifest.parse(raw);
+  } catch (e: any) {
+    throw new Error(
+      `The manifest file on ${manifestFullPath} can not be parsed: ${e instanceof Error ? e.message : e}`,
+    );
+  }
+
+  if (manifest.hasError()) {
+    throw new Error(manifest.getErrors().join('\n'));
+  }
+
+  return {
+    squidDir,
+    manifest: manifest.values() as ManifestValue,
+  };
 }

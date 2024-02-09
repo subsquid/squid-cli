@@ -3,14 +3,14 @@ import path from 'path';
 import { promisify } from 'util';
 
 import { CliUx, Flags } from '@oclif/core';
+import { ManifestValue } from '@subsquid/manifest';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import targz from 'targz';
 
 import { deploySquid, uploadFile } from '../api';
 import { DeployCommand } from '../deploy-command';
-import { Manifest } from '../manifest';
-import { loadManifestFile } from '../manifest/loadManifestFile';
+import { loadManifestFile } from '../manifest';
 
 const compressAsync = promisify(targz.compress);
 
@@ -24,7 +24,7 @@ const SQUID_PATH_DESC = [
 export function resolveManifest(
   localPath: string,
   manifestPath: string,
-): { error: string } | { buildDir: string; squidDir: string; manifest: Manifest } {
+): { error: string } | { buildDir: string; squidDir: string; manifest: ManifestValue } {
   try {
     const { squidDir, manifest } = loadManifestFile(localPath, manifestPath);
 
