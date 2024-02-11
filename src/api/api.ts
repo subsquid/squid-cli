@@ -3,7 +3,7 @@ import path from 'path';
 import chalk from 'chalk';
 import { pickBy } from 'lodash';
 import fetch from 'node-fetch';
-import qs from 'query-string';
+import qs from 'qs';
 
 import { getConfig } from '../config';
 

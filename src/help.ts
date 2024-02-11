@@ -1,4 +1,4 @@
-import { CliUx, Help as OclifHelp } from '@oclif/core';
+import { ux as CliUx, Help as OclifHelp } from '@oclif/core';
 import chalk from 'chalk';
 
 import DefaultCommand from './commands/default';

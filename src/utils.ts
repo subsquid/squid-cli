@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'fs';
 
-import { Command, CliUx } from '@oclif/core';
+import { Command, ux as CliUx } from '@oclif/core';
 import { ConfigNotFound, getConfig } from '@subsquid/commands';
 import { dim } from 'chalk';
 import cliSelect from 'cli-select';
