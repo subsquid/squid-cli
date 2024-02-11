@@ -12,8 +12,7 @@ import { defaults, omit } from 'lodash';
 import treeKill from 'tree-kill';
 
 import { CliCommand } from '../command';
-import { evalManifestEnv } from '../manifest';
-import { loadManifestFile } from '../manifest/loadManifestFile';
+import { evalManifestEnv, loadManifestFile } from '../manifest';
 
 const chalkColors = [chalk.green, chalk.yellow, chalk.blue, chalk.magenta, chalk.cyan];
 
@@ -189,7 +188,7 @@ export default class Run extends CliCommand {
       };
 
       const init = manifest.deploy?.init;
-      if (init && !isSkipped({ include, exclude }, 'init')) {
+      if (init && init.cmd && !isSkipped({ include, exclude }, 'init')) {
         const p = new SquidProcess('init', init.cmd, {
           env: {
             ...env,
@@ -202,7 +201,7 @@ export default class Run extends CliCommand {
       }
 
       const api = manifest.deploy?.api;
-      if (api && !isSkipped({ include, exclude }, 'api')) {
+      if (api && api.cmd && !isSkipped({ include, exclude }, 'api')) {
         children.push(
           new SquidProcess('api', api.cmd, {
             env: {
@@ -220,7 +219,7 @@ export default class Run extends CliCommand {
           : [manifest.deploy.processor];
 
         for (const processor of processors) {
-          if (isSkipped({ include, exclude }, processor.name)) continue;
+          if (!processor.cmd || isSkipped({ include, exclude }, processor.name)) continue;
 
           children.push(
             new SquidProcess(processor.name, processor.cmd, {
