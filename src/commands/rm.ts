@@ -1,4 +1,4 @@
-import { CliUx, Command, Flags } from '@oclif/core';
+import { Args, ux as CliUx, Command, Flags } from '@oclif/core';
 import inquirer from 'inquirer';
 
 import { destroySquid, destroyVersion } from '../api';
@@ -8,13 +8,14 @@ export default class Rm extends Command {
   static aliases = ['squid:kill', 'kill'];
 
   static description = 'Remove a squid or a squid version deployed to the Cloud';
-  static args = [
-    {
-      name: 'nameAndVersion',
+
+  static args = {
+    nameAndVersion: Args.string({
       description: '<name> or <name@version>',
       required: true,
-    },
-  ];
+    }),
+  };
+
   static flags = {
     force: Flags.boolean({
       char: 'f',

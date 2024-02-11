@@ -1,4 +1,4 @@
-import { Flags } from '@oclif/core';
+import { Args, Flags } from '@oclif/core';
 
 import { setSecret } from '../../api';
 import { CliCommand } from '../../command';
@@ -12,18 +12,17 @@ export default class Set extends CliCommand {
     `NOTE: The changes take affect only after a squid is restarted or updated.`,
   ].join('\n');
 
-  static args = [
-    {
-      name: 'name',
+  static args = {
+    name: Args.string({
       description: 'The secret name',
       required: true,
-    },
-    {
-      name: 'value',
+    }),
+    value: Args.string({
       description: 'The secret value',
-      required: false,
-    },
-  ];
+      required: true,
+    }),
+  };
+
   static flags = {
     org: Flags.string({
       char: 'o',
@@ -44,7 +43,7 @@ export default class Set extends CliCommand {
     if (!secretValue) {
       this.logQuestion('Reading plaintext input from stdin.');
       this.logDimmed('Use ctrl-d to end input, twice if secret does not have a newline. Ctrl+c to cancel');
-      secretValue = await readFromStdin().catch((e) => console.log(e));
+      secretValue = await readFromStdin();
     }
 
     await setSecret({ name, value: secretValue, organization });
@@ -53,7 +52,7 @@ export default class Set extends CliCommand {
   }
 }
 
-async function readFromStdin() {
+async function readFromStdin(): Promise<string> {
   let res = '';
   return await new Promise((resolve, reject) => {
     process.stdin.on('data', (data) => {

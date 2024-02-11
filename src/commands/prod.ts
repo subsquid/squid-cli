@@ -1,5 +1,6 @@
 import assert from 'assert';
 
+import { Args } from '@oclif/core';
 import inquirer from 'inquirer';
 
 import { getSquid, setProduction } from '../api';
@@ -10,13 +11,12 @@ export default class Prod extends DeployCommand {
   static aliases = ['squid:prod'];
 
   static description = 'Assign the canonical production API alias for a squid deployed to the Cloud';
-  static args = [
-    {
-      name: 'nameAndVersion',
+  static args = {
+    nameAndVersion: Args.string({
       description: 'name@version',
       required: true,
-    },
-  ];
+    }),
+  };
 
   async run(): Promise<void> {
     const { args } = await this.parse(Prod);

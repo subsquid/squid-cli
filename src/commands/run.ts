@@ -3,7 +3,7 @@ import { ChildProcess } from 'child_process';
 import path from 'path';
 import * as readline from 'readline';
 
-import { Flags } from '@oclif/core';
+import { Args, Flags } from '@oclif/core';
 import retryAsync from 'async-retry';
 import chalk from 'chalk';
 import crossSpawn from 'cross-spawn';
@@ -34,7 +34,11 @@ class SquidProcess {
   private child?: ChildProcess;
   private options: SquidProcessOptions;
 
-  constructor(readonly name: string, private cmd: string[], options: Partial<SquidProcessOptions>) {
+  constructor(
+    readonly name: string,
+    private cmd: string[],
+    options: Partial<SquidProcessOptions>,
+  ) {
     this.prefix = chalkColorGenerator()(`[${name}]`);
     this.options = defaults(options, {
       stdin: process.stdin,
@@ -149,15 +153,13 @@ export default class Run extends CliCommand {
     }),
   };
 
-  static args = [
-    {
-      name: 'path',
-      required: true,
+  static args = {
+    path: Args.string({
       hidden: false,
+      required: true,
       default: '.',
-    },
-  ];
-
+    }),
+  };
   async run(): Promise<void> {
     try {
       const {

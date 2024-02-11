@@ -1,4 +1,4 @@
-import { CliUx, Flags } from '@oclif/core';
+import { Args, ux as CliUx, Flags } from '@oclif/core';
 import ms from 'ms';
 
 import { debugLog, streamSquidLogs, versionHistoryLogs } from '../api';
@@ -24,13 +24,13 @@ export default class Logs extends CliCommand {
   static aliases = ['squid:logs'];
 
   static description = 'Fetch logs from a squid deployed to the Cloud';
-  static args = [
-    {
-      name: 'name',
+  static args = {
+    name: Args.string({
       description: 'name@version',
       required: true,
-    },
-  ];
+    }),
+  };
+
   static flags = {
     container: Flags.string({
       char: 'c',

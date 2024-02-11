@@ -1,4 +1,4 @@
-import { CliUx } from '@oclif/core';
+import { ux as CliUx } from '@oclif/core';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 
