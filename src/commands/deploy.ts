@@ -3,14 +3,15 @@ import path from 'path';
 import { promisify } from 'util';
 
 import { CliUx, Flags } from '@oclif/core';
+import { ManifestValue } from '@subsquid/manifest';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
+import { get } from 'lodash';
 import targz from 'targz';
 
 import { deploySquid, uploadFile } from '../api';
 import { DeployCommand } from '../deploy-command';
-import { Manifest } from '../manifest';
-import { loadManifestFile } from '../manifest/loadManifestFile';
+import { loadManifestFile } from '../manifest';
 
 const compressAsync = promisify(targz.compress);
 
@@ -21,10 +22,16 @@ const SQUID_PATH_DESC = [
   `  - a github URL to a git repo with a branch or commit tag`,
 ];
 
+const lockFiles = {
+  npm: 'package-lock.json',
+  yarn: 'yarn.lock',
+  pnpm: 'pnpm-lock.yaml',
+};
+
 export function resolveManifest(
   localPath: string,
   manifestPath: string,
-): { error: string } | { buildDir: string; squidDir: string; manifest: Manifest } {
+): { error: string } | { buildDir: string; squidDir: string; manifest: ManifestValue } {
   try {
     const { squidDir, manifest } = loadManifestFile(localPath, manifestPath);
 
@@ -148,7 +155,35 @@ export default class Deploy extends DeployCommand {
         organization = await this.promptOrganization(organization, 'using "-o" flag');
       }
 
+      if (!hasPackageJson(squidDir)) {
+        return this.error(
+          [
+            `The package.json file was not found in the squid directory`,
+            ``,
+            `Squid directory    ${squidDir}`,
+            ``,
+            `Please provide a path to the root of a squid directory`,
+            ``,
+          ].join('\n'),
+        );
+      }
+
+      const lockFile = get(lockFiles, manifest.build.package_manager);
+      if (!hasLockFile(squidDir, lockFile)) {
+        return this.error(
+          [
+            `${lockFile || 'Lockfile'} is not found in the squid directory`,
+            ``,
+            `Squid directory    ${squidDir}`,
+            ``,
+            `Please provide a path to the root of a squid directory`,
+            ``,
+          ].join('\n'),
+        );
+      }
+
       CliUx.ux.action.start(`◷ Compressing the squid to ${archiveName} `);
+
       let filesCount = 0;
       await compressAsync({
         src: squidDir,
@@ -215,5 +250,17 @@ export default class Deploy extends DeployCommand {
     await this.pollDeploy({ deployId: deploy.id, streamLogs: !disableStreamLogs });
 
     this.log('✔️ Done!');
+  }
+}
+
+function hasPackageJson(squidDir: string) {
+  return fs.existsSync(path.join(squidDir, 'package.json'));
+}
+
+function hasLockFile(squidDir: string, lockFile?: string) {
+  if (lockFile) {
+    return fs.existsSync(path.join(squidDir, lockFile));
+  } else {
+    return Object.values(lockFiles).some((lf) => fs.existsSync(path.join(squidDir, lf)));
   }
 }
