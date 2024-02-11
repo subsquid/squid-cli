@@ -1,20 +1,20 @@
-import { Flags } from '@oclif/core';
+import { Args, Flags } from '@oclif/core';
 
 import { restartSquid } from '../api';
 import { DeployCommand } from '../deploy-command';
-import { parseEnvs, parseNameAndVersion } from '../utils';
+import { parseNameAndVersion } from '../utils';
 
 export default class Restart extends DeployCommand {
   static aliases = ['squid:redeploy', 'redeploy'];
 
   static description = 'Restart a squid deployed to the Cloud';
-  static args = [
-    {
-      name: 'nameAndVersion',
+  static args = {
+    nameAndVersion: Args.string({
       description: 'name@version',
       required: true,
-    },
-  ];
+    }),
+  };
+
   static flags = {
     env: Flags.string({
       char: 'e',
@@ -39,8 +39,8 @@ export default class Restart extends DeployCommand {
 
   async run(): Promise<void> {
     const {
-      flags,
-      args: { nameAndVersion, 'no-stream-logs': disableStreamLogs },
+      flags: { 'no-stream-logs': disableStreamLogs },
+      args: { nameAndVersion },
     } = await this.parse(Restart);
     const { squidName, versionName } = parseNameAndVersion(nameAndVersion, this);
 

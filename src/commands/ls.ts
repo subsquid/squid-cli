@@ -1,4 +1,4 @@
-import { CliUx, Flags } from '@oclif/core';
+import { ux as CliUx, Flags } from '@oclif/core';
 
 import { getSquid, squidList } from '../api';
 import { CliCommand } from '../command';

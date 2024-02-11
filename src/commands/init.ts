@@ -1,7 +1,7 @@
 import { promises as asyncFs } from 'fs';
 import path from 'path';
 
-import { CliUx, Flags } from '@oclif/core';
+import { Args, ux as CliUx, Flags } from '@oclif/core';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import simpleGit from 'simple-git';
@@ -82,13 +82,9 @@ const SQUID_TEMPLATE_DESC = [
 export default class Init extends CliCommand {
   static description = 'Setup a new squid project from a template or github repo';
 
-  static args = [
-    {
-      name: 'name',
-      description: SQUID_NAME_DESC.join('\n'),
-      required: true,
-    },
-  ];
+  static args = {
+    name: Args.string({ description: SQUID_NAME_DESC.join('\n'), required: true }),
+  };
 
   static flags = {
     template: Flags.string({
