@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
 
-import { CliUx, Flags } from '@oclif/core';
+import { Args, Flags, ux as CliUx } from '@oclif/core';
 import { ManifestValue } from '@subsquid/manifest';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
@@ -50,13 +50,14 @@ export function resolveManifest(
 
 export default class Deploy extends DeployCommand {
   static description = 'Deploy new or update an existing squid in the Cloud';
-  static args = [
-    {
-      name: 'source',
+
+  static args = {
+    source: Args.string({
       description: SQUID_PATH_DESC.join('\n'),
       required: true,
-    },
-  ];
+    }),
+  };
+
   static flags = {
     manifest: Flags.string({
       char: 'm',

@@ -1,11 +1,11 @@
-import { CliUx, Flags } from '@oclif/core';
+import { ux as CliUx, Flags } from '@oclif/core';
 
 import { listSecrets } from '../../api';
 import { CliCommand } from '../../command';
 
 export default class Ls extends CliCommand {
   static description = 'List secrets set in the Cloud';
-  static args = [];
+
   static flags = {
     org: Flags.string({
       char: 'o',

@@ -1,4 +1,4 @@
-import queryString from 'query-string';
+import qs from 'qs';
 
 import { getCreds } from '../../config';
 import { baseUrl } from '../baseUrl';
@@ -30,7 +30,7 @@ export async function getDeployPipeline(
   versionName: string,
 ): Promise<DeployPipelineResponse | undefined> {
   const apiUrl = `${baseUrl}/client/squid/${squidName}/pipeline`;
-  const params = queryString.stringify({ name: versionName });
+  const params = qs.stringify({ name: versionName });
   const response = await request(`${apiUrl}?${params}`, {
     method: 'get',
     headers: {
