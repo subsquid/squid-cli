@@ -65,6 +65,7 @@
     "@oclif/core": "^1.26.1",
     "@oclif/plugin-autocomplete": "^1.4.2",
     "@subsquid/commands": "^1.0.0",
+    "@subsquid/manifest": "^0.0.1-beta.13",
     "@subsquid/manifest-expr": "^0.0.0",
     "@types/fast-levenshtein": "^0.0.2",
     "@types/lodash": "^4.14.191",

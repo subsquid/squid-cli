@@ -6,7 +6,7 @@ describe('Manifest', () => {
       const formatted = formatManifest({
         name: 'test',
         version: 1,
-        build: null,
+        build: null as any,
       });
 
       expect(formatted).toEqual(['name: test', 'version: 1', 'build: ', ''].join('\n'));
