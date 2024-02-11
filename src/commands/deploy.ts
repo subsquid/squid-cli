@@ -155,16 +155,34 @@ export default class Deploy extends DeployCommand {
         organization = await this.promptOrganization(organization, 'using "-o" flag');
       }
 
-      CliUx.ux.action.start(`◷ Compressing the squid to ${archiveName} `);
-
       if (!hasPackageJson(squidDir)) {
-        return this.error(`package.json was not found in ${squidDir}`);
+        return this.error(
+          [
+            `The package.json file was not found in the squid directory`,
+            ``,
+            `Squid directory    ${squidDir}`,
+            ``,
+            `Please provide a path to the root of a squid directory`,
+            ``,
+          ].join('\n'),
+        );
       }
 
       const lockFile = get(lockFiles, manifest.build.package_manager);
       if (!hasLockFile(squidDir, lockFile)) {
-        return this.error(`${lockFile || 'Lockfile'} was not found in ${squidDir}`);
+        return this.error(
+          [
+            `${lockFile || 'Lockfile'} is not found in the squid directory`,
+            ``,
+            `Squid directory    ${squidDir}`,
+            ``,
+            `Please provide a path to the root of a squid directory`,
+            ``,
+          ].join('\n'),
+        );
       }
+
+      CliUx.ux.action.start(`◷ Compressing the squid to ${archiveName} `);
 
       let filesCount = 0;
       await compressAsync({

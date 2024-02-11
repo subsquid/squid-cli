@@ -4,7 +4,7 @@ import path from 'path';
 import { Manifest, ManifestValue } from '@subsquid/manifest';
 import { Expression, Parser } from '@subsquid/manifest-expr';
 import yaml from 'js-yaml';
-import { isPlainObject, mapValues } from 'lodash';
+import { mapValues } from 'lodash';
 
 export function readManifest(path: string) {
   return yaml.load(fs.readFileSync(path).toString()) as Partial<ManifestValue>;
@@ -41,15 +41,57 @@ export function loadManifestFile(
   const squidDir = path.resolve(localPath);
 
   if (!fs.statSync(squidDir).isDirectory()) {
-    throw new Error(`The path ${squidDir} is a not a squid directory. Please provide a path to a squid root directory`);
+    throw new Error(
+      [
+        `The squid directory is not a directoru`,
+        ``,
+        `Squid directory    ${squidDir}`,
+        ``,
+        `Please provide a path to the root of a squid directory`,
+        ``,
+      ].join('\n'),
+    );
   }
 
   const manifestFullPath = path.isAbsolute(manifestPath)
     ? manifestPath
     : path.resolve(path.join(localPath, manifestPath));
+
+  if (!fs.existsSync(manifestFullPath)) {
+    throw new Error(
+      [
+        `The manifest file is not found`,
+        ``,
+        `Manifest path     ${manifestFullPath}`,
+        ``,
+        `Please provide a path to a valid manifest inside the squid directory using "-m" flag`,
+        ``,
+      ].join('\n'),
+    );
+  }
+
+  if (!manifestFullPath.startsWith(squidDir)) {
+    throw new Error(
+      [
+        `The manifest is located outside the squid directory.`,
+        ``,
+        `Squid directory    ${squidDir}`,
+        `Manifest           ${manifestFullPath}`,
+        ``,
+        `To fix the problem, please`,
+        `  — check the squid directory is correct`,
+        `  — move manifest inside into the squid directory`,
+        ``,
+      ].join('\n'),
+    );
+  }
+
   if (fs.statSync(manifestFullPath).isDirectory()) {
     throw new Error(
-      `The path ${manifestFullPath} is a directory, not a manifest file. Please provide a path to a valid manifest file inside squid directory`,
+      [
+        `The path ${manifestFullPath} is a directory, not a manifest file`,
+        `Please provide a path to a valid manifest inside squid directory using -m flag `,
+      ].join('\n'),
     );
   }
 
