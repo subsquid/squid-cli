@@ -37,7 +37,7 @@ export default class Help extends OclifHelp {
     await super.showCommandHelp(command);
   }
 
-  async showHelp(argv: any) {
+  async showHelp(argv: string[]) {
     const squidCommands = await this.getVisibleSquidCommands();
 
     if (squidCommands.find((c) => c.name === argv[0])) {
@@ -45,7 +45,7 @@ export default class Help extends OclifHelp {
       return;
     }
 
-    super.showHelp(argv);
+    await super.showHelp(argv);
   }
 
   async printHelp() {

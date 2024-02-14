@@ -14,15 +14,17 @@ export default class DefaultCommand extends Command {
   static strict = false;
 
   async run(): Promise<void> {
-    await this.parse(DefaultCommand);
-    const help = new Help(this.config);
+    const argv: string[] = Array.isArray(this.argv) ? this.argv : Object.values(this.argv);
 
-    const [id] = this.argv;
-    if (!id || (id === 'help' && this.argv.length === 1)) return await help.printHelp();
+    await this.parse(DefaultCommand, argv);
+
+    const help = new Help(this.config);
+    const [id] = argv;
+    if (!id || (id === 'help' && argv.length === 1)) return await help.printHelp();
 
     const squidCmdConfig = await getSquidCommands();
     if (squidCmdConfig?.commands?.[id]) {
-      process.exit(await squidCommandRun(squidCmdConfig, id, this.argv.slice(1)));
+      process.exit(await squidCommandRun(squidCmdConfig, id, argv.slice(1)));
     }
 
     const squidCommands = await help.getVisibleSquidCommands();
@@ -32,7 +34,7 @@ export default class DefaultCommand extends Command {
       ...squidCommands.map(({ name }) => name),
     ]);
     const readableSuggestion = toConfiguredId(suggestion, this.config);
-    const originalCmd = toConfiguredId(this.argv.filter((c) => !c.startsWith('-')).join(' '), this.config);
+    const originalCmd = toConfiguredId(argv.filter((c) => !c.startsWith('-')).join(' '), this.config);
 
     this.log(`"${originalCmd}" is not a ${this.config.bin} command.`);
     this.log(`Did you mean "${readableSuggestion}"?`);
