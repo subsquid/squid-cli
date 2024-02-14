@@ -169,19 +169,19 @@ export default class Deploy extends DeployCommand {
         );
       }
 
-      const lockFile = get(lockFiles, manifest.build.package_manager);
-      if (!hasLockFile(squidDir, lockFile)) {
-        return this.error(
-          [
-            `${lockFile || 'Lockfile'} is not found in the squid directory`,
-            ``,
-            `Squid directory    ${squidDir}`,
-            ``,
-            `Please provide a path to the root of a squid directory`,
-            ``,
-          ].join('\n'),
-        );
-      }
+      // const lockFile = get(lockFiles, manifest.build.package_manager);
+      // if (!hasLockFile(squidDir, lockFile)) {
+      //   return this.error(
+      //     [
+      //       `${lockFile || 'Lockfile'} is not found in the squid directory`,
+      //       ``,
+      //       `Squid directory    ${squidDir}`,
+      //       ``,
+      //       `Please provide a path to the root of a squid directory`,
+      //       ``,
+      //     ].join('\n'),
+      //   );
+      // }
 
       CliUx.ux.action.start(`◷ Compressing the squid to ${archiveName} `);
 
