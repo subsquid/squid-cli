@@ -37,17 +37,16 @@ export class VersionLogTab implements VersionTab {
 
     process.nextTick(async () => {
       try {
-        const { logs } = await versionHistoryLogs(
-          squid.squid.name,
-          squid.version.name,
-          {
+        const { logs } = await versionHistoryLogs({
+          orgCode: squid.squid.organization!.code,
+          squidName: squid.squid.name,
+          versionName: squid.version.name,
+          query: {
             limit: 100,
             from: addMinutes(new Date(), -30),
           },
-          {
-            abortController,
-          },
-        );
+          abortController,
+        });
         pretty(logs.reverse()).forEach((line) => {
           logsBox.add(line);
         });
@@ -60,15 +59,15 @@ export class VersionLogTab implements VersionTab {
       logsBox.show();
       logsBox.screen.render();
 
-      streamSquidLogs(
-        squid.squid.name,
-        squid.version.name,
-        (line) => {
+      streamSquidLogs({
+        orgCode: squid.squid.organization!.code,
+        squidName: squid.squid.name,
+        versionName: squid.version.name,
+        onLog: (line) => {
           logsBox.add(line);
         },
-        {},
-        { abortController },
-      );
+        abortController,
+      });
     });
 
     return () => {

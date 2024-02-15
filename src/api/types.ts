@@ -17,6 +17,7 @@ export type DeployResponse = {
   status: DeployStatus;
   squidName?: string;
   versionName?: string;
+  orgCode?: string;
   deploymentUrl?: string;
   failed: 'NO' | 'UNEXPECTED' | 'PERMISSIONS' | 'REQUIREMENTS' | 'SOURCE_FILES_BUILD_FAILED';
   logs: { severity: 'debug' | 'warn' | 'info' | 'error'; message: string }[];

@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { Args } from '@oclif/core';
+import { Args, Flags } from '@oclif/core';
 import inquirer from 'inquirer';
 
 import { getSquid, setProduction } from '../api';
@@ -17,13 +17,25 @@ export default class Prod extends DeployCommand {
       required: true,
     }),
   };
+  static flags = {
+    org: Flags.string({
+      char: 'o',
+      description: 'Organization',
+      required: false,
+    }),
+  };
 
   async run(): Promise<void> {
-    const { args } = await this.parse(Prod);
+    const {
+      args,
+      flags: { org },
+    } = await this.parse(Prod);
 
     const { squidName, versionName } = parseNameAndVersion(args.nameAndVersion, this);
 
-    const foundSquid = await getSquid({ squidName, versionName });
+    const orgCode = await this.promptOrganization(org, 'using "-o" flag');
+
+    const foundSquid = await getSquid({ orgCode, squidName, versionName });
     if (!foundSquid.versions?.length) {
       this.log(`Cannot find a squid version "${versionName}". Please make sure the spelling is correct.`);
       return;
@@ -39,7 +51,7 @@ export default class Prod extends DeployCommand {
     ]);
     if (!confirm) return;
 
-    const res = await setProduction(squidName, versionName);
+    const res = await setProduction({ orgCode, squidName, versionName });
 
     this.log(
       `The squid "${squidName}@${versionName}" is assigned to the production endpoint and will soon be available at ${res.versions[0].deploymentUrl}.`,

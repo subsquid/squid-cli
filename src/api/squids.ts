@@ -15,28 +15,27 @@ import {
   VersionResponse,
 } from './types';
 
-export async function squidList({ organization }: { organization?: string } = {}): Promise<SquidResponse[]> {
+export async function squidList({ orgCode }: { orgCode: string }): Promise<SquidResponse[]> {
   const { body } = await api<HttpResponse<SquidResponse[]>>({
     method: 'get',
-    path: '/squids',
-    query: {
-      organization,
-    },
+    path: `/organizations/${orgCode}/squids`,
   });
 
   return body.payload;
 }
 
 export async function getSquid({
+  orgCode,
   squidName,
   versionName,
 }: {
+  orgCode: string;
   squidName: string;
   versionName?: string;
 }): Promise<SquidResponse> {
   const { body } = await api<HttpResponse<SquidResponse>>({
     method: 'get',
-    path: `/squids/${squidName}`,
+    path: `/organizations/${orgCode}/squids/${squidName}`,
     query: {
       versionName,
     },
@@ -54,9 +53,16 @@ export async function squidNameIsAvailable(squidName: string): Promise<boolean> 
   return Boolean(body.payload?.available);
 }
 
-export async function versionHistoryLogs(
-  squidName: string,
-  versionName: string,
+export async function versionHistoryLogs({
+  orgCode,
+  squidName,
+  versionName,
+  query,
+  abortController,
+}: {
+  orgCode: string;
+  squidName: string;
+  versionName: string;
   query: {
     limit: number;
     from: Date;
@@ -64,12 +70,12 @@ export async function versionHistoryLogs(
     orderBy?: string;
     container?: string[];
     level?: string[];
-  },
-  { abortController }: { abortController?: AbortController } = {},
-): Promise<LogsResponse> {
+  };
+  abortController?: AbortController;
+}): Promise<LogsResponse> {
   const { body } = await api<LogsResponse>({
     method: 'get',
-    path: `/client/squid/${squidName}/versions/${versionName}/logs/history`,
+    path: `/organizations/${orgCode}/squids/${squidName}/versions/${versionName}/logs/history`,
     query: {
       ...query,
       from: query.from.toISOString(),
@@ -81,15 +87,22 @@ export async function versionHistoryLogs(
   return body || { logs: [], nextPage: null };
 }
 
-export async function versionLogsFollow(
-  squidName: string,
-  versionName: string,
-  query: { container?: string[]; level?: string[] },
-  abortController?: AbortController,
-) {
+export async function versionLogsFollow({
+  orgCode,
+  query,
+  squidName,
+  versionName,
+  abortController,
+}: {
+  orgCode: string;
+  squidName: string;
+  versionName: string;
+  query: { container?: string[]; level?: string[] };
+  abortController?: AbortController;
+}) {
   const { body } = await api<NodeJS.ReadableStream>({
     method: 'get',
-    path: `/client/squid/${squidName}/versions/${versionName}/logs/follow`,
+    path: `/organizations/${orgCode}/squids/${squidName}/versions/${versionName}/logs/follow`,
     query,
     responseType: 'stream',
     abortController: abortController,
@@ -98,13 +111,21 @@ export async function versionLogsFollow(
   return body;
 }
 
-export async function streamSquidLogs(
-  squidName: string,
-  versionName: string,
-  onLog: (log: string) => unknown,
-  query: { container?: string[]; level?: string[] } = {},
-  { abortController }: { abortController?: AbortController } = {},
-) {
+export async function streamSquidLogs({
+  orgCode,
+  squidName,
+  versionName,
+  abortController,
+  query = {},
+  onLog,
+}: {
+  orgCode: string;
+  squidName: string;
+  versionName: string;
+  onLog: (log: string) => unknown;
+  query?: { container?: string[]; level?: string[] };
+  abortController?: AbortController;
+}) {
   let attempt = 0;
   let stream: NodeJS.ReadableStream;
 
@@ -112,7 +133,13 @@ export async function streamSquidLogs(
     debugLog(`streaming logs`);
     const retry = await new Promise(async (resolve) => {
       try {
-        stream = await versionLogsFollow(squidName, versionName, query, abortController);
+        stream = await versionLogsFollow({
+          orgCode,
+          squidName,
+          versionName,
+          query,
+          abortController,
+        });
       } catch (e: any) {
         /**
          * 524 status means timeout
@@ -168,31 +195,20 @@ export async function streamSquidLogs(
   }
 }
 
-export async function releaseSquid(
-  squidName: string,
-  versionName: string,
-  artifactUrl: string,
-  description?: string,
-  envs?: Record<string, string>,
-): Promise<SquidVersionResponse> {
-  const { body } = await api<SquidVersionResponse>({
-    method: 'post',
-    path: `/client/squid/${squidName}/version`,
-    data: { artifactUrl, versionName, description, envs },
-  });
-
-  return body;
-}
-
-export async function deploySquid(data: {
-  hardReset: boolean;
-  artifactUrl: string;
-  manifestPath: string;
-  organization?: string;
+export async function deploySquid({
+  orgCode,
+  data,
+}: {
+  orgCode: string;
+  data: {
+    hardReset: boolean;
+    artifactUrl: string;
+    manifestPath: string;
+  };
 }): Promise<DeployResponse> {
   const { body } = await api<HttpResponse<DeployResponse>>({
     method: 'post',
-    path: `/squids/deploy`,
+    path: `/organizations/${orgCode}/squids/deploy`,
     data,
   });
 
@@ -208,21 +224,6 @@ export async function getUploadUrl(): Promise<UploadUrlResponse> {
   return body.payload;
 }
 
-export async function updateSquid(
-  squidName: string,
-  versionName: string,
-  artifactUrl: string,
-  hardReset: boolean,
-  envs?: Record<string, string>,
-): Promise<VersionResponse> {
-  const { body } = await api<VersionResponse>({
-    method: 'put',
-    path: `/client/squid/${squidName}/version/${versionName}/deployment`,
-    data: { artifactUrl, hardReset, envs },
-  });
-  return body;
-}
-
 export async function restartSquid(squidName: string, versionName: string): Promise<DeployResponse> {
   const { body } = await api<HttpResponse<DeployResponse>>({
     method: 'put',
@@ -232,19 +233,27 @@ export async function restartSquid(squidName: string, versionName: string): Prom
   return body.payload;
 }
 
-export async function destroyVersion(squidName: string, versionName: string): Promise<string> {
+export async function destroyVersion({
+  orgCode,
+  squidName,
+  versionName,
+}: {
+  orgCode: string;
+  squidName: string;
+  versionName: string;
+}): Promise<string> {
   const { body } = await api<HttpResponse<SquidResponse>>({
     method: 'delete',
-    path: `/squids/${squidName}/version/${versionName}`,
+    path: `/organizations/${orgCode}/squids/${squidName}/version/${versionName}`,
   });
 
   return `Destroyed Squid "${body.payload.name}" version ${body.payload.versions?.[0]?.name}`;
 }
 
-export async function destroySquid(squidName: string): Promise<string> {
+export async function destroySquid({ orgCode, squidName }: { orgCode: string; squidName: string }): Promise<string> {
   const { body } = await api<HttpResponse<SquidResponse>>({
     method: 'delete',
-    path: `/squids/${squidName}`,
+    path: `/organizations/${orgCode}/squids/${squidName}`,
   });
 
   return `Destroyed Squid ${body.payload.name}`;

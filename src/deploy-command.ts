@@ -18,9 +18,9 @@ export abstract class DeployCommand extends CliCommand {
   deploy: DeployResponse | undefined;
   logsPrinted = 0;
 
-  async findSquid({ squidName }: { squidName: string }) {
+  async findSquid({ orgCode, squidName }: { orgCode: string; squidName: string }) {
     try {
-      return await getSquid({ squidName });
+      return await getSquid({ orgCode, squidName });
     } catch (e: any) {
       if (e.status === 404) {
         return null;
@@ -109,9 +109,15 @@ Do you want to attach to the running deploy process?`,
               `The squid is up and running. The GraphQL API will be shortly available at ${this.deploy.deploymentUrl}`,
             );
 
-            if (streamLogs && this.deploy.squidName && this.deploy.versionName) {
+            const { squidName, versionName, orgCode } = this.deploy;
+            if (streamLogs && squidName && versionName && orgCode) {
               CliUx.ux.action.start(`Streaming logs from the squid`);
-              await streamSquidLogs(this.deploy.squidName, this.deploy.versionName, (l) => this.log(l));
+              await streamSquidLogs({
+                orgCode,
+                squidName,
+                versionName,
+                onLog: (l) => this.log(l),
+              });
             }
 
             return true;
