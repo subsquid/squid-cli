@@ -42,16 +42,16 @@
   },
   "homepage": "https://www.subsquid.io/",
   "scripts": {
-    "postinstall": "./bin/run.js autocomplete --refresh-cache",
+    "postinstall": "bin/run.js autocomplete --refresh-cache",
     "build": "rm -rf lib && tsc",
-    "dev": "./bin/dev",
-    "sqd": "./bin/run.js",
-    "bl": "node ./lib/blessed.js",
+    "dev": "bin/dev",
+    "sqd": "bin/run.js",
+    "bl": "node lib/blessed.js",
     "lint": "eslint --fix src/**/*",
     "test:unit": "NODE_ENV=test jest --bail --testRegex=.unit.spec.ts$",
     "tsc": "tsc --noEmit",
-    "pkg:build": "./bin/pkg-build.sh",
-    "pkg:compress": "./bin/pkg-compress.sh",
+    "pkg:build": "bin/pkg-build.sh",
+    "pkg:compress": "bin/pkg-compress.sh",
     "upg": "npx npm-check-updates -u -i"
   },
   "jest": {
