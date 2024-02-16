@@ -12,7 +12,7 @@ export async function setProduction({
 }): Promise<SquidResponse> {
   const { body } = await api<HttpResponse<SquidResponse>>({
     method: 'put',
-    path: `/organizations/${orgCode}/squids/${squidName}/versions/${versionName}/prod`,
+    path: `/orgs/${orgCode}/squids/${squidName}/versions/${versionName}/prod`,
   });
 
   return body.payload;

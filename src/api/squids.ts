@@ -18,7 +18,7 @@ import {
 export async function squidList({ orgCode }: { orgCode: string }): Promise<SquidResponse[]> {
   const { body } = await api<HttpResponse<SquidResponse[]>>({
     method: 'get',
-    path: `/organizations/${orgCode}/squids`,
+    path: `/orgs/${orgCode}/squids`,
   });
 
   return body.payload;
@@ -35,7 +35,7 @@ export async function getSquid({
 }): Promise<SquidResponse> {
   const { body } = await api<HttpResponse<SquidResponse>>({
     method: 'get',
-    path: `/organizations/${orgCode}/squids/${squidName}`,
+    path: `/orgs/${orgCode}/squids/${squidName}`,
     query: {
       versionName,
     },
@@ -75,7 +75,7 @@ export async function versionHistoryLogs({
 }): Promise<LogsResponse> {
   const { body } = await api<LogsResponse>({
     method: 'get',
-    path: `/organizations/${orgCode}/squids/${squidName}/versions/${versionName}/logs/history`,
+    path: `/orgs/${orgCode}/squids/${squidName}/versions/${versionName}/logs/history`,
     query: {
       ...query,
       from: query.from.toISOString(),
@@ -102,7 +102,7 @@ export async function versionLogsFollow({
 }) {
   const { body } = await api<NodeJS.ReadableStream>({
     method: 'get',
-    path: `/organizations/${orgCode}/squids/${squidName}/versions/${versionName}/logs/follow`,
+    path: `/orgs/${orgCode}/squids/${squidName}/versions/${versionName}/logs/follow`,
     query,
     responseType: 'stream',
     abortController: abortController,
@@ -208,7 +208,7 @@ export async function deploySquid({
 }): Promise<DeployResponse> {
   const { body } = await api<HttpResponse<DeployResponse>>({
     method: 'post',
-    path: `/organizations/${orgCode}/squids/deploy`,
+    path: `/orgs/${orgCode}/squids/deploy`,
     data,
   });
 
@@ -244,7 +244,7 @@ export async function destroyVersion({
 }): Promise<string> {
   const { body } = await api<HttpResponse<SquidResponse>>({
     method: 'delete',
-    path: `/organizations/${orgCode}/squids/${squidName}/version/${versionName}`,
+    path: `/orgs/${orgCode}/squids/${squidName}/version/${versionName}`,
   });
 
   return `Destroyed Squid "${body.payload.name}" version ${body.payload.versions?.[0]?.name}`;
@@ -253,7 +253,7 @@ export async function destroyVersion({
 export async function destroySquid({ orgCode, squidName }: { orgCode: string; squidName: string }): Promise<string> {
   const { body } = await api<HttpResponse<SquidResponse>>({
     method: 'delete',
-    path: `/organizations/${orgCode}/squids/${squidName}`,
+    path: `/orgs/${orgCode}/squids/${squidName}`,
   });
 
   return `Destroyed Squid ${body.payload.name}`;
