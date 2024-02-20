@@ -6,7 +6,6 @@ import { Args, Flags, ux as CliUx } from '@oclif/core';
 import { ManifestValue } from '@subsquid/manifest';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
-import { get } from 'lodash';
 import targz from 'targz';
 
 import { deploySquid, uploadFile } from '../api';
@@ -200,7 +199,7 @@ export default class Deploy extends DeployCommand {
 
       CliUx.ux.action.start(`◷ Uploading ${path.basename(squidArtifact)}`);
 
-      const { error, fileUrl: artifactUrl } = await uploadFile(squidArtifact);
+      const { error, fileUrl: artifactUrl } = await uploadFile(orgCode, squidArtifact);
       if (error) return this.error(error);
       else if (!artifactUrl) return this.error('The artifact URL is missing');
 
@@ -228,7 +227,7 @@ export default class Deploy extends DeployCommand {
     }
     if (!deploy) return;
 
-    await this.pollDeploy({ deployId: deploy.id, streamLogs: !disableStreamLogs });
+    await this.pollDeploy({ orgCode, deployId: deploy.id, streamLogs: !disableStreamLogs });
 
     this.log('✔️ Done!');
   }

@@ -47,19 +47,33 @@ Do you want to attach to the running deploy process?`,
         ]);
         if (!confirm) return false;
 
-        await this.pollDeploy({ deployId: version.runningDeploy.id, streamLogs: true });
+        if (squid.organization) {
+          await this.pollDeploy({
+            orgCode: squid.organization.code,
+            deployId: version.runningDeploy.id,
+            streamLogs: true,
+          });
+        }
 
         return true;
     }
   }
 
-  async pollDeploy({ deployId, streamLogs }: { deployId: string; streamLogs: boolean }): Promise<void> {
+  async pollDeploy({
+    orgCode,
+    deployId,
+    streamLogs,
+  }: {
+    orgCode: string;
+    deployId: string;
+    streamLogs: boolean;
+  }): Promise<void> {
     let lastStatus: string;
     let validatedPrinted = false;
 
     await doUntil(
       async () => {
-        this.deploy = await getDeploy(deployId);
+        this.deploy = await getDeploy({ orgCode, id: deployId });
 
         if (!this.deploy) return true;
         if (this.deploy.status !== lastStatus) {

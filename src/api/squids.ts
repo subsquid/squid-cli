@@ -215,19 +215,27 @@ export async function deploySquid({
   return body.payload;
 }
 
-export async function getUploadUrl(): Promise<UploadUrlResponse> {
+export async function getUploadUrl({ orgCode }: { orgCode: string }): Promise<UploadUrlResponse> {
   const { body } = await api<HttpResponse<UploadUrlResponse>>({
     method: 'post',
-    path: `/deploys/upload-url`,
+    path: `/orgs/${orgCode}/deploys/upload-url`,
   });
 
   return body.payload;
 }
 
-export async function restartSquid(squidName: string, versionName: string): Promise<DeployResponse> {
+export async function restartSquid({
+  orgCode,
+  squidName,
+  versionName,
+}: {
+  orgCode: string;
+  squidName: string;
+  versionName: string;
+}): Promise<DeployResponse> {
   const { body } = await api<HttpResponse<DeployResponse>>({
     method: 'put',
-    path: `/squids/${squidName}/version/${versionName}/redeploy`,
+    path: `/orgs/${orgCode}/squids/${squidName}/version/${versionName}/redeploy`,
   });
 
   return body.payload;
