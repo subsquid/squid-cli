@@ -1,5 +1,7 @@
 # @subsquid/cli
 
+[![npm version](https://badge.fury.io/js/@subsquid%2Fcli.svg)](https://badge.fury.io/js/@subsquid%2Fcli)
+
 `sqd(1)` tool for [squid project](https://docs.subsquid.io) management.
 
 ## Installation

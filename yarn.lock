@@ -943,10 +943,10 @@
   resolved "https://registry.yarnpkg.com/@subsquid/manifest-expr/-/manifest-expr-0.0.1.tgz#da8078dcdc8e765b6b82cca1a0db9dbf5bff0297"
   integrity sha512-QKrgq+BPVX03SPm/kxXr3kDRDFn+ddBAuA9ysvae3PBA0jlj5DUSFxNjIoGZoy+RBwu82t4T0Xt4oTXR8e0OBw==
 
-"@subsquid/manifest@^0.0.1-beta.13":
-  version "0.0.1-beta.13"
-  resolved "https://registry.yarnpkg.com/@subsquid/manifest/-/manifest-0.0.1-beta.13.tgz#6cebdf5ae097bfc2673040057e2b850153a21364"
-  integrity sha512-g/p2NCtuCs+EzDg484qj2Dp5CMUZfzQZbxkk9OsVi8HN12TZts9yk+JUKLzp0frpPDi/A7hCL0w5T/9OQkv3Rg==
+"@subsquid/manifest@^0.0.1-beta.16":
+  version "0.0.1-beta.16"
+  resolved "https://registry.yarnpkg.com/@subsquid/manifest/-/manifest-0.0.1-beta.16.tgz#7cf1c3895a34f25b84ac466872c9ed40d0367d35"
+  integrity sha512-Xj3dVOCdOvgLMW0jVyGJ6xBK4xx29UQrfZq0tDrxhJ42Tm6h1itzudAP1BD/mkbDPNz0fe0E6+t1cimw3nEe5w==
   dependencies:
     joi "^17.12.0"
     js-yaml "^4.1.0"

@@ -98,7 +98,7 @@ export function loadManifestFile(
   let manifest;
   try {
     const raw = fs.readFileSync(manifestFullPath).toString();
-    manifest = Manifest.parse(raw);
+    manifest = Manifest.parse(raw, { validation: { allowUnknown: true } });
   } catch (e: any) {
     throw new Error(
       `The manifest file on ${manifestFullPath} can not be parsed: ${e instanceof Error ? e.message : e}`,
