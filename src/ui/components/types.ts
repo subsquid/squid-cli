@@ -3,7 +3,10 @@ import { SquidResponse, VersionResponse } from '../../api';
 export class SquidVersion {
   name: string;
 
-  constructor(public squid: SquidResponse, public version: VersionResponse) {
+  constructor(
+    public squid: SquidResponse,
+    public version: VersionResponse,
+  ) {
     this.name = `${this.squid.name}@${this.version.name}`;
 
     if (this.version.aliases.length) {

@@ -6,8 +6,8 @@ import fetch from 'node-fetch';
 import { ApiError } from './api';
 import { getUploadUrl } from './squids';
 
-export async function uploadFile(path: string): Promise<{ error: string | null; fileUrl?: string }> {
-  const { uploadFields, uploadUrl, maxUploadBytes, fileUrl } = await getUploadUrl();
+export async function uploadFile(orgCode: string, path: string): Promise<{ error: string | null; fileUrl?: string }> {
+  const { uploadFields, uploadUrl, maxUploadBytes, fileUrl } = await getUploadUrl({ orgCode });
 
   const fileStream = fs.createReadStream(path);
   const { size } = fs.statSync(path);

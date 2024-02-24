@@ -20,8 +20,8 @@ export default class Ls extends CliCommand {
       args: {},
     } = await this.parse(Ls);
 
-    const organization = await this.promptOrganization(org, 'using "-o" flag');
-    const response = await listSecrets({ organization });
+    const orgCode = await this.promptOrganization(org, 'using "-o" flag');
+    const response = await listSecrets({ orgCode });
 
     if (!Object.keys(response.secrets).length) {
       return this.log('There are no secrets');

@@ -73,12 +73,15 @@ export abstract class CliCommand extends Command {
     throw error;
   }
 
-  async promptOrganization(organizationCode: string | null | undefined, using: string) {
+  async promptOrganization(organizationCode: string | null | undefined, using: string): Promise<string> {
     if (organizationCode) return organizationCode;
 
     const organizations = await listOrganizations();
-    if (organizations.length === 0) return;
-    else if (organizations.length === 1) return organizations[0].code;
+    if (organizations.length === 0) {
+      return this.error(`You have no organizations. Please create organization first.`);
+    } else if (organizations.length === 1) {
+      return organizations[0].code;
+    }
 
     const { stdin, stdout } = getTTY();
     if (!stdin || !stdout) {
