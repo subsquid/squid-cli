@@ -4,7 +4,7 @@ import path from 'path';
 import { Args, ux as CliUx, Flags } from '@oclif/core';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
-import simpleGit from 'simple-git';
+import { simpleGit } from 'simple-git';
 import { adjectives, animals, colors, uniqueNamesGenerator } from 'unique-names-generator';
 
 import { squidNameIsAvailable } from '../api';

@@ -8,7 +8,7 @@ import { VersionTab } from './Tabs';
 import { SquidVersion } from './types';
 
 export class VersionDeployTab implements VersionTab {
-  async append(parent: Element, { version }: SquidVersion) {
+  async append(parent: Element, { version, squid: { organization } }: SquidVersion) {
     const list = blessed.listtable({
       top: 0,
       left: 0,
@@ -34,7 +34,9 @@ export class VersionDeployTab implements VersionTab {
     parent.append(list);
     parent.append(loader);
 
-    const deploys = await getDeploys({ versionId: version.id });
+    const deploys = organization
+      ? await getDeploys({ orgCode: organization.code, query: { versionId: version.id } })
+      : [];
 
     list.setRows([
       ['ID', 'Status', 'Failed', 'Logs', 'Created'],

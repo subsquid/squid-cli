@@ -6,7 +6,6 @@ import { Args, Flags, ux as CliUx } from '@oclif/core';
 import { ManifestValue } from '@subsquid/manifest';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
-import { get } from 'lodash';
 import targz from 'targz';
 
 import { deploySquid, uploadFile } from '../api';
@@ -97,7 +96,7 @@ export default class Deploy extends DeployCommand {
     const isUrl = source.startsWith('http://') || source.startsWith('https://');
     let deploy;
 
-    let organization = org;
+    const orgCode = await this.promptOrganization(org, 'using "-o" flag');
 
     if (!isUrl) {
       const res = resolveManifest(source, manifestPath);
@@ -112,7 +111,7 @@ export default class Deploy extends DeployCommand {
       this.log(chalk.dim(`Build directory: ${buildDir}`));
       this.log(chalk.dim(`Manifest: ${manifestPath}`));
 
-      const squid = await this.findSquid({ squidName: manifest.name });
+      const squid = await this.findSquid({ orgCode, squidName: manifest.name });
       if (squid) {
         const version = squid.versions.find((v) => v.name === `v${manifest.version}`);
 
@@ -122,21 +121,6 @@ export default class Deploy extends DeployCommand {
            */
           const attached = await this.attachToParallelDeploy(squid, version);
           if (attached) return;
-        }
-
-        if (squid.organization?.code) {
-          if (organization && organization !== squid.organization.code) {
-            const { confirm } = await inquirer.prompt([
-              {
-                name: 'confirm',
-                type: 'confirm',
-                message: `Version "v${manifest.version}" of Squid "${manifest.name}" belongs to "${squid.organization?.code}". Update a squid in "${squid.organization?.code}" project?`,
-              },
-            ]);
-            if (!confirm) return;
-          }
-
-          organization = squid.organization.code;
         }
 
         if (version && !update) {
@@ -149,11 +133,6 @@ export default class Deploy extends DeployCommand {
           ]);
           if (!confirm) return;
         }
-      } else {
-        /**
-         * It is a new squid need to check project code is specified
-         */
-        organization = await this.promptOrganization(organization, 'using "-o" flag');
       }
 
       if (!hasPackageJson(squidDir)) {
@@ -225,35 +204,35 @@ export default class Deploy extends DeployCommand {
 
       CliUx.ux.action.start(`◷ Uploading ${path.basename(squidArtifact)}`);
 
-      const { error, fileUrl: artifactUrl } = await uploadFile(squidArtifact);
+      const { error, fileUrl: artifactUrl } = await uploadFile(orgCode, squidArtifact);
       if (error) return this.error(error);
       else if (!artifactUrl) return this.error('The artifact URL is missing');
 
       this.log(`🦑 Releasing the squid from local folder`);
 
       deploy = await deploySquid({
-        hardReset,
-        artifactUrl,
-        manifestPath,
-        organization,
+        orgCode,
+        data: {
+          hardReset,
+          artifactUrl,
+          manifestPath,
+        },
       });
     } else {
-      organization = await this.promptOrganization(organization, 'using "-o" flag');
       this.log(`🦑 Releasing the squid from remote`);
 
       deploy = await deploySquid({
-        hardReset,
-        artifactUrl: source,
-        manifestPath,
-        organization,
+        orgCode,
+        data: {
+          hardReset,
+          artifactUrl: source,
+          manifestPath,
+        },
       });
     }
+    if (!deploy) return;
 
-    if (!deploy) {
-      return;
-    }
-
-    await this.pollDeploy({ deployId: deploy.id, streamLogs: !disableStreamLogs });
+    await this.pollDeploy({ orgCode, deployId: deploy.id, streamLogs: !disableStreamLogs });
 
     this.log('✔️ Done!');
   }

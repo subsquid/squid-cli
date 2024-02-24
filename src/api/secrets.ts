@@ -1,31 +1,19 @@
 import { api } from './api';
 import { HttpResponse, SecretsListResponse } from './types';
 
-export async function listSecrets({ organization }: { organization?: string }): Promise<SecretsListResponse> {
+export async function listSecrets({ orgCode }: { orgCode: string }): Promise<SecretsListResponse> {
   const { body } = await api<HttpResponse<SecretsListResponse>>({
     method: 'get',
-    query: organization
-      ? {
-          organization,
-        }
-      : undefined,
-    path: `/secrets`,
+    path: `/orgs/${orgCode}/secrets`,
   });
   return body.payload;
 }
 
-export async function removeSecret({
-  name,
-  organization,
-}: {
-  name: string;
-  organization?: string;
-}): Promise<SecretsListResponse> {
+export async function removeSecret({ name, orgCode }: { name: string; orgCode: string }): Promise<SecretsListResponse> {
   const { body } = await api<HttpResponse<SecretsListResponse>>({
     method: 'put',
-    path: `/secrets`,
+    path: `/orgs/${orgCode}/secrets`,
     data: {
-      organization,
       secrets: [{ action: 'DELETE', name }],
     },
   });
@@ -36,17 +24,16 @@ export async function removeSecret({
 export async function setSecret({
   name,
   value,
-  organization,
+  orgCode,
 }: {
   name: string;
   value: string;
-  organization?: string;
+  orgCode: string;
 }): Promise<SecretsListResponse> {
   const { body } = await api<HttpResponse<SecretsListResponse>>({
     method: 'put',
-    path: `/secrets`,
+    path: `/orgs/${orgCode}/secrets`,
     data: {
-      organization,
       secrets: [{ action: 'UPDATE', name, value }],
     },
   });

@@ -26,13 +26,21 @@ export async function getSquidCommands() {
   }
 }
 
-export async function pollDeployPipelines(
-  squidName: string,
-  versionName: string,
-  deploymentUrl: string,
-  command: Command,
-  { verbose = true }: { verbose?: boolean } = {},
-): Promise<void> {
+export async function pollDeployPipelines({
+  orgCode,
+  squidName,
+  versionName,
+  deploymentUrl,
+  command,
+  verbose = true,
+}: {
+  orgCode: string;
+  squidName: string;
+  versionName: string;
+  deploymentUrl: string;
+  command: Command;
+  verbose?: boolean;
+}): Promise<void> {
   let lastStatus: string;
 
   await doUntil(
@@ -102,7 +110,7 @@ export async function pollDeployPipelines(
 
           CliUx.ux.action.start(`Streaming logs from the squid`);
 
-          await streamSquidLogs(squidName, versionName, (l) => command.log(l));
+          await streamSquidLogs({ orgCode, squidName, versionName, onLog: (l) => command.log(l) });
 
           return true;
         default:
