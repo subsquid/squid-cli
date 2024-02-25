@@ -71,9 +71,22 @@ Do you want to attach to the running deploy process?`,
     let lastStatus: string;
     let validatedPrinted = false;
 
+    let attempt = 0;
+
     await doUntil(
       async () => {
-        this.deploy = await getDeploy({ orgCode, id: deployId });
+        try {
+          this.deploy = await getDeploy({ orgCode, id: deployId });
+
+          attempt = 0;
+        } catch (e: unknown) {
+          if (attempt < 10) {
+            attempt += 1;
+            return false;
+          } else {
+            throw e;
+          }
+        }
 
         if (!this.deploy) return true;
         if (this.deploy.status !== lastStatus) {
