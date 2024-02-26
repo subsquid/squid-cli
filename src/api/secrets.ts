@@ -1,24 +1,27 @@
-import { api } from './api';
+import { client } from './client';
 import { HttpResponse, SecretsListResponse } from './types';
 
 export async function listSecrets({ orgCode }: { orgCode: string }): Promise<SecretsListResponse> {
-  const { body } = await api<HttpResponse<SecretsListResponse>>({
+  const { data } = await client.request<HttpResponse<SecretsListResponse>>({
     method: 'get',
-    path: `/orgs/${orgCode}/secrets`,
+    url: `/orgs/${orgCode}/secrets`,
   });
-  return body.payload;
+  return data.payload;
 }
 
 export async function removeSecret({ name, orgCode }: { name: string; orgCode: string }): Promise<SecretsListResponse> {
-  const { body } = await api<HttpResponse<SecretsListResponse>>({
+  const { data } = await client.request<HttpResponse<SecretsListResponse>>({
     method: 'put',
-    path: `/orgs/${orgCode}/secrets`,
+    url: `/orgs/${orgCode}/secrets`,
+    headers: {
+      'content-type': 'application/json',
+    },
     data: {
       secrets: [{ action: 'DELETE', name }],
     },
   });
 
-  return body.payload;
+  return data.payload;
 }
 
 export async function setSecret({
@@ -30,13 +33,16 @@ export async function setSecret({
   value: string;
   orgCode: string;
 }): Promise<SecretsListResponse> {
-  const { body } = await api<HttpResponse<SecretsListResponse>>({
+  const { data } = await client.request<HttpResponse<SecretsListResponse>>({
     method: 'put',
-    path: `/orgs/${orgCode}/secrets`,
+    url: `/orgs/${orgCode}/secrets`,
+    headers: {
+      'content-type': 'application/json',
+    },
     data: {
       secrets: [{ action: 'UPDATE', name, value }],
     },
   });
 
-  return body.payload;
+  return data.payload;
 }

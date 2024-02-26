@@ -44,29 +44,20 @@ export abstract class CliCommand extends Command {
             });
             return this.error(`Validation error:\n${messages.join('\n')}`);
           }
-          return this.error(body?.error || body?.message || `Validation error ${body}`);
+          return this.error(error.message || `Validation error ${body}`);
         case 404:
           return this.error(
-            `Unknown API endpoint. Check that your are using the latest version of the Squid CLI. Message: ${
-              body?.error || body?.message || 'API url not found'
-            }`,
+            `${error.message || 'API url not found'}. Check that your are using the latest version of the Squid CLI`,
           );
 
         case 405:
-          return this.error(body?.error || body?.message || 'Method not allowed');
+          return this.error(error.message || 'Method not allowed');
         case 502:
         case 503:
         case 504:
           return this.error('The API is currently unavailable. Please try again later');
         default:
-          return this.error(
-            [
-              `Unknown network error occurred`,
-              `==================`,
-              `Status: ${status}`,
-              `Body:\n${JSON.stringify(body)}`,
-            ].join('\n'),
-          );
+          return this.error(error);
       }
     }
 

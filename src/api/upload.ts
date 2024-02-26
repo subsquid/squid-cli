@@ -1,9 +1,9 @@
 import fs from 'fs';
 
+import axios from 'axios';
 import FormData from 'form-data';
-import fetch from 'node-fetch';
 
-import { ApiError } from './api';
+import { ApiError } from './client';
 import { getUploadUrl } from './squids';
 
 export async function uploadFile(orgCode: string, path: string): Promise<{ error: string | null; fileUrl?: string }> {
@@ -27,18 +27,17 @@ export async function uploadFile(orgCode: string, path: string): Promise<{ error
 
   body.append('file', fileStream, { knownLength: size });
 
-  const res = await fetch(uploadUrl, {
+  const res = await axios.request({
+    url: uploadUrl,
     method: 'POST',
     headers: {
       ...body.getHeaders(),
     },
-    body,
+    data: body,
   });
 
   if (res.status !== 204) {
-    throw new ApiError(400, {
-      error: await res.text(),
-    });
+    throw new ApiError(400, res.data);
   }
 
   return { error: null, fileUrl };

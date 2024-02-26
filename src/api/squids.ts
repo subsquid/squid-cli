@@ -2,7 +2,7 @@ import split2 from 'split2';
 
 import { pretty } from '../logs';
 
-import { api, debugLog } from './api';
+import { client, debugLog } from './client';
 import {
   DeployResponse,
   HttpResponse,
@@ -16,12 +16,12 @@ import {
 } from './types';
 
 export async function squidList({ orgCode }: { orgCode: string }): Promise<SquidResponse[]> {
-  const { body } = await api<HttpResponse<SquidResponse[]>>({
+  const { data } = await client.request<HttpResponse<SquidResponse[]>>({
     method: 'get',
-    path: `/orgs/${orgCode}/squids`,
+    url: `/orgs/${orgCode}/squids`,
   });
 
-  return body.payload;
+  return data.payload;
 }
 
 export async function getSquid({
@@ -33,24 +33,24 @@ export async function getSquid({
   squidName: string;
   versionName?: string;
 }): Promise<SquidResponse> {
-  const { body } = await api<HttpResponse<SquidResponse>>({
+  const { data } = await client.request<HttpResponse<SquidResponse>>({
     method: 'get',
-    path: `/orgs/${orgCode}/squids/${squidName}`,
-    query: {
+    url: `/orgs/${orgCode}/squids/${squidName}`,
+    params: {
       versionName,
     },
   });
 
-  return body.payload;
+  return data.payload;
 }
 
 export async function squidNameIsAvailable(squidName: string): Promise<boolean> {
-  const { body } = await api<HttpResponse<SquidNameIsAvailableResponse>>({
+  const { data } = await client.request<HttpResponse<SquidNameIsAvailableResponse>>({
     method: 'get',
-    path: `/squids/${squidName}/available`,
+    url: `/squids/${squidName}/available`,
   });
 
-  return Boolean(body.payload?.available);
+  return Boolean(data.payload.available);
 }
 
 export async function versionHistoryLogs({
@@ -73,18 +73,18 @@ export async function versionHistoryLogs({
   };
   abortController?: AbortController;
 }): Promise<LogsResponse> {
-  const { body } = await api<LogsResponse>({
+  const { data } = await client.request<HttpResponse<LogsResponse>>({
     method: 'get',
-    path: `/orgs/${orgCode}/squids/${squidName}/versions/${versionName}/logs/history`,
-    query: {
+    url: `/orgs/${orgCode}/squids/${squidName}/versions/${versionName}/logs/history`,
+    params: {
       ...query,
       from: query.from.toISOString(),
       level: query.level?.map((l) => l.toUpperCase()),
     },
-    abortController,
+    signal: abortController?.signal,
   });
 
-  return body || { logs: [], nextPage: null };
+  return data.payload || { logs: [], nextPage: null };
 }
 
 export async function versionLogsFollow({
@@ -100,15 +100,15 @@ export async function versionLogsFollow({
   query: { container?: string[]; level?: string[] };
   abortController?: AbortController;
 }) {
-  const { body } = await api<NodeJS.ReadableStream>({
+  const { data } = await client.request<NodeJS.ReadableStream>({
     method: 'get',
-    path: `/orgs/${orgCode}/squids/${squidName}/versions/${versionName}/logs/follow`,
-    query,
+    url: `/orgs/${orgCode}/squids/${squidName}/versions/${versionName}/logs/follow`,
+    params: query,
     responseType: 'stream',
-    abortController: abortController,
+    signal: abortController?.signal,
   });
 
-  return body;
+  return data;
 }
 
 export async function streamSquidLogs({
@@ -197,7 +197,7 @@ export async function streamSquidLogs({
 
 export async function deploySquid({
   orgCode,
-  data,
+  data: _data,
 }: {
   orgCode: string;
   data: {
@@ -206,22 +206,25 @@ export async function deploySquid({
     manifestPath: string;
   };
 }): Promise<DeployResponse> {
-  const { body } = await api<HttpResponse<DeployResponse>>({
+  const { data } = await client.request<HttpResponse<DeployResponse>>({
     method: 'post',
-    path: `/orgs/${orgCode}/squids/deploy`,
-    data,
+    url: `/orgs/${orgCode}/squids/deploy`,
+    headers: {
+      'content-type': 'application/json',
+    },
+    data: _data,
   });
 
-  return body.payload;
+  return data.payload;
 }
 
 export async function getUploadUrl({ orgCode }: { orgCode: string }): Promise<UploadUrlResponse> {
-  const { body } = await api<HttpResponse<UploadUrlResponse>>({
+  const { data } = await client.request<HttpResponse<UploadUrlResponse>>({
     method: 'post',
-    path: `/orgs/${orgCode}/deploys/upload-url`,
+    url: `/orgs/${orgCode}/deploys/upload-url`,
   });
 
-  return body.payload;
+  return data.payload;
 }
 
 export async function restartSquid({
@@ -233,12 +236,12 @@ export async function restartSquid({
   squidName: string;
   versionName: string;
 }): Promise<DeployResponse> {
-  const { body } = await api<HttpResponse<DeployResponse>>({
+  const { data } = await client.request<HttpResponse<DeployResponse>>({
     method: 'put',
-    path: `/orgs/${orgCode}/squids/${squidName}/version/${versionName}/redeploy`,
+    url: `/orgs/${orgCode}/squids/${squidName}/version/${versionName}/redeploy`,
   });
 
-  return body.payload;
+  return data.payload;
 }
 
 export async function destroyVersion({
@@ -250,19 +253,19 @@ export async function destroyVersion({
   squidName: string;
   versionName: string;
 }): Promise<string> {
-  const { body } = await api<HttpResponse<SquidResponse>>({
+  const { data } = await client.request<HttpResponse<SquidResponse>>({
     method: 'delete',
-    path: `/orgs/${orgCode}/squids/${squidName}/version/${versionName}`,
+    url: `/orgs/${orgCode}/squids/${squidName}/version/${versionName}`,
   });
 
-  return `Destroyed Squid "${body.payload.name}" version ${body.payload.versions?.[0]?.name}`;
+  return `Destroyed Squid "${data.payload.name}" version ${data.payload.versions?.[0]?.name}`;
 }
 
 export async function destroySquid({ orgCode, squidName }: { orgCode: string; squidName: string }): Promise<string> {
-  const { body } = await api<HttpResponse<SquidResponse>>({
+  const { data } = await client.request<HttpResponse<SquidResponse>>({
     method: 'delete',
-    path: `/orgs/${orgCode}/squids/${squidName}`,
+    url: `/orgs/${orgCode}/squids/${squidName}`,
   });
 
-  return `Destroyed Squid ${body.payload.name}`;
+  return `Destroyed Squid ${data.payload.name}`;
 }

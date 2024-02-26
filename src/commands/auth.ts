@@ -27,10 +27,8 @@ export default class Auth extends CliCommand {
     } = await this.parse(Auth);
 
     const { username, email } = await profile({
-      auth: {
-        apiUrl: host,
-        credentials: key,
-      },
+      apiUrl: host,
+      credentials: key,
     });
 
     setConfig(key, host);

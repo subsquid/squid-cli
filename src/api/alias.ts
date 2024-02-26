@@ -1,4 +1,4 @@
-import { api } from './api';
+import { client } from './client';
 import { HttpResponse, SquidResponse } from './types';
 
 export async function setProduction({
@@ -10,10 +10,10 @@ export async function setProduction({
   squidName: string;
   versionName: string;
 }): Promise<SquidResponse> {
-  const { body } = await api<HttpResponse<SquidResponse>>({
+  const { data } = await client.request<HttpResponse<SquidResponse>>({
     method: 'put',
-    path: `/orgs/${orgCode}/squids/${squidName}/versions/${versionName}/prod`,
+    url: `/orgs/${orgCode}/squids/${squidName}/versions/${versionName}/prod`,
   });
 
-  return body.payload;
+  return data.payload;
 }

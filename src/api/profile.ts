@@ -1,4 +1,4 @@
-import { api, ApiError } from './api';
+import { client } from './client';
 import { HttpResponse } from './types';
 
 export type Profile = {
@@ -11,21 +11,22 @@ export type Profile = {
 };
 
 export async function profile({
-  auth,
+  apiUrl,
+  credentials,
 }: {
-  auth?: { apiUrl: string; credentials: string };
+  apiUrl?: string;
+  credentials?: string;
 } = {}): Promise<Profile> {
-  const { body } = await api<HttpResponse<Profile>>({
+  const { data } = await client.request<HttpResponse<Profile>>({
     method: 'get',
-    auth,
-    path: `/profile`,
+    baseURL: apiUrl ? apiUrl : client.defaults.baseURL,
+    url: `/profile`,
+    headers: {
+      authorization: credentials ? `token ${credentials}` : client.defaults.headers.authorization,
+    },
   });
 
-  if (!body.payload) {
-    throw new ApiError(401, { error: 'username is missing' });
-  }
-
-  return body.payload;
+  return data.payload;
 }
 
 export async function listOrganizations() {
