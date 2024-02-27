@@ -1,7 +1,7 @@
 import { promises as asyncFs } from 'fs';
 import path from 'path';
 
-import { Args, ux as CliUx, Flags } from '@oclif/core';
+import { Args, Flags, ux as CliUx } from '@oclif/core';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { simpleGit } from 'simple-git';

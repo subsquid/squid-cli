@@ -30,10 +30,10 @@ export abstract class CliCommand extends Command {
   }
 
   async catch(error: any) {
-    const { status, body } = error;
+    const { request, body } = error;
 
     if (error instanceof ApiError) {
-      switch (status) {
+      switch (request.status) {
         case 401:
           return this.error(
             `Authentication failure. Please obtain a new deployment key at https://app.subsquid.io and follow the instructions`,
@@ -47,10 +47,10 @@ export abstract class CliCommand extends Command {
           }
           return this.error(body?.error || body?.message || `Validation error ${body}`);
         case 404:
+          const url = `${chalk.bold(request.method)} ${chalk.bold(request.url)}`;
+
           return this.error(
-            `Unknown API endpoint. Check that your are using the latest version of the Squid CLI. Message: ${
-              body?.error || body?.message || 'API url not found'
-            }`,
+            `Unknown API endpoint ${url}. Check that your are using the latest version of the Squid CLI. If the problem persists, please contact support.`,
           );
 
         case 405:
@@ -64,7 +64,7 @@ export abstract class CliCommand extends Command {
             [
               `Unknown network error occurred`,
               `==================`,
-              `Status: ${status}`,
+              `Status: ${request.status}`,
               `Body:\n${JSON.stringify(body)}`,
             ].join('\n'),
           );
