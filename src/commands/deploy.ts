@@ -193,8 +193,12 @@ export default class Deploy extends DeployCommand {
           ignore: (name) => {
             const relativePath = path.relative(path.resolve(squidDir), path.resolve(name));
 
+            if (relativePath.includes(`node_modules`)) {
+              this.log(chalk.dim(`-- ignoring ${relativePath}`));
+              return true;
+            }
+
             switch (relativePath) {
-              case 'node_modules':
               case 'builds':
               case 'lib':
               case 'Dockerfile':
@@ -213,6 +217,7 @@ export default class Deploy extends DeployCommand {
           },
         },
       });
+
       CliUx.ux.action.stop(`${filesCount} file(s) ✔️`);
       if (filesCount === 0) {
         return this.error(`0 files were found in ${squidDir}. Please check the squid source, looks like it is empty`);
