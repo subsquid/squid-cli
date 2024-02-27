@@ -22,7 +22,14 @@ export async function profile({
   });
 
   if (!body.payload) {
-    throw new ApiError(401, { error: 'username is missing' });
+    throw new ApiError(
+      {
+        status: 401,
+        method: 'get',
+        url: '/user',
+      },
+      { error: 'Credentials are missing or invalid' },
+    );
   }
 
   return body.payload;

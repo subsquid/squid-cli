@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { promisify } from 'util';
 
 import { Args, Flags, ux as CliUx } from '@oclif/core';
@@ -8,6 +8,7 @@ import chalk from 'chalk';
 import { globSync } from 'glob';
 import ignore from 'ignore';
 import inquirer from 'inquirer';
+import prettyBytes from 'pretty-bytes';
 import targz from 'targz';
 
 import { deploySquid, uploadFile } from '../api';
@@ -174,9 +175,9 @@ export default class Deploy extends DeployCommand {
   private async pack({ buildDir, squidDir, archiveName }: { buildDir: string; squidDir: string; archiveName: string }) {
     CliUx.ux.action.start(`◷ Compressing the squid to ${archiveName} `);
 
-    const squidignore = createSquidIgnore(squidDir);
+    const squidIgnore = createSquidIgnore(squidDir);
 
-    if (!hasPackageJson(squidDir) || squidignore?.ignores(PACKAGE_JSON)) {
+    if (!hasPackageJson(squidDir) || squidIgnore?.ignores(PACKAGE_JSON)) {
       return this.showError(
         [
           `The ${PACKAGE_JSON} file was not found in the squid directory`,
@@ -211,41 +212,18 @@ export default class Deploy extends DeployCommand {
       src: squidDir,
       dest: squidArtifact,
       tar: {
-        // if squidignore does not exist, we fallback to the old ignore approach
-        ignore: squidignore
-          ? (name) => {
-              const relativePath = path.relative(path.resolve(squidDir), path.resolve(name));
+        ignore: (name) => {
+          const relativePath = path.relative(path.resolve(squidDir), path.resolve(name));
 
-              if (squidignore.ignores(relativePath)) {
-                this.log(chalk.dim(`-- ignoring ${relativePath}`));
-                return true;
-              } else {
-                this.log(chalk.dim(`adding ${relativePath}`));
-                filesCount++;
-                return false;
-              }
-            }
-          : (name) => {
-              const relativePath = path.relative(path.resolve(squidDir), path.resolve(name));
-
-              switch (relativePath) {
-                case 'node_modules':
-                case 'builds':
-                case 'lib':
-                case 'Dockerfile':
-                // FIXME: .env ?
-                case '.git':
-                case '.github':
-                case '.idea':
-                  this.log(chalk.dim(`-- ignoring ${relativePath}`));
-                  return true;
-                default:
-                  this.log(chalk.dim(`adding ${relativePath}`));
-
-                  filesCount++;
-                  return false;
-              }
-            },
+          if (squidIgnore.ignores(relativePath)) {
+            this.log(chalk.dim(`-- ignoring ${relativePath}`));
+            return true;
+          } else {
+            this.log(chalk.dim(`adding ${relativePath}`));
+            filesCount++;
+            return false;
+          }
+        },
       },
     });
 
@@ -256,7 +234,9 @@ export default class Deploy extends DeployCommand {
       );
     }
 
-    CliUx.ux.action.stop(`${filesCount} file(s) ✔️`);
+    const squidArtifactStats = fs.statSync(squidArtifact);
+
+    CliUx.ux.action.stop(`${filesCount} files, ${prettyBytes(squidArtifactStats.size)} ✔️`);
 
     return squidArtifact;
   }
@@ -290,7 +270,10 @@ function hasLockFile(squidDir: string, lockFile?: string) {
 }
 
 function createSquidIgnore(squidDir: string) {
-  const ig = ignore();
+  const ig = ignore().add(
+    // default ignore patterns
+    ['node_modules', '.git'],
+  );
 
   const ignoreFilePaths = globSync(['.squidignore', '**/.squidignore'], {
     cwd: squidDir,
@@ -298,8 +281,16 @@ function createSquidIgnore(squidDir: string) {
     posix: true,
   });
 
-  if (ignoreFilePaths.length === 0) {
-    return undefined;
+  if (!ignoreFilePaths.length) {
+    return ig.add([
+      // squid uploaded archives directory
+      '/builds',
+      // squid built files
+      '/lib',
+      // IDE files
+      '.idea',
+      '.vscode',
+    ]);
   }
 
   for (const ignoreFilePath of ignoreFilePaths) {
