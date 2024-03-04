@@ -93,7 +93,13 @@ export type SquidResponse = {
   isPublic: boolean;
   deploy?: DeployResponse;
   createdAt: Date;
-  organization?: { id: string; code: string };
+  organization?: SquidOrganizationResponse;
+};
+
+export type SquidOrganizationResponse = {
+  id: string;
+  code: string;
+  name: string;
 };
 
 export type SquidNameIsAvailableResponse = {

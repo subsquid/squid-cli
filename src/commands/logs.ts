@@ -77,12 +77,12 @@ export default class Logs extends CliCommand {
       args: { name },
     } = await this.parse(Logs);
 
-    const orgCode = await this.promptOrganization(org, 'using "-o" flag');
+    const { squidName, versionName } = parseNameAndVersion(name, this);
+
+    const orgCode = await this.promptSquidOrganization(org, squidName, 'using "-o" flag');
 
     const fromDate = parseDate(since);
     this.log(`Fetching logs from ${fromDate.toISOString()}...`);
-
-    const { squidName, versionName } = parseNameAndVersion(name, this);
 
     if (follow) {
       await this.fetchLogs(orgCode, squidName, versionName, {
