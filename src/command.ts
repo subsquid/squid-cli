@@ -1,8 +1,9 @@
 import { Command } from '@oclif/core';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
+import { isNil } from 'lodash';
 
-import { ApiError, listOrganizations } from './api';
+import { ApiError, SquidOrganizationResponse, listOrganizations, listSquids } from './api';
 import { getTTY } from './tty';
 
 export const RELEASE_DEPRECATE = [
@@ -73,8 +74,8 @@ export abstract class CliCommand extends Command {
     throw error;
   }
 
-  async promptOrganization(organizationCode: string | null | undefined, using: string): Promise<string> {
-    if (organizationCode) return organizationCode;
+  async promptOrganization(orgCode: string | null | undefined, using: string): Promise<string> {
+    if (orgCode) return orgCode;
 
     const organizations = await listOrganizations();
     if (organizations.length === 0) {
@@ -83,6 +84,24 @@ export abstract class CliCommand extends Command {
       return organizations[0].code;
     }
 
+    return await this.getOrganizationPromt(organizations, using);
+  }
+
+  async promptSquidOrganization(orgCode: string | null | undefined, squidName: string, using: string): Promise<string> {
+    if (orgCode) return orgCode;
+
+    const squids = await listSquids({ squidName });
+    const organizations = squids.map((s) => s.organization).filter((o): o is SquidOrganizationResponse => !isNil(o));
+    if (organizations.length === 0) {
+      return this.error(`No organizations has been found`);
+    } else if (organizations.length === 1) {
+      return organizations[0].code;
+    }
+
+    return await this.getOrganizationPromt(organizations, using);
+  }
+
+  private async getOrganizationPromt(organizations: { code: string; name: string }[], using: string) {
     const { stdin, stdout } = getTTY();
     if (!stdin || !stdout) {
       this.log(chalk.dim(`You have ${organizations.length} organizations:`));
