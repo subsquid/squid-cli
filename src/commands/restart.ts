@@ -47,9 +47,9 @@ export default class Restart extends DeployCommand {
       flags: { 'no-stream-logs': disableStreamLogs, org },
       args: { nameAndVersion },
     } = await this.parse(Restart);
-    const orgCode = await this.promptOrganization(org, 'using "-o" flag');
-
     const { squidName, versionName } = parseNameAndVersion(nameAndVersion, this);
+
+    const orgCode = await this.promptSquidOrganization(org, squidName, 'using "-o" flag');
 
     const deploy = await restartSquid({ orgCode, squidName, versionName });
 

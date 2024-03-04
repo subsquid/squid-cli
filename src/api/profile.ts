@@ -1,5 +1,5 @@
 import { api, ApiError } from './api';
-import { HttpResponse } from './types';
+import { HttpResponse, SquidResponse } from './types';
 
 export type Profile = {
   username?: string;
@@ -18,7 +18,7 @@ export async function profile({
   const { body } = await api<HttpResponse<Profile>>({
     method: 'get',
     auth,
-    path: `/profile`,
+    path: `/user`,
   });
 
   if (!body.payload) {
@@ -32,4 +32,16 @@ export async function listOrganizations() {
   const { organizations, ...rest } = await profile();
 
   return organizations || [];
+}
+
+export async function listSquids({ squidName }: { squidName?: string }) {
+  const { body } = await api<HttpResponse<SquidResponse[]>>({
+    method: 'get',
+    path: `/user/squids`,
+    query: {
+      squidName,
+    },
+  });
+
+  return body.payload;
 }

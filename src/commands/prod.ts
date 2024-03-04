@@ -33,7 +33,7 @@ export default class Prod extends DeployCommand {
 
     const { squidName, versionName } = parseNameAndVersion(args.nameAndVersion, this);
 
-    const orgCode = await this.promptOrganization(org, 'using "-o" flag');
+    const orgCode = await this.promptSquidOrganization(org, squidName, 'using "-o" flag');
 
     const foundSquid = await getSquid({ orgCode, squidName, versionName });
     if (!foundSquid.versions?.length) {

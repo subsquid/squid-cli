@@ -36,10 +36,10 @@ export default class Rm extends DeployCommand {
       flags: { force, org },
     } = await this.parse(Rm);
 
-    const orgCode = await this.promptOrganization(org, 'using "-o" flag');
-
     if (nameAndVersion.includes('@')) {
       const { squidName, versionName } = parseNameAndVersion(nameAndVersion, this);
+
+      const orgCode = await this.promptSquidOrganization(org, squidName, 'using "-o" flag');
 
       if (!force) {
         const { confirm } = await inquirer.prompt([
@@ -57,6 +57,8 @@ export default class Rm extends DeployCommand {
       CliUx.ux.action.stop();
       return;
     } else {
+      const orgCode = await this.promptSquidOrganization(org, nameAndVersion, 'using "-o" flag');
+
       if (!force) {
         const { confirm } = await inquirer.prompt([
           {
