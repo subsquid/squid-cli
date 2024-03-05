@@ -42,7 +42,6 @@
   },
   "homepage": "https://www.subsquid.io/",
   "scripts": {
-    "postinstall": "node ./bin/run.js autocomplete --refresh-cache",
     "build": "rm -rf lib && tsc",
     "dev": "./bin/dev",
     "sqd": "./bin/run.js",
