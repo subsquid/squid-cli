@@ -173,10 +173,10 @@ Do you want to attach to the running deploy process?`,
       });
   };
 
-  showError(text: string): boolean {
-    CliUx.ux.action.stop('');
+  showError(text: string, reason?: string): never {
+    CliUx.ux.action.stop('❌');
 
-    const reason = this.deploy?.failed || 'UNEXPECTED';
+    reason = reason || this.deploy?.failed || 'UNEXPECTED';
     const errors: (string | null)[] = [text];
     if (reason === 'UNEXPECTED') {
       errors.push(
@@ -190,8 +190,6 @@ Do you want to attach to the running deploy process?`,
 
     // FIXME: maybe we should send an error report ourselves here with more details?
     this.error(errors.filter(Boolean).join('\n'));
-
-    return true;
   }
 
   isFailed() {
