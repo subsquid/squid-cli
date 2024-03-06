@@ -23,6 +23,8 @@ const SQUID_PATH_DESC = [
   `  - a github URL to a git repo with a branch or commit tag`,
 ];
 
+const PACKAGE_JSON = 'package.json';
+
 const lockFiles = {
   npm: 'package-lock.json',
   yarn: 'yarn.lock',
@@ -174,10 +176,10 @@ export default class Deploy extends DeployCommand {
 
     const squidignore = createSquidIgnore(squidDir);
 
-    if (!hasPackageJson(squidDir, (name) => !squidignore?.ignores(name))) {
+    if (!hasPackageJson(squidDir) || squidignore?.ignores(PACKAGE_JSON)) {
       return this.showError(
         [
-          `The package.json file was not found in the squid directory`,
+          `The ${PACKAGE_JSON} file was not found in the squid directory`,
           ``,
           `Squid directory: ${squidDir}`,
           ``,
@@ -275,8 +277,8 @@ export default class Deploy extends DeployCommand {
   }
 }
 
-function hasPackageJson(squidDir: string, cb?: (fileName: string) => boolean) {
-  return fs.existsSync(path.join(squidDir, 'package.json')) && (!cb || cb('package.json'));
+function hasPackageJson(squidDir: string) {
+  return fs.existsSync(path.join(squidDir, PACKAGE_JSON));
 }
 
 function hasLockFile(squidDir: string, lockFile?: string) {
