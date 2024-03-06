@@ -84,6 +84,8 @@
     "fast-levenshtein": "^3.0.0",
     "figlet": "^1.7.0",
     "form-data": "^4.0.0",
+    "glob": "^10.3.10",
+    "ignore": "^5.3.1",
     "inquirer": "^8.2.5",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",

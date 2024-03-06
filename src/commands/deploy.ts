@@ -5,6 +5,8 @@ import { promisify } from 'util';
 import { Args, Flags, ux as CliUx } from '@oclif/core';
 import { ManifestValue } from '@subsquid/manifest';
 import chalk from 'chalk';
+import { globSync } from 'glob';
+import ignore from 'ignore';
 import inquirer from 'inquirer';
 import targz from 'targz';
 
@@ -20,6 +22,8 @@ const SQUID_PATH_DESC = [
   `  - a URL to a .tar.gz archive`,
   `  - a github URL to a git repo with a branch or commit tag`,
 ];
+
+const PACKAGE_JSON = 'package.json';
 
 const lockFiles = {
   npm: 'package-lock.json',
@@ -54,6 +58,7 @@ export default class Deploy extends DeployCommand {
     source: Args.string({
       description: SQUID_PATH_DESC.join('\n'),
       required: true,
+      default: '.',
     }),
   };
 
@@ -99,13 +104,12 @@ export default class Deploy extends DeployCommand {
     const orgCode = await this.promptOrganization(org, 'using "-o" flag');
 
     if (!isUrl) {
+      this.log(`🦑 Releasing the squid from local folder`);
+
       const res = resolveManifest(source, manifestPath);
-      if ('error' in res) return this.error(res.error);
+      if ('error' in res) return this.showError(res.error, 'MANIFEST_VALIDATION_FAILED');
 
       const { buildDir, squidDir, manifest } = res;
-
-      const archiveName = `${manifest.name}-v${manifest.version}.tar.gz`;
-      const squidArtifact = path.join(buildDir, archiveName);
 
       this.log(chalk.dim(`Squid directory: ${squidDir}`));
       this.log(chalk.dim(`Build directory: ${buildDir}`));
@@ -135,80 +139,10 @@ export default class Deploy extends DeployCommand {
         }
       }
 
-      if (!hasPackageJson(squidDir)) {
-        return this.error(
-          [
-            `The package.json file was not found in the squid directory`,
-            ``,
-            `Squid directory    ${squidDir}`,
-            ``,
-            `Please provide a path to the root of a squid directory`,
-            ``,
-          ].join('\n'),
-        );
-      }
+      const archiveName = `${manifest.name}-v${manifest.version}.tar.gz`;
 
-      // const lockFile = get(lockFiles, manifest.build.package_manager);
-      // if (!hasLockFile(squidDir, lockFile)) {
-      //   return this.error(
-      //     [
-      //       `${lockFile || 'Lockfile'} is not found in the squid directory`,
-      //       ``,
-      //       `Squid directory    ${squidDir}`,
-      //       ``,
-      //       `Please provide a path to the root of a squid directory`,
-      //       ``,
-      //     ].join('\n'),
-      //   );
-      // }
-
-      CliUx.ux.action.start(`◷ Compressing the squid to ${archiveName} `);
-
-      let filesCount = 0;
-      await compressAsync({
-        src: squidDir,
-        dest: squidArtifact,
-        tar: {
-          ignore: (name) => {
-            const relativePath = path.relative(path.resolve(squidDir), path.resolve(name));
-
-            if (relativePath.includes(`node_modules`)) {
-              this.log(chalk.dim(`-- ignoring ${relativePath}`));
-              return true;
-            }
-
-            switch (relativePath) {
-              case 'builds':
-              case 'lib':
-              case 'Dockerfile':
-              // FIXME: .env ?
-              case '.git':
-              case '.github':
-              case '.idea':
-                this.log(chalk.dim(`-- ignoring ${relativePath}`));
-                return true;
-              default:
-                this.log(chalk.dim(`adding ${relativePath}`));
-
-                filesCount++;
-                return false;
-            }
-          },
-        },
-      });
-
-      CliUx.ux.action.stop(`${filesCount} file(s) ✔️`);
-      if (filesCount === 0) {
-        return this.error(`0 files were found in ${squidDir}. Please check the squid source, looks like it is empty`);
-      }
-
-      CliUx.ux.action.start(`◷ Uploading ${path.basename(squidArtifact)}`);
-
-      const { error, fileUrl: artifactUrl } = await uploadFile(orgCode, squidArtifact);
-      if (error) return this.error(error);
-      else if (!artifactUrl) return this.error('The artifact URL is missing');
-
-      this.log(`🦑 Releasing the squid from local folder`);
+      const actifactPath = await this.pack({ buildDir, squidDir, archiveName });
+      const artifactUrl = await this.upload({ orgCode, actifactPath });
 
       deploy = await deploySquid({
         orgCode,
@@ -236,10 +170,115 @@ export default class Deploy extends DeployCommand {
 
     this.log('✔️ Done!');
   }
+
+  private async pack({ buildDir, squidDir, archiveName }: { buildDir: string; squidDir: string; archiveName: string }) {
+    CliUx.ux.action.start(`◷ Compressing the squid to ${archiveName} `);
+
+    const squidignore = createSquidIgnore(squidDir);
+
+    if (!hasPackageJson(squidDir) || squidignore?.ignores(PACKAGE_JSON)) {
+      return this.showError(
+        [
+          `The ${PACKAGE_JSON} file was not found in the squid directory`,
+          ``,
+          `Squid directory: ${squidDir}`,
+          ``,
+          `Please provide a path to the root of a squid directory`,
+          ``,
+        ].join('\n'),
+        'PACKING_FAILED',
+      );
+    }
+
+    // const lockFile = get(lockFiles, manifest.build.package_manager);
+    // if (!hasLockFile(squidDir, lockFile)) {
+    //   return this.error(
+    //     [
+    //       `${lockFile || 'Lockfile'} is not found in the squid directory`,
+    //       ``,
+    //       `Squid directory    ${squidDir}`,
+    //       ``,
+    //       `Please provide a path to the root of a squid directory`,
+    //       ``,
+    //     ].join('\n'),
+    //   );
+    // }
+
+    const squidArtifact = path.join(buildDir, archiveName);
+
+    let filesCount = 0;
+    await compressAsync({
+      src: squidDir,
+      dest: squidArtifact,
+      tar: {
+        // if squidignore does not exist, we fallback to the old ignore approach
+        ignore: squidignore
+          ? (name) => {
+              const relativePath = path.relative(path.resolve(squidDir), path.resolve(name));
+
+              if (squidignore.ignores(relativePath)) {
+                this.log(chalk.dim(`-- ignoring ${relativePath}`));
+                return true;
+              } else {
+                this.log(chalk.dim(`adding ${relativePath}`));
+                filesCount++;
+                return false;
+              }
+            }
+          : (name) => {
+              const relativePath = path.relative(path.resolve(squidDir), path.resolve(name));
+
+              switch (relativePath) {
+                case 'node_modules':
+                case 'builds':
+                case 'lib':
+                case 'Dockerfile':
+                // FIXME: .env ?
+                case '.git':
+                case '.github':
+                case '.idea':
+                  this.log(chalk.dim(`-- ignoring ${relativePath}`));
+                  return true;
+                default:
+                  this.log(chalk.dim(`adding ${relativePath}`));
+
+                  filesCount++;
+                  return false;
+              }
+            },
+      },
+    });
+
+    if (filesCount === 0) {
+      return this.showError(
+        `0 files were found in ${squidDir}. Please check the squid source, looks like it is empty`,
+        'PACKING_FAILED',
+      );
+    }
+
+    CliUx.ux.action.stop(`${filesCount} file(s) ✔️`);
+
+    return squidArtifact;
+  }
+
+  private async upload({ orgCode, actifactPath }: { orgCode: string; actifactPath: string }) {
+    CliUx.ux.action.start(`◷ Uploading ${path.basename(actifactPath)}`);
+
+    const { error, fileUrl: artifactUrl } = await uploadFile(orgCode, actifactPath);
+    if (error) {
+      return this.showError(error);
+    } else if (!artifactUrl) {
+      return this.showError('The artifact URL is missing', 'UPLOAD_FAILED');
+    }
+
+    CliUx.ux.action.stop('✔️');
+
+    return artifactUrl;
+  }
 }
 
 function hasPackageJson(squidDir: string) {
-  return fs.existsSync(path.join(squidDir, 'package.json'));
+  return fs.existsSync(path.join(squidDir, PACKAGE_JSON));
 }
 
 function hasLockFile(squidDir: string, lockFile?: string) {
@@ -248,4 +287,30 @@ function hasLockFile(squidDir: string, lockFile?: string) {
   } else {
     return Object.values(lockFiles).some((lf) => fs.existsSync(path.join(squidDir, lf)));
   }
+}
+
+function createSquidIgnore(squidDir: string) {
+  const ig = ignore();
+
+  const ignoreFilePaths = globSync(['.squidignore', '**/.squidignore'], {
+    cwd: squidDir,
+    nodir: true,
+    posix: true,
+  });
+
+  if (ignoreFilePaths.length === 0) {
+    return undefined;
+  }
+
+  for (const ignoreFilePath of ignoreFilePaths) {
+    const ignoreCwd = path.dirname(ignoreFilePath);
+
+    const patterns = fs.readFileSync(ignoreFilePath).toString().split('\n');
+    for (const pattern of patterns) {
+      if (pattern.length === 0) continue;
+      ig.add(path.posix.join(ignoreCwd, pattern));
+    }
+  }
+
+  return ig;
 }
