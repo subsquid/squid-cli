@@ -139,7 +139,7 @@ export default class Deploy extends DeployCommand {
 
       const archiveName = `${manifest.name}-v${manifest.version}.tar.gz`;
 
-      const actifactPath = await this.build({ buildDir, squidDir, archiveName });
+      const actifactPath = await this.pack({ buildDir, squidDir, archiveName });
       const artifactUrl = await this.upload({ orgCode, actifactPath });
 
       deploy = await deploySquid({
@@ -169,15 +169,7 @@ export default class Deploy extends DeployCommand {
     this.log('✔️ Done!');
   }
 
-  private async build({
-    buildDir,
-    squidDir,
-    archiveName,
-  }: {
-    buildDir: string;
-    squidDir: string;
-    archiveName: string;
-  }) {
+  private async pack({ buildDir, squidDir, archiveName }: { buildDir: string; squidDir: string; archiveName: string }) {
     CliUx.ux.action.start(`◷ Compressing the squid to ${archiveName} `);
 
     const squidignore = createSquidIgnore(squidDir);
@@ -192,7 +184,7 @@ export default class Deploy extends DeployCommand {
           `Please provide a path to the root of a squid directory`,
           ``,
         ].join('\n'),
-        'SOURCE_FILES_BUILD_FAILED',
+        'PACKING_FAILED',
       );
     }
 
@@ -258,7 +250,7 @@ export default class Deploy extends DeployCommand {
     if (filesCount === 0) {
       return this.showError(
         `0 files were found in ${squidDir}. Please check the squid source, looks like it is empty`,
-        'SOURCE_FILES_BUILD_FAILED',
+        'PACKING_FAILED',
       );
     }
 
