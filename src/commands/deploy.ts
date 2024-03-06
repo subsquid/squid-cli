@@ -5,6 +5,8 @@ import { promisify } from 'util';
 import { Args, Flags, ux as CliUx } from '@oclif/core';
 import { ManifestValue } from '@subsquid/manifest';
 import chalk from 'chalk';
+import { globSync } from 'glob';
+import ignore from 'ignore';
 import inquirer from 'inquirer';
 import targz from 'targz';
 
@@ -54,6 +56,7 @@ export default class Deploy extends DeployCommand {
     source: Args.string({
       description: SQUID_PATH_DESC.join('\n'),
       required: true,
+      default: '.',
     }),
   };
 
@@ -135,7 +138,9 @@ export default class Deploy extends DeployCommand {
         }
       }
 
-      if (!hasPackageJson(squidDir)) {
+      const squidignore = createSquidIgnore(squidDir);
+
+      if (!hasPackageJson(squidDir, (name) => !squidignore?.ignores(name))) {
         return this.error(
           [
             `The package.json file was not found in the squid directory`,
@@ -169,27 +174,41 @@ export default class Deploy extends DeployCommand {
         src: squidDir,
         dest: squidArtifact,
         tar: {
-          ignore: (name) => {
-            const relativePath = path.relative(path.resolve(squidDir), path.resolve(name));
+          // if squidignore does not exist, we fallback to the old ignore approach
+          ignore: squidignore
+            ? (name) => {
+                const relativePath = path.relative(path.resolve(squidDir), path.resolve(name));
 
-            switch (relativePath) {
-              case 'node_modules':
-              case 'builds':
-              case 'lib':
-              case 'Dockerfile':
-              // FIXME: .env ?
-              case '.git':
-              case '.github':
-              case '.idea':
-                this.log(chalk.dim(`-- ignoring ${relativePath}`));
-                return true;
-              default:
-                this.log(chalk.dim(`adding ${relativePath}`));
+                if (squidignore.ignores(relativePath)) {
+                  this.log(chalk.dim(`-- ignoring ${relativePath}`));
+                  return true;
+                } else {
+                  this.log(chalk.dim(`adding ${relativePath}`));
+                  filesCount++;
+                  return false;
+                }
+              }
+            : (name) => {
+                const relativePath = path.relative(path.resolve(squidDir), path.resolve(name));
 
-                filesCount++;
-                return false;
-            }
-          },
+                switch (relativePath) {
+                  case 'node_modules':
+                  case 'builds':
+                  case 'lib':
+                  case 'Dockerfile':
+                  // FIXME: .env ?
+                  case '.git':
+                  case '.github':
+                  case '.idea':
+                    this.log(chalk.dim(`-- ignoring ${relativePath}`));
+                    return true;
+                  default:
+                    this.log(chalk.dim(`adding ${relativePath}`));
+
+                    filesCount++;
+                    return false;
+                }
+              },
         },
       });
       CliUx.ux.action.stop(`${filesCount} file(s) ✔️`);
@@ -233,8 +252,8 @@ export default class Deploy extends DeployCommand {
   }
 }
 
-function hasPackageJson(squidDir: string) {
-  return fs.existsSync(path.join(squidDir, 'package.json'));
+function hasPackageJson(squidDir: string, cb?: (fileName: string) => boolean) {
+  return fs.existsSync(path.join(squidDir, 'package.json')) && (!cb || cb('package.json'));
 }
 
 function hasLockFile(squidDir: string, lockFile?: string) {
@@ -243,4 +262,30 @@ function hasLockFile(squidDir: string, lockFile?: string) {
   } else {
     return Object.values(lockFiles).some((lf) => fs.existsSync(path.join(squidDir, lf)));
   }
+}
+
+function createSquidIgnore(squidDir: string) {
+  const ig = ignore();
+
+  const ignoreFilePaths = globSync(['.squidignore', '**/.squidignore'], {
+    cwd: squidDir,
+    nodir: true,
+    posix: true,
+  });
+
+  if (ignoreFilePaths.length === 0) {
+    return undefined;
+  }
+
+  for (const ignoreFilePath of ignoreFilePaths) {
+    const ignoreCwd = path.dirname(ignoreFilePath);
+
+    const patterns = fs.readFileSync(ignoreFilePath).toString().split('\n');
+    for (const pattern of patterns) {
+      if (pattern.length === 0) continue;
+      ig.add(path.posix.join(ignoreCwd, pattern));
+    }
+  }
+
+  return ig;
 }
