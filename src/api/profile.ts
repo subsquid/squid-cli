@@ -46,7 +46,7 @@ export async function listSquids({ squidName }: { squidName?: string }) {
     method: 'get',
     path: `/user/squids`,
     query: {
-      squidName,
+      name: squidName,
     },
   });
 
