@@ -32,10 +32,10 @@ export default class Ls extends CliCommand {
     } = await this.parse(Ls);
     const noTruncate = !truncate;
 
-    const organization = await this.promptOrganization(org, 'using "-o" flag');
+    const orgCode = await this.promptOrganization(org, 'using "-o" flag');
 
     if (name) {
-      const squid = await getSquid({ squidName: name });
+      const squid = await getSquid({ orgCode, squidName: name });
 
       if (squid.versions) {
         CliUx.ux.table(
@@ -52,7 +52,7 @@ export default class Ls extends CliCommand {
         );
       }
     } else {
-      const squids = await squidList({ organization });
+      const squids = await squidList({ orgCode });
       if (squids) {
         CliUx.ux.table(
           squids,

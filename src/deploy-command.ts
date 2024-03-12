@@ -18,9 +18,9 @@ export abstract class DeployCommand extends CliCommand {
   deploy: DeployResponse | undefined;
   logsPrinted = 0;
 
-  async findSquid({ squidName }: { squidName: string }) {
+  async findSquid({ orgCode, squidName }: { orgCode: string; squidName: string }) {
     try {
-      return await getSquid({ squidName });
+      return await getSquid({ orgCode, squidName });
     } catch (e: any) {
       if (e.status === 404) {
         return null;
@@ -47,19 +47,33 @@ Do you want to attach to the running deploy process?`,
         ]);
         if (!confirm) return false;
 
-        await this.pollDeploy({ deployId: version.runningDeploy.id, streamLogs: true });
+        if (squid.organization) {
+          await this.pollDeploy({
+            orgCode: squid.organization.code,
+            deployId: version.runningDeploy.id,
+            streamLogs: true,
+          });
+        }
 
         return true;
     }
   }
 
-  async pollDeploy({ deployId, streamLogs }: { deployId: string; streamLogs: boolean }): Promise<void> {
+  async pollDeploy({
+    orgCode,
+    deployId,
+    streamLogs,
+  }: {
+    orgCode: string;
+    deployId: string;
+    streamLogs: boolean;
+  }): Promise<void> {
     let lastStatus: string;
     let validatedPrinted = false;
 
     await doUntil(
       async () => {
-        this.deploy = await getDeploy(deployId);
+        this.deploy = await getDeploy({ orgCode, id: deployId });
 
         if (!this.deploy) return true;
         if (this.deploy.status !== lastStatus) {
@@ -109,9 +123,15 @@ Do you want to attach to the running deploy process?`,
               `The squid is up and running. The GraphQL API will be shortly available at ${this.deploy.deploymentUrl}`,
             );
 
-            if (streamLogs && this.deploy.squidName && this.deploy.versionName) {
+            const { squidName, versionName, orgCode } = this.deploy;
+            if (streamLogs && squidName && versionName && orgCode) {
               CliUx.ux.action.start(`Streaming logs from the squid`);
-              await streamSquidLogs(this.deploy.squidName, this.deploy.versionName, (l) => this.log(l));
+              await streamSquidLogs({
+                orgCode,
+                squidName,
+                versionName,
+                onLog: (l) => this.log(l),
+              });
             }
 
             return true;
@@ -153,10 +173,10 @@ Do you want to attach to the running deploy process?`,
       });
   };
 
-  showError(text: string): boolean {
-    CliUx.ux.action.stop('');
+  showError(text: string, reason?: string): never {
+    CliUx.ux.action.stop('❌');
 
-    const reason = this.deploy?.failed || 'UNEXPECTED';
+    reason = reason || this.deploy?.failed || 'UNEXPECTED';
     const errors: (string | null)[] = [text];
     if (reason === 'UNEXPECTED') {
       errors.push(
@@ -170,8 +190,6 @@ Do you want to attach to the running deploy process?`,
 
     // FIXME: maybe we should send an error report ourselves here with more details?
     this.error(errors.filter(Boolean).join('\n'));
-
-    return true;
   }
 
   isFailed() {

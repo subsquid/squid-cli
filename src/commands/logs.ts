@@ -64,36 +64,48 @@ export default class Logs extends CliCommand {
       default: false,
       exclusive: ['fromDate', 'pageSize'],
     }),
+    org: Flags.string({
+      char: 'o',
+      description: 'Organization',
+      required: false,
+    }),
   };
 
   async run(): Promise<void> {
     const {
-      flags: { follow, pageSize, container, level, since },
+      flags: { follow, pageSize, container, level, since, org },
       args: { name },
     } = await this.parse(Logs);
 
-    const fromDate = parseDate(since);
-
-    this.log(`Fetching logs from ${fromDate.toISOString()}...`);
-
     const { squidName, versionName } = parseNameAndVersion(name, this);
 
+    const orgCode = await this.promptSquidOrganization(org, squidName, 'using "-o" flag');
+
+    const fromDate = parseDate(since);
+    this.log(`Fetching logs from ${fromDate.toISOString()}...`);
+
     if (follow) {
-      await this.fetchLogs(squidName, versionName, {
+      await this.fetchLogs(orgCode, squidName, versionName, {
         limit: 30,
         from: fromDate,
         reverse: true,
         container,
         level,
       });
-      await streamSquidLogs(squidName, versionName, (l) => this.log(l), { container, level });
+      await streamSquidLogs({
+        orgCode,
+        squidName,
+        versionName,
+        onLog: (l) => this.log(l),
+        query: { container, level },
+      });
       debugLog(`done`);
       return;
     }
 
     let cursor = undefined;
     do {
-      const { hasLogs, nextPage }: LogResult = await this.fetchLogs(squidName, versionName, {
+      const { hasLogs, nextPage }: LogResult = await this.fetchLogs(orgCode, squidName, versionName, {
         limit: pageSize,
         from: fromDate,
         nextPage: cursor,
@@ -117,6 +129,7 @@ export default class Logs extends CliCommand {
   }
 
   async fetchLogs(
+    orgCode: string,
     squidName: string,
     versionName: string,
     {
@@ -133,7 +146,7 @@ export default class Logs extends CliCommand {
     },
   ): Promise<LogResult> {
     // eslint-disable-next-line prefer-const
-    let { logs, nextPage } = await versionHistoryLogs(squidName, versionName, query);
+    let { logs, nextPage } = await versionHistoryLogs({ orgCode, squidName, versionName, query });
     if (reverse) {
       logs = logs.reverse();
     }

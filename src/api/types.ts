@@ -17,6 +17,7 @@ export type DeployResponse = {
   status: DeployStatus;
   squidName?: string;
   versionName?: string;
+  orgCode?: string;
   deploymentUrl?: string;
   failed: 'NO' | 'UNEXPECTED' | 'PERMISSIONS' | 'REQUIREMENTS' | 'SOURCE_FILES_BUILD_FAILED';
   logs: { severity: 'debug' | 'warn' | 'info' | 'error'; message: string }[];
@@ -92,7 +93,13 @@ export type SquidResponse = {
   isPublic: boolean;
   deploy?: DeployResponse;
   createdAt: Date;
-  organization?: { id: string; code: string };
+  organization?: SquidOrganizationResponse;
+};
+
+export type SquidOrganizationResponse = {
+  id: string;
+  code: string;
+  name: string;
 };
 
 export type SquidNameIsAvailableResponse = {

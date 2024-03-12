@@ -35,18 +35,25 @@ export default class Restart extends DeployCommand {
       required: false,
       default: false,
     }),
+    org: Flags.string({
+      char: 'o',
+      description: 'Organization',
+      required: false,
+    }),
   };
 
   async run(): Promise<void> {
     const {
-      flags: { 'no-stream-logs': disableStreamLogs },
+      flags: { 'no-stream-logs': disableStreamLogs, org },
       args: { nameAndVersion },
     } = await this.parse(Restart);
     const { squidName, versionName } = parseNameAndVersion(nameAndVersion, this);
 
-    const deploy = await restartSquid(squidName, versionName);
+    const orgCode = await this.promptSquidOrganization(org, squidName, 'using "-o" flag');
 
-    await this.pollDeploy({ deployId: deploy.id, streamLogs: !disableStreamLogs });
+    const deploy = await restartSquid({ orgCode, squidName, versionName });
+
+    await this.pollDeploy({ orgCode, deployId: deploy.id, streamLogs: !disableStreamLogs });
 
     this.log('✔️ Done!');
   }
