@@ -30,9 +30,9 @@ export abstract class CliCommand extends Command {
   }
 
   async catch(error: any) {
-    const { request, body } = error;
-
     if (error instanceof ApiError) {
+      const { request, body } = error;
+
       switch (request.status) {
         case 401:
           return this.error(
@@ -47,12 +47,20 @@ export abstract class CliCommand extends Command {
           }
           return this.error(body?.error || body?.message || `Validation error ${body}`);
         case 404:
-          const url = `${chalk.bold(request.method)} ${chalk.bold(request.url)}`;
+          const defaultErrorStart = `cannot ${request.method.toLowerCase()}`;
 
-          return this.error(
-            `Unknown API endpoint ${url}. Check that your are using the latest version of the Squid CLI. If the problem persists, please contact support.`,
-          );
+          if (
+            body.error.toLowerCase().startsWith(defaultErrorStart) ||
+            body.message?.toLowerCase().startsWith(defaultErrorStart)
+          ) {
+            const url = `${chalk.bold(request.method)} ${chalk.bold(request.url)}`;
 
+            return this.error(
+              `Unknown API endpoint ${url}. Check that your are using the latest version of the Squid CLI. If the problem persists, please contact support.`,
+            );
+          } else {
+            return this.error(body.error);
+          }
         case 405:
           return this.error(body?.error || body?.message || 'Method not allowed');
         case 502:
@@ -93,7 +101,7 @@ export abstract class CliCommand extends Command {
     const squids = await listSquids({ squidName });
     const organizations = squids.map((s) => s.organization).filter((o): o is SquidOrganizationResponse => !isNil(o));
     if (organizations.length === 0) {
-      return this.error(`No organizations has been found`);
+      return this.error(`Squid "${squidName}" was not found.`);
     } else if (organizations.length === 1) {
       return organizations[0].code;
     }
