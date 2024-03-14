@@ -736,7 +736,7 @@
     is-wsl "^2.1.1"
     tslib "^2.3.1"
 
-"@oclif/core@^3.19.1":
+"@oclif/core@3.19.1", "@oclif/core@^3.19.1":
   version "3.19.1"
   resolved "https://registry.yarnpkg.com/@oclif/core/-/core-3.19.1.tgz#18af989f4b086ba9b6dfac891fb27f8281664084"
   integrity sha512-dd1h4Hz+LwpuYhKvgBjDmW3/HgUAm93JM95cnbzSv5VcmiBeC+utjLvY96PmPbYxxDoz7XazEOl8oOpSLSEgcg==
@@ -840,7 +840,7 @@
     chalk "^4.1.0"
     tslib "^2.4.1"
 
-"@oclif/plugin-autocomplete@^3.0.8":
+"@oclif/plugin-autocomplete@3.0.8":
   version "3.0.8"
   resolved "https://registry.yarnpkg.com/@oclif/plugin-autocomplete/-/plugin-autocomplete-3.0.8.tgz#e874172bbf48b4ae6f019411582c56cedfcfa8cd"
   integrity sha512-8h9PU56msmSD+s+mZcS/b+YYJwyxDwONC8FFQUbfeWAB/rRqMFj2tOMbh7VGk6ZUTU5KcQvMDeDQ3UXfTKVPqA==
