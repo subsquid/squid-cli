@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 
 import {
+  ApiError,
   DeployResponse,
   DeployStatus,
   getDeploy,
@@ -22,7 +23,7 @@ export abstract class DeployCommand extends CliCommand {
     try {
       return await getSquid({ orgCode, squidName });
     } catch (e: any) {
-      if (e.status === 404) {
+      if (e instanceof ApiError && e.request.status === 404) {
         return null;
       }
 
