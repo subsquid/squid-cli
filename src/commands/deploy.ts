@@ -294,12 +294,16 @@ function createSquidIgnore(squidDir: string) {
   }
 
   for (const ignoreFilePath of ignoreFilePaths) {
-    const ignoreCwd = path.dirname(ignoreFilePath);
+    const ignoreDir = path.dirname(ignoreFilePath);
 
     const patterns = fs.readFileSync(ignoreFilePath).toString().split('\n');
     for (const pattern of patterns) {
-      if (pattern.length === 0) continue;
-      ig.add(path.posix.join(ignoreCwd, pattern));
+      if (pattern.length === 0 || pattern.startsWith('#')) continue;
+
+      let fullPattern = pattern.startsWith('/') ? pattern : `**/${pattern}`;
+      fullPattern = ignoreDir === '.' ? fullPattern : `/${ignoreDir}/${fullPattern}`;
+
+      ig.add(fullPattern);
     }
   }
 
