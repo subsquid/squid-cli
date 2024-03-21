@@ -269,7 +269,7 @@ function hasLockFile(squidDir: string, lockFile?: string) {
   }
 }
 
-function createSquidIgnore(squidDir: string) {
+export function createSquidIgnore(squidDir: string) {
   const ig = ignore().add(
     // default ignore patterns
     ['node_modules', '.git'],
@@ -296,16 +296,34 @@ function createSquidIgnore(squidDir: string) {
   for (const ignoreFilePath of ignoreFilePaths) {
     const ignoreDir = path.dirname(ignoreFilePath);
 
-    const patterns = fs.readFileSync(ignoreFilePath).toString().split('\n');
-    for (const pattern of patterns) {
-      if (pattern.length === 0 || pattern.startsWith('#')) continue;
+    const raw = fs.readFileSync(ignoreFilePath).toString();
+    const patterns = getIgnorePatterns(ignoreDir, raw);
 
-      let fullPattern = pattern.startsWith('/') ? pattern : `**/${pattern}`;
-      fullPattern = ignoreDir === '.' ? fullPattern : `/${ignoreDir}/${fullPattern}`;
-
-      ig.add(fullPattern);
-    }
+    ig.add(patterns);
   }
 
   return ig;
+}
+
+export function getIgnorePatterns(ignoreDir: string, raw: string) {
+  const lines = raw.split('\n');
+
+  const patterns: string[] = [];
+  for (let line of lines) {
+    line = line.trim();
+
+    if (line.length === 0) continue;
+    if (line.startsWith('#')) continue;
+
+    let pattern = line.startsWith('/') || line.startsWith('*/') || line.startsWith('**/') ? line : `**/${line}`;
+    pattern = ignoreDir === '.' ? pattern : `${toRootPattern(ignoreDir)}${toRootPattern(pattern)}`;
+
+    patterns.push(pattern);
+  }
+
+  return patterns;
+}
+
+function toRootPattern(pattern: string) {
+  return pattern.startsWith('/') ? pattern : `/${pattern}`;
 }
