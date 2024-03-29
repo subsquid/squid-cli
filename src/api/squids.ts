@@ -70,6 +70,7 @@ export async function versionHistoryLogs({
     orderBy?: string;
     container?: string[];
     level?: string[];
+    search?: string;
   };
   abortController?: AbortController;
 }): Promise<LogsResponse> {
@@ -97,7 +98,7 @@ export async function versionLogsFollow({
   orgCode: string;
   squidName: string;
   versionName: string;
-  query: { container?: string[]; level?: string[] };
+  query: { container?: string[]; level?: string[]; search?: string };
   abortController?: AbortController;
 }) {
   const { body } = await api<NodeJS.ReadableStream>({
@@ -123,7 +124,7 @@ export async function streamSquidLogs({
   squidName: string;
   versionName: string;
   onLog: (log: string) => unknown;
-  query?: { container?: string[]; level?: string[] };
+  query?: { container?: string[]; level?: string[]; search?: string };
   abortController?: AbortController;
 }) {
   let attempt = 0;

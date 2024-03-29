@@ -57,6 +57,11 @@ export default class Logs extends CliCommand {
       required: false,
       default: '1d',
     }),
+    search: Flags.string({
+      char: 's',
+      summary: 'Filter by content',
+      required: false,
+    }),
     follow: Flags.boolean({
       char: 'f',
       summary: 'Follow',
@@ -73,7 +78,7 @@ export default class Logs extends CliCommand {
 
   async run(): Promise<void> {
     const {
-      flags: { follow, pageSize, container, level, since, org },
+      flags: { follow, pageSize, container, level, since, org, search },
       args: { name },
     } = await this.parse(Logs);
 
@@ -85,19 +90,25 @@ export default class Logs extends CliCommand {
     this.log(`Fetching logs from ${fromDate.toISOString()}...`);
 
     if (follow) {
-      await this.fetchLogs(orgCode, squidName, versionName, {
-        limit: 30,
-        from: fromDate,
+      await this.fetchLogs({
+        orgCode,
+        squidName,
+        versionName,
         reverse: true,
-        container,
-        level,
+        query: {
+          limit: 30,
+          from: fromDate,
+          container,
+          level,
+          search,
+        },
       });
       await streamSquidLogs({
         orgCode,
         squidName,
         versionName,
         onLog: (l) => this.log(l),
-        query: { container, level },
+        query: { container, level, search },
       });
       debugLog(`done`);
       return;
@@ -105,12 +116,18 @@ export default class Logs extends CliCommand {
 
     let cursor = undefined;
     do {
-      const { hasLogs, nextPage }: LogResult = await this.fetchLogs(orgCode, squidName, versionName, {
-        limit: pageSize,
-        from: fromDate,
-        nextPage: cursor,
-        container,
-        level,
+      const { hasLogs, nextPage }: LogResult = await this.fetchLogs({
+        orgCode,
+        squidName,
+        versionName,
+        query: {
+          limit: pageSize,
+          from: fromDate,
+          nextPage: cursor,
+          container,
+          level,
+          search,
+        },
       });
       if (!hasLogs) {
         this.log('No logs found');
@@ -128,23 +145,27 @@ export default class Logs extends CliCommand {
     } while (cursor);
   }
 
-  async fetchLogs(
-    orgCode: string,
-    squidName: string,
-    versionName: string,
-    {
-      reverse,
-      ...query
-    }: {
+  async fetchLogs({
+    orgCode,
+    squidName,
+    query,
+    versionName,
+    reverse,
+  }: {
+    orgCode: string;
+    squidName: string;
+    versionName: string;
+    reverse?: boolean;
+    query: {
       limit: number;
       from: Date;
       container?: string[];
       nextPage?: string;
       orderBy?: string;
-      reverse?: boolean;
       level?: string[];
-    },
-  ): Promise<LogResult> {
+      search?: string;
+    };
+  }): Promise<LogResult> {
     // eslint-disable-next-line prefer-const
     let { logs, nextPage } = await versionHistoryLogs({ orgCode, squidName, versionName, query });
     if (reverse) {
