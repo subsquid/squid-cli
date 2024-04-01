@@ -1,4 +1,5 @@
-import { api, ApiError } from './api';
+import { api } from './api';
+import { ApiError } from './common';
 import { HttpResponse, SquidResponse } from './types';
 
 export type Profile = {

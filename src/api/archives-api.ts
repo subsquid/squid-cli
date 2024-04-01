@@ -1,19 +1,24 @@
-import path from 'path';
-
 import axios, { Method } from 'axios';
 import chalk from 'chalk';
 import { pickBy } from 'lodash';
 import ms from 'ms';
 
-import { getConfig } from '../config';
+import { API_DEBUG, ApiError, DEFAULT_RETRY, version } from './common';
 
-import { ApiError, DEFAULT_RETRY, version, API_DEBUG } from './common';
+export type Provider = {
+  provider: string;
+  dataSourceUrl: string;
+  release: string;
+};
 
-export function debugLog(...args: any[]) {
-  if (!API_DEBUG) return;
+export type Archive = {
+  network: string;
+  providers: Provider[];
+};
 
-  console.log(chalk.dim(new Date().toISOString()), chalk.cyan`[DEBUG]`, ...args);
-}
+export type ArchivesResponse = {
+  archives: Archive[];
+};
 
 export async function api<T = any>({
   method,
@@ -36,14 +41,11 @@ export async function api<T = any>({
   abortController?: AbortController;
   retry?: number;
 }): Promise<{ body: T }> {
-  const config = auth || getConfig();
-
   const started = Date.now();
-  // add the API_URL to the path if it's not a full url
-  const url = !path.startsWith('https') ? `${config.apiUrl}${path}` : path;
+
+  const url = !path.startsWith('https') ? `https://cdn.subsquid.io/archives${path}` : path;
 
   const finalHeaders = {
-    authorization: url.startsWith(config.apiUrl) ? `token ${config.credentials}` : null,
     'X-CLI-Version': version,
     ...headers,
   };
@@ -94,4 +96,22 @@ export async function api<T = any>({
         response.data,
       );
   }
+}
+
+export async function listSubstrate() {
+  const { body } = await api<ArchivesResponse>({
+    method: 'get',
+    path: '/substrate.json',
+  });
+
+  return body;
+}
+
+export async function listEVM() {
+  const { body } = await api<ArchivesResponse>({
+    method: 'get',
+    path: '/evm.json',
+  });
+
+  return body;
 }
