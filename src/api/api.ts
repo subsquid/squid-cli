@@ -1,13 +1,45 @@
 import path from 'path';
 
 import axios, { Method } from 'axios';
+import axiosRetry, { IAxiosRetryConfig, isNetworkOrIdempotentRequestError } from 'axios-retry';
 import chalk from 'chalk';
 import { pickBy } from 'lodash';
 import ms from 'ms';
 
 import { getConfig } from '../config';
 
-import { ApiError, DEFAULT_RETRY, version, API_DEBUG } from './common';
+const API_DEBUG = process.env.API_DEBUG === 'true';
+
+const DEFAULT_RETRY: IAxiosRetryConfig = {
+  retries: 10,
+  retryDelay: axiosRetry.exponentialDelay,
+  retryCondition: isNetworkOrIdempotentRequestError,
+};
+
+axiosRetry(axios, DEFAULT_RETRY);
+
+let version = 'unknown';
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  version = require(path.resolve(__dirname, '../../package.json')).version;
+} catch (e) {}
+
+export class ApiError extends Error {
+  constructor(
+    public request: { status: number; method: string; url: string },
+    public body: {
+      error: string;
+      message?: string;
+      invalidFields?: { path: string[]; message: string; type: string }[];
+    },
+  ) {
+    super();
+
+    if (body?.message) {
+      this.message = body.message;
+    }
+  }
+}
 
 export function debugLog(...args: any[]) {
   if (!API_DEBUG) return;
