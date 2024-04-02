@@ -1,6 +1,7 @@
 import { ux as CliUx, Flags } from '@oclif/core';
+import chalk from 'chalk';
 
-import { listEVM, listSubstrate } from '../../api/gateways-api';
+import { Gateway, GatewaysResponse, listEVM, listSubstrate } from '../../api/gateways-api';
 import { CliCommand } from '../../command';
 
 export default class Ls extends CliCommand {
@@ -12,7 +13,7 @@ export default class Ls extends CliCommand {
       description: 'network type: EVM/Substrate',
       options: ['evm', 'substrate'],
       helpValue: '<evm|substrate>',
-      required: true,
+      required: false,
     }),
     search: Flags.string({
       char: 's',
@@ -26,10 +27,28 @@ export default class Ls extends CliCommand {
       flags: { type, search },
     } = await this.parse(Ls);
 
-    const gatewaysResponse = type === 'evm' ? await listEVM() : await listSubstrate();
-    const gateways = search
-      ? gatewaysResponse.archives.filter((g) => g.network.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
-      : gatewaysResponse.archives;
+    switch (type) {
+      case 'evm':
+        this.processGateways(await listEVM(), search);
+        break;
+      case 'substrate':
+        this.processGateways(await listSubstrate(), search);
+        break;
+      default:
+        this.processGateways(await listEVM(), search, 'EVM');
+        this.log();
+        this.processGateways(await listSubstrate(), search, 'Substrate');
+    }
+  }
+
+  processGateways(gateways: Gateway[], search: string | undefined, type?: string) {
+    if (type) {
+      this.log(chalk.bold(`${type}:`));
+    }
+
+    gateways = search
+      ? gateways.filter((g) => g.network.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
+      : gateways;
 
     if (!gateways.length) {
       return this.log('No gateways found');
@@ -38,12 +57,12 @@ export default class Ls extends CliCommand {
     CliUx.ux.table(
       gateways.map(({ network, providers }) => ({
         network,
-        release: providers[0].release,
+        release: chalk.dim(providers[0].release),
         url: providers[0].dataSourceUrl,
       })),
       {
         network: { header: 'Name' },
-        release: { header: 'Release' },
+        release: { header: 'Release', minWidth: 12 },
         url: { header: 'Gateway URL' },
       },
       {

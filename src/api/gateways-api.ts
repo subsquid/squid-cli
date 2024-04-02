@@ -21,7 +21,7 @@ export async function listSubstrate() {
     path: 'https://cdn.subsquid.io/archives/substrate.json',
   });
 
-  return body;
+  return body.archives;
 }
 
 export async function listEVM() {
@@ -30,5 +30,5 @@ export async function listEVM() {
     path: 'https://cdn.subsquid.io/archives/evm.json',
   });
 
-  return body;
+  return body.archives;
 }
