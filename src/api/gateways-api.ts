@@ -11,13 +11,13 @@ export type Provider = {
   release: string;
 };
 
-export type Archive = {
+export type Gateway = {
   network: string;
   providers: Provider[];
 };
 
-export type ArchivesResponse = {
-  archives: Archive[];
+export type GatewaysResponse = {
+  archives: Gateway[];
 };
 
 export async function api<T = any>({
@@ -99,7 +99,7 @@ export async function api<T = any>({
 }
 
 export async function listSubstrate() {
-  const { body } = await api<ArchivesResponse>({
+  const { body } = await api<GatewaysResponse>({
     method: 'get',
     path: '/substrate.json',
   });
@@ -108,7 +108,7 @@ export async function listSubstrate() {
 }
 
 export async function listEVM() {
-  const { body } = await api<ArchivesResponse>({
+  const { body } = await api<GatewaysResponse>({
     method: 'get',
     path: '/evm.json',
   });
