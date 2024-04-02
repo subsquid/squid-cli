@@ -1,8 +1,7 @@
-import { ux as CliUx, Help as OclifHelp } from '@oclif/core';
+import { Help as OclifHelp, ux as CliUx } from '@oclif/core';
 import chalk from 'chalk';
-
-import DefaultCommand from './commands/default';
 import { getSquidCommands } from './utils';
+import * as Interfaces from '@oclif/core/lib/interfaces';
 
 const TABLE_OPTIONS = {
   'no-header': true,
@@ -28,27 +27,7 @@ const COMMANDS_FORMAT = {
 };
 
 export default class Help extends OclifHelp {
-  async showCommandHelp(command: any) {
-    if (command.id === 'default') {
-      await DefaultCommand.run(command.args);
-      return;
-    }
-
-    await super.showCommandHelp(command);
-  }
-
-  async showHelp(argv: string[]) {
-    const squidCommands = await this.getVisibleSquidCommands();
-
-    if (squidCommands.find((c) => c.name === argv[0])) {
-      await DefaultCommand.run(argv);
-      return;
-    }
-
-    await super.showHelp(argv);
-  }
-
-  async printHelp() {
+  async showRootHelp() {
     this.log('Subsquid CLI tool');
 
     this.log();
@@ -58,14 +37,14 @@ export default class Help extends OclifHelp {
     this.log();
     this.helpHeader('CLOUD COMMANDS');
 
-    const commands = this.getVisibleCloudCommands();
+    const commands = Help.getVisibleCloudCommands(this.config);
     CliUx.ux.table(
       commands.filter((c) => !TOOLS_COMMANDS.includes(c.name)),
       COMMANDS_FORMAT,
       TABLE_OPTIONS,
     );
 
-    const squidCommands = await this.getVisibleSquidCommands();
+    const squidCommands = await Help.getVisibleSquidCommands();
     if (squidCommands.length !== 0) {
       this.log();
       this.helpHeader('SQUID COMMANDS');
@@ -83,7 +62,7 @@ export default class Help extends OclifHelp {
     );
   }
 
-  async getVisibleSquidCommands(): Promise<{ name: string; description?: string }[]> {
+  static async getVisibleSquidCommands(): Promise<{ name: string; description?: string }[]> {
     const config = await getSquidCommands();
     if (!config) return [];
 
@@ -95,10 +74,10 @@ export default class Help extends OclifHelp {
       }));
   }
 
-  getVisibleCloudCommands(): { name: string; description?: string; aliases: string[] }[] {
+  static getVisibleCloudCommands(config: Interfaces.Config): { name: string; description?: string; aliases: string[] }[] {
     const aliases = new Set<string>();
 
-    return this.config.commands
+    return config.commands
       .filter((c) => !c.hidden)
       .map((c) => {
         c.aliases.forEach((a) => {

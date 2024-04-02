@@ -1,7 +1,7 @@
 {
   "name": "@subsquid/cli",
   "description": "squid cli tool",
-  "version": "2.10.0",
+  "version": "2.10.1-beta.0",
   "license": "GPL-3.0-or-later",
   "repository": "git@github.com:subsquid/squid-cli.git",
   "publishConfig": {
@@ -19,8 +19,10 @@
     "assets": "./node_modules/**/*"
   },
   "oclif": {
-    "commands": "./lib/commands",
-    "default": "default",
+    "commands": {
+      "strategy": "pattern",
+      "target": "./lib/commands"
+    },
     "helpClass": "./lib/help",
     "bin": "sqd",
     "repositoryPrefix": "<%- repo %>/tree/master/<%- commandPath %>",
@@ -29,11 +31,11 @@
       "@oclif/plugin-autocomplete"
     ],
     "topics": {
-      "squid": {
-        "description": "Manage squid deployments to the Subsquid Cloud service."
+      "gateways": {
+        "description": "Explore data sources for a squid"
       },
       "secrets": {
-        "description": "Manage account secrets. The secrets are exposed as environment variables, and are accessible to all the squids deployed by the current Cloud account."
+        "description": "Manage organization secrets"
       }
     },
     "hooks": {
@@ -66,7 +68,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@oclif/core": "3.19.7",
+    "@oclif/core": "3.26.0",
     "@oclif/plugin-autocomplete": "3.0.13",
     "@subsquid/commands": "^2.3.1",
     "@subsquid/manifest": "^0.0.1-beta.17",
@@ -116,9 +118,9 @@
     "@types/node": "^20.12.3",
     "@types/qs": "^6.9.14",
     "@types/split2": "^3.2.1",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/eslint-plugin-tslint": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
+    "@typescript-eslint/eslint-plugin": "^7.5.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^7.0.2",
+    "@typescript-eslint/parser": "^7.5.0",
     "eslint": "8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard": "^17.1.0",
