@@ -51,7 +51,7 @@
     "tsc": "tsc --noEmit",
     "pkg:build": "./bin/pkg-build.sh",
     "pkg:compress": "./bin/pkg-compress.sh",
-    "upg": "npx npm-check-updates -u -i"
+    "upg": "yarn upgrade-interactive"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -132,5 +132,6 @@
     "prettier": "^3.2.5",
     "ts-jest": "^29.1.2",
     "typescript": "~5.3.3"
-  }
+  },
+  "packageManager": "yarn@4.1.1"
 }
