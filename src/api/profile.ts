@@ -36,7 +36,7 @@ export async function profile({
 }
 
 export async function listOrganizations() {
-  const { organizations, ...rest } = await profile();
+  const { organizations } = await profile();
 
   return organizations || [];
 }
