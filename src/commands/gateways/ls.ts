@@ -1,7 +1,9 @@
-import { ux as CliUx, Flags } from '@oclif/core';
+import { Flags } from '@oclif/core';
 import chalk from 'chalk';
+import Table from 'cli-table3';
+import { maxBy } from 'lodash';
 
-import { Gateway, GatewaysResponse, listEVM, listSubstrate } from '../../api/gateways-api';
+import { Gateway, getEvmGateways, getSubstrateGateways } from '../../api/gateways';
 import { CliCommand } from '../../command';
 
 export default class Ls extends CliCommand {
@@ -10,14 +12,14 @@ export default class Ls extends CliCommand {
   static flags = {
     type: Flags.string({
       char: 't',
-      description: 'network type: EVM/Substrate',
+      description: 'Filter gateways by network type',
       options: ['evm', 'substrate'],
       helpValue: '<evm|substrate>',
       required: false,
     }),
     search: Flags.string({
       char: 's',
-      description: 'name of gateway to search',
+      description: 'Search gateways',
       required: false,
     }),
   };
@@ -27,23 +29,33 @@ export default class Ls extends CliCommand {
       flags: { type, search },
     } = await this.parse(Ls);
 
+    const [evm, substrate] = await Promise.all([
+      !type || type === 'evm' ? getEvmGateways() : [],
+      !type || type === 'substrate' ? getSubstrateGateways() : [],
+    ]);
+
+    const maxNameLength = maxBy([...evm, ...substrate], (g) => g.network.length)?.network.length;
+
     switch (type) {
       case 'evm':
-        this.processGateways(await listEVM(), search);
+        this.processGateways(evm, { search, summary: 'EVM', maxNameLength });
         break;
       case 'substrate':
-        this.processGateways(await listSubstrate(), search);
+        this.processGateways(substrate, { search, summary: 'Substrate', maxNameLength });
         break;
       default:
-        this.processGateways(await listEVM(), search, 'EVM');
+        this.processGateways(evm, { search, summary: 'EVM', maxNameLength });
         this.log();
-        this.processGateways(await listSubstrate(), search, 'Substrate');
+        this.processGateways(substrate, { search, summary: 'Substrate', maxNameLength });
     }
   }
 
-  processGateways(gateways: Gateway[], search: string | undefined, type?: string) {
-    if (type) {
-      this.log(chalk.bold(`${type}:`));
+  processGateways(
+    gateways: Gateway[],
+    { summary, search, maxNameLength }: { search?: string; summary?: string; maxNameLength?: number },
+  ) {
+    if (summary) {
+      this.log(chalk.bold(summary));
     }
 
     gateways = search
@@ -54,20 +66,23 @@ export default class Ls extends CliCommand {
       return this.log('No gateways found');
     }
 
-    CliUx.ux.table(
-      gateways.map(({ network, providers }) => ({
-        network,
-        release: chalk.dim(providers[0].release),
-        url: providers[0].dataSourceUrl,
-      })),
-      {
-        network: { header: 'Name' },
-        release: { header: 'Release', minWidth: 12 },
-        url: { header: 'Gateway URL' },
+    const table = new Table({
+      wordWrap: true,
+      colWidths: [maxNameLength ? maxNameLength + 2 : null],
+      head: ['Name', 'Release', 'Gateway URL'],
+      wrapOnWordBoundary: false,
+
+      style: {
+        head: ['bold'],
+        border: ['gray'],
+        compact: true,
       },
-      {
-        'no-truncate': true,
-      },
-    );
+    });
+
+    gateways.map(({ network, providers }) => {
+      table.push([network, chalk.dim(providers[0].release), providers[0].dataSourceUrl]);
+    });
+
+    this.log(table.toString());
   }
 }

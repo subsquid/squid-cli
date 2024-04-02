@@ -15,7 +15,7 @@ export type GatewaysResponse = {
   archives: Gateway[];
 };
 
-export async function listSubstrate() {
+export async function getSubstrateGateways() {
   const { body } = await api<GatewaysResponse>({
     method: 'get',
     path: 'https://cdn.subsquid.io/archives/substrate.json',
@@ -24,7 +24,7 @@ export async function listSubstrate() {
   return body.archives;
 }
 
-export async function listEVM() {
+export async function getEvmGateways() {
   const { body } = await api<GatewaysResponse>({
     method: 'get',
     path: 'https://cdn.subsquid.io/archives/evm.json',
