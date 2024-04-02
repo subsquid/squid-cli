@@ -4,7 +4,7 @@ import { listSecrets } from '../../api';
 import { CliCommand } from '../../command';
 
 export default class Ls extends CliCommand {
-  static description = 'List secrets set in the Cloud';
+  static description = 'List organization secrets in the Cloud';
 
   static flags = {
     org: Flags.string({
