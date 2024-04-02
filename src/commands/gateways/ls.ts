@@ -1,4 +1,4 @@
-import { Args, ux as CliUx, Flags } from '@oclif/core';
+import { ux as CliUx, Flags } from '@oclif/core';
 
 import { listEVM, listSubstrate } from '../../api/gateways-api';
 import { CliCommand } from '../../command';
@@ -14,28 +14,25 @@ export default class Ls extends CliCommand {
       helpValue: '<evm|substrate>',
       required: true,
     }),
-  };
-
-  static args = {
-    name: Args.string({
-      description: 'name of archive to search',
+    search: Flags.string({
+      char: 's',
+      description: 'name of gateway to search',
       required: false,
     }),
   };
 
   async run(): Promise<void> {
     const {
-      args: { name },
-      flags: { type },
+      flags: { type, search },
     } = await this.parse(Ls);
 
     const gatewaysResponse = type === 'evm' ? await listEVM() : await listSubstrate();
-    const gateways = name
-      ? gatewaysResponse.archives.filter((g) => g.network.toLocaleLowerCase().includes(name.toLocaleLowerCase()))
+    const gateways = search
+      ? gatewaysResponse.archives.filter((g) => g.network.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
       : gatewaysResponse.archives;
 
     if (!gateways.length) {
-      return this.error('No gateways found');
+      return this.log('No gateways found');
     }
 
     CliUx.ux.table(
