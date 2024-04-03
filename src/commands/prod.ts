@@ -41,7 +41,7 @@ export default class Prod extends DeployCommand {
       return;
     }
 
-    const newUrl = inferProdUrl(foundSquid.versions[0].deploymentUrl, versionName);
+    const newUrl = inferProdUrl(foundSquid.versions[0].deploymentUrl, squidName);
     const { confirm } = await inquirer.prompt([
       {
         name: 'confirm',
