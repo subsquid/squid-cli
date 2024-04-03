@@ -1,6 +1,5 @@
-import { execSync } from 'child_process';
-
 import { Command } from '@oclif/core';
+import open from 'open';
 
 export default class Docs extends Command {
   static description = 'Open the docs in a browser';
@@ -8,6 +7,6 @@ export default class Docs extends Command {
   async run(): Promise<void> {
     await this.parse(Docs);
 
-    execSync('open https://docs.subsquid.io');
+    void open('https://docs.subsquid.io');
   }
 }
