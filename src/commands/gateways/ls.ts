@@ -34,7 +34,7 @@ export default class Ls extends CliCommand {
       !type || type === 'substrate' ? getSubstrateGateways() : [],
     ]);
 
-    const maxNameLength = maxBy([...evm, ...substrate], (g) => g.network.length)?.network.length;
+    const maxNameLength = maxBy([...evm, ...substrate], (g) => g.chainName.length)?.chainName.length;
 
     switch (type) {
       case 'evm':
@@ -59,7 +59,7 @@ export default class Ls extends CliCommand {
     }
 
     gateways = search
-      ? gateways.filter((g) => g.network.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
+      ? gateways.filter((g) => g.chainName.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
       : gateways;
 
     if (!gateways.length) {
@@ -69,7 +69,7 @@ export default class Ls extends CliCommand {
     const table = new Table({
       wordWrap: true,
       colWidths: [maxNameLength ? maxNameLength + 2 : null],
-      head: ['Name', 'Release', 'Gateway URL'],
+      head: ['Name', summary === 'EVM' ? 'Chain ID' : 'SS58 Prefix', 'Release', 'Gateway URL'],
       wrapOnWordBoundary: false,
 
       style: {
@@ -79,8 +79,8 @@ export default class Ls extends CliCommand {
       },
     });
 
-    gateways.map(({ network, providers }) => {
-      table.push([network, chalk.dim(providers[0].release), providers[0].dataSourceUrl]);
+    gateways.map(({ chainName, chainId, chainSS58Prefix, providers }) => {
+      table.push([chainName, summary === 'EVM' ? chalk.dim(chainId || '') : chalk.dim(chainSS58Prefix || ''), chalk.dim(providers[0].release), providers[0].dataSourceUrl]);
     });
 
     this.log(table.toString());

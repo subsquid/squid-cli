@@ -8,6 +8,9 @@ export type Provider = {
 
 export type Gateway = {
   network: string;
+  chainName: string;
+  chainId?: number;
+  chainSS58Prefix?: number;
   providers: Provider[];
 };
 
