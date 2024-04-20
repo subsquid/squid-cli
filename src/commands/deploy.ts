@@ -294,9 +294,9 @@ export function createSquidIgnore(squidDir: string) {
   }
 
   for (const ignoreFilePath of ignoreFilePaths) {
-    const ignoreDir = path.dirname(ignoreFilePath);
+    const raw = fs.readFileSync(path.resolve(squidDir, ignoreFilePath)).toString();
 
-    const raw = fs.readFileSync(ignoreFilePath).toString();
+    const ignoreDir = path.dirname(ignoreFilePath);
     const patterns = getIgnorePatterns(ignoreDir, raw);
 
     ig.add(patterns);
