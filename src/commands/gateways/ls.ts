@@ -66,10 +66,13 @@ export default class Ls extends CliCommand {
       return this.log('No gateways found');
     }
 
+    const headRow = ['Name', 'Release', 'Gateway URL'];
+    if (summary === 'EVM')
+      headRow.splice(1, 0, 'Chain ID');
     const table = new Table({
       wordWrap: true,
       colWidths: [maxNameLength ? maxNameLength + 2 : null],
-      head: ['Name', summary === 'EVM' ? 'Chain ID' : 'SS58 Prefix', 'Release', 'Gateway URL'],
+      head: headRow,
       wrapOnWordBoundary: false,
 
       style: {
@@ -79,8 +82,11 @@ export default class Ls extends CliCommand {
       },
     });
 
-    gateways.map(({ chainName, chainId, chainSS58Prefix, providers }) => {
-      table.push([chainName, summary === 'EVM' ? chalk.dim(chainId || '') : chalk.dim(chainSS58Prefix || ''), chalk.dim(providers[0].release), providers[0].dataSourceUrl]);
+    gateways.map(({ chainName, chainId, providers }) => {
+      const row = [chainName, chalk.dim(providers[0].release), providers[0].dataSourceUrl];
+      if (summary === 'EVM')
+        row.splice(1, 0, chalk.dim(chainId || ''));
+      table.push(row);
     });
 
     this.log(table.toString());
