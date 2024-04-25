@@ -12,74 +12,78 @@ export default class Ls extends CliCommand {
   static flags = {
     type: Flags.string({
       char: 't',
-      description: 'Filter gateways by network type',
+      description: 'Filter by network type',
       options: ['evm', 'substrate'],
       helpValue: '<evm|substrate>',
       required: false,
     }),
-    search: Flags.string({
-      char: 's',
-      description: 'Search gateways',
+    name: Flags.string({
+      char: 'n',
+      description: 'Filter by network name',
+      helpValue: '<regex>',
       required: false,
     }),
-    id: Flags.string({
-      char: 'i',
-      description: 'Search by id',
+    chain: Flags.string({
+      char: 'c',
+      description: 'Filter by chain ID or SS58 prefix',
+      helpValue: '<number>',
       required: false,
     }),
   };
 
   async run(): Promise<void> {
     const {
-      flags: { type, search, id: chainId },
+      flags: { type, name, chain: chainId },
     } = await this.parse(Ls);
 
     const [evm, substrate] = await Promise.all([
-      !type || type === 'evm' || chainId ? getEvmGateways() : [],
-      !chainId && (!type || type === 'substrate') ? getSubstrateGateways() : [],
+      !type || type === 'evm' ? getEvmGateways() : [],
+      !type || type === 'substrate' ? getSubstrateGateways() : [],
     ]);
 
     const maxNameLength = maxBy([...evm, ...substrate], (g) => g.chainName.length)?.chainName.length;
 
     switch (type) {
       case 'evm':
-        this.processGateways(evm, { search, summary: 'EVM', chainId, maxNameLength });
+        this.processGateways(evm, { type, name, chainId, summary: 'EVM', maxNameLength });
         break;
       case 'substrate':
-        this.processGateways(substrate, { search, summary: 'Substrate', maxNameLength });
+        this.processGateways(substrate, { type, name, chainId, summary: 'Substrate', maxNameLength });
         break;
       default:
-        this.processGateways(evm, { search, summary: 'EVM', chainId, maxNameLength });
+        this.processGateways(evm, { type: 'evm', name, chainId, summary: 'EVM', maxNameLength });
         this.log();
-        this.processGateways(substrate, { search, summary: 'Substrate', maxNameLength });
+        this.processGateways(substrate, { type: 'substrate', name, chainId, summary: 'Substrate', maxNameLength });
     }
   }
 
   processGateways(
     gateways: Gateway[],
     {
-      search,
-      summary,
+      type,
+      name,
       chainId,
+      summary,
       maxNameLength,
-    }: { search?: string; summary?: string; chainId?: string; maxNameLength?: number },
+    }: { type: 'evm' | 'substrate'; name?: string; chainId?: string; summary?: string; maxNameLength?: number },
   ) {
     if (summary) {
       this.log(chalk.bold(summary));
     }
 
-    gateways = search
-      ? gateways.filter((g) => g.chainName.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
+    gateways = name
+      ? gateways.filter((g) => g.network.toLocaleLowerCase().match(new RegExp(name.toLocaleLowerCase())))
       : gateways;
 
-    if (summary === 'EVM' && chainId) gateways = gateways.filter((g) => String(g.chainId) === chainId);
+    gateways = chainId
+      ? gateways.filter((g) => (type === 'evm' ? String(g.chainId) === chainId : String(g.chainSS58Prefix) === chainId))
+      : gateways;
 
     if (!gateways.length) {
       return this.log('No gateways found');
     }
 
-    const headRow = ['Name', 'Release', 'Gateway URL'];
-    if (summary === 'EVM') headRow.splice(1, 0, 'Chain ID');
+    const headRow = ['Name', ...(type === 'evm' ? ['Chain ID'] : ['SS58 prefix']), 'Gateway URL'];
     const table = new Table({
       wordWrap: true,
       colWidths: [maxNameLength ? maxNameLength + 2 : null],
@@ -93,9 +97,8 @@ export default class Ls extends CliCommand {
       },
     });
 
-    gateways.map(({ chainName, chainId, providers }) => {
-      const row = [chainName, chalk.dim(providers[0].release), providers[0].dataSourceUrl];
-      if (summary === 'EVM') row.splice(1, 0, chalk.dim(chainId || ''));
+    gateways.map(({ chainName, chainId, chainSS58Prefix, providers }) => {
+      const row = [chainName, chalk.dim(chainId || chainSS58Prefix), providers[0].dataSourceUrl];
       table.push(row);
     });
 
