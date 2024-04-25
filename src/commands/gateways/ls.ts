@@ -71,9 +71,7 @@ export default class Ls extends CliCommand {
       this.log(chalk.bold(summary));
     }
 
-    gateways = name
-      ? gateways.filter((g) => g.network.toLocaleLowerCase().match(new RegExp(name.toLocaleLowerCase())))
-      : gateways;
+    gateways = name ? gateways.filter((g) => g.network.match(new RegExp(name, 'i'))) : gateways;
 
     gateways = chainId
       ? gateways.filter((g) => (type === 'evm' ? String(g.chainId) === chainId : String(g.chainSS58Prefix) === chainId))
@@ -83,7 +81,7 @@ export default class Ls extends CliCommand {
       return this.log('No gateways found');
     }
 
-    const headRow = ['Name', ...(type === 'evm' ? ['Chain ID'] : ['SS58 prefix']), 'Gateway URL'];
+    const headRow = ['Network', type === 'evm' ? 'Chain ID' : 'SS58 prefix', 'Gateway URL'];
     const table = new Table({
       wordWrap: true,
       colWidths: [maxNameLength ? maxNameLength + 2 : null],
@@ -98,7 +96,7 @@ export default class Ls extends CliCommand {
     });
 
     gateways.map(({ chainName, chainId, chainSS58Prefix, providers }) => {
-      const row = [chainName, chalk.dim(chainId || chainSS58Prefix), providers[0].dataSourceUrl];
+      const row = [chainName, chalk.dim(chainId || chainSS58Prefix || '-'), providers[0].dataSourceUrl];
       table.push(row);
     });
 
