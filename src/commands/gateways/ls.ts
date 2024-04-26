@@ -12,21 +12,28 @@ export default class Ls extends CliCommand {
   static flags = {
     type: Flags.string({
       char: 't',
-      description: 'Filter gateways by network type',
+      description: 'Filter by network type',
       options: ['evm', 'substrate'],
       helpValue: '<evm|substrate>',
       required: false,
     }),
-    search: Flags.string({
-      char: 's',
-      description: 'Search gateways',
+    name: Flags.string({
+      char: 'n',
+      description: 'Filter by network name',
+      helpValue: '<regex>',
+      required: false,
+    }),
+    chain: Flags.string({
+      char: 'c',
+      description: 'Filter by chain ID or SS58 prefix',
+      helpValue: '<number>',
       required: false,
     }),
   };
 
   async run(): Promise<void> {
     const {
-      flags: { type, search },
+      flags: { type, name, chain: chainId },
     } = await this.parse(Ls);
 
     const [evm, substrate] = await Promise.all([
@@ -34,42 +41,51 @@ export default class Ls extends CliCommand {
       !type || type === 'substrate' ? getSubstrateGateways() : [],
     ]);
 
-    const maxNameLength = maxBy([...evm, ...substrate], (g) => g.network.length)?.network.length;
+    const maxNameLength = maxBy([...evm, ...substrate], (g) => g.chainName.length)?.chainName.length;
 
     switch (type) {
       case 'evm':
-        this.processGateways(evm, { search, summary: 'EVM', maxNameLength });
+        this.processGateways(evm, { type, name, chainId, summary: 'EVM', maxNameLength });
         break;
       case 'substrate':
-        this.processGateways(substrate, { search, summary: 'Substrate', maxNameLength });
+        this.processGateways(substrate, { type, name, chainId, summary: 'Substrate', maxNameLength });
         break;
       default:
-        this.processGateways(evm, { search, summary: 'EVM', maxNameLength });
+        this.processGateways(evm, { type: 'evm', name, chainId, summary: 'EVM', maxNameLength });
         this.log();
-        this.processGateways(substrate, { search, summary: 'Substrate', maxNameLength });
+        this.processGateways(substrate, { type: 'substrate', name, chainId, summary: 'Substrate', maxNameLength });
     }
   }
 
   processGateways(
     gateways: Gateway[],
-    { summary, search, maxNameLength }: { search?: string; summary?: string; maxNameLength?: number },
+    {
+      type,
+      name,
+      chainId,
+      summary,
+      maxNameLength,
+    }: { type: 'evm' | 'substrate'; name?: string; chainId?: string; summary?: string; maxNameLength?: number },
   ) {
     if (summary) {
       this.log(chalk.bold(summary));
     }
 
-    gateways = search
-      ? gateways.filter((g) => g.network.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
+    gateways = name ? gateways.filter((g) => g.network.match(new RegExp(name, 'i'))) : gateways;
+
+    gateways = chainId
+      ? gateways.filter((g) => (type === 'evm' ? String(g.chainId) === chainId : String(g.chainSS58Prefix) === chainId))
       : gateways;
 
     if (!gateways.length) {
       return this.log('No gateways found');
     }
 
+    const headRow = ['Network', type === 'evm' ? 'Chain ID' : 'SS58 prefix', 'Gateway URL'];
     const table = new Table({
       wordWrap: true,
       colWidths: [maxNameLength ? maxNameLength + 2 : null],
-      head: ['Name', 'Release', 'Gateway URL'],
+      head: headRow,
       wrapOnWordBoundary: false,
 
       style: {
@@ -79,8 +95,9 @@ export default class Ls extends CliCommand {
       },
     });
 
-    gateways.map(({ network, providers }) => {
-      table.push([network, chalk.dim(providers[0].release), providers[0].dataSourceUrl]);
+    gateways.map(({ chainName, chainId, chainSS58Prefix, providers }) => {
+      const row = [chainName, chalk.dim(chainId || chainSS58Prefix || '-'), providers[0].dataSourceUrl];
+      table.push(row);
     });
 
     this.log(table.toString());
