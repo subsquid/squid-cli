@@ -49,7 +49,7 @@
     "sqd": "./bin/run.js",
     "bl": "node ./lib/blessed.js",
     "lint": "eslint --fix src/**/*",
-    "test:unit": "NODE_ENV=test jest --bail --testRegex=.unit.spec.ts$",
+    "test:unit": "NODE_ENV=test jest --bail --testRegex=.unit.spec.ts\\$",
     "tsc": "tsc --noEmit",
     "pkg:build": "./bin/pkg-build.sh",
     "pkg:compress": "./bin/pkg-compress.sh",
