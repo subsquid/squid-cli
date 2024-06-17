@@ -28,8 +28,13 @@
     "repositoryPrefix": "<%- repo %>/tree/master/<%- commandPath %>",
     "topicSeparator": " ",
     "plugins": [
-      "@oclif/plugin-autocomplete"
+      "@oclif/plugin-autocomplete",
+      "@oclif/plugin-warn-if-update-available"
     ],
+    "warn-if-update-available": {
+      "timeoutInDays": 1,
+      "message": "\n<%= chalk.yellow('=========================================================') %>\n<%= config.name %> update is available from <%= chalk.greenBright(config.version) %> to <%= chalk.greenBright(latest) %>\n\nPlease run <%= chalk.bold(`npm i -g @subsquid/cli`) %>\n<%= chalk.yellow('=========================================================') %>"
+    },
     "topics": {
       "gateways": {
         "description": "Explore data sources for a squid"
@@ -70,6 +75,7 @@
   "dependencies": {
     "@oclif/core": "3.26.0",
     "@oclif/plugin-autocomplete": "3.0.13",
+    "@oclif/plugin-warn-if-update-available": "^3.1.6",
     "@subsquid/commands": "^2.3.1",
     "@subsquid/manifest": "^0.0.1-beta.17",
     "@subsquid/manifest-expr": "^0.0.1",

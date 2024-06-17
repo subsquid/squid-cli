@@ -1075,6 +1075,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@oclif/core@npm:^4":
+  version: 4.0.6
+  resolution: "@oclif/core@npm:4.0.6"
+  dependencies:
+    ansi-escapes: "npm:^4.3.2"
+    ansis: "npm:^3.1.1"
+    clean-stack: "npm:^3.0.1"
+    cli-spinners: "npm:^2.9.2"
+    debug: "npm:^4.3.5"
+    ejs: "npm:^3.1.10"
+    get-package-type: "npm:^0.1.0"
+    globby: "npm:^11.1.0"
+    indent-string: "npm:^4.0.0"
+    is-wsl: "npm:^2.2.0"
+    lilconfig: "npm:^3.1.2"
+    minimatch: "npm:^9.0.4"
+    string-width: "npm:^4.2.3"
+    supports-color: "npm:^8"
+    widest-line: "npm:^3.1.0"
+    wordwrap: "npm:^1.0.0"
+    wrap-ansi: "npm:^7.0.0"
+  checksum: 10c0/45c5d8a0243c2aaea832b8cd34c2d731ba01e9b91f1322467619a94db7082da0bce7ef8a408ad8f49a0c31d9ac88194991c88c4e9a9e15931aa6571067d061bb
+  languageName: node
+  linkType: hard
+
 "@oclif/dev-cli@npm:^1.26.10":
   version: 1.26.10
   resolution: "@oclif/dev-cli@npm:1.26.10"
@@ -1220,6 +1245,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@oclif/plugin-warn-if-update-available@npm:^3.1.6":
+  version: 3.1.6
+  resolution: "@oclif/plugin-warn-if-update-available@npm:3.1.6"
+  dependencies:
+    "@oclif/core": "npm:^4"
+    ansis: "npm:^3.2.0"
+    debug: "npm:^4.3.5"
+    http-call: "npm:^5.2.2"
+    lodash: "npm:^4.17.21"
+  checksum: 10c0/7a7bffc26f94c8860a9955a9f1de08f61d6763943bc4d8d6a4079778ae7e8a1b1480058e8cb415e39658cc0fa2e95f8d9427a54493d8437bf947cfbe3e459498
+  languageName: node
+  linkType: hard
+
 "@oclif/screen@npm:^1.0.4":
   version: 1.0.4
   resolution: "@oclif/screen@npm:1.0.4"
@@ -1297,6 +1335,7 @@ __metadata:
     "@oclif/dev-cli": "npm:^1.26.10"
     "@oclif/help": "npm:^1.0.15"
     "@oclif/plugin-autocomplete": "npm:3.0.13"
+    "@oclif/plugin-warn-if-update-available": "npm:^3.1.6"
     "@subsquid/commands": "npm:^2.3.1"
     "@subsquid/manifest": "npm:^0.0.1-beta.17"
     "@subsquid/manifest-expr": "npm:^0.0.1"
@@ -2158,6 +2197,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ansis@npm:^3.1.1, ansis@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "ansis@npm:3.2.0"
+  checksum: 10c0/b61c16554e707f30685ab153ffafc02b59bb9e86567a04b2e2ad521ade771c9ae3cd67f3e486a1cd2e3c89ad898653266bc38d76ea7af4ac67762baa3c87befa
+  languageName: node
+  linkType: hard
+
 "anymatch@npm:^3.0.3":
   version: 3.1.2
   resolution: "anymatch@npm:3.1.2"
@@ -2859,6 +2905,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cli-spinners@npm:^2.9.2":
+  version: 2.9.2
+  resolution: "cli-spinners@npm:2.9.2"
+  checksum: 10c0/907a1c227ddf0d7a101e7ab8b300affc742ead4b4ebe920a5bf1bc6d45dce2958fcd195eb28fa25275062fe6fa9b109b93b63bc8033396ed3bcb50297008b3a3
+  languageName: node
+  linkType: hard
+
 "cli-table3@npm:^0.6.1":
   version: 0.6.3
   resolution: "cli-table3@npm:0.6.3"
@@ -3119,6 +3172,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"debug@npm:^4.3.5":
+  version: 4.3.5
+  resolution: "debug@npm:4.3.5"
+  dependencies:
+    ms: "npm:2.1.2"
+  peerDependenciesMeta:
+    supports-color:
+      optional: true
+  checksum: 10c0/082c375a2bdc4f4469c99f325ff458adad62a3fc2c482d59923c260cb08152f34e2659f72b3767db8bb2f21ca81a60a42d1019605a412132d7b9f59363a005cc
+  languageName: node
+  linkType: hard
+
 "decompress-response@npm:^6.0.0":
   version: 6.0.0
   resolution: "decompress-response@npm:6.0.0"
@@ -3321,6 +3386,17 @@ __metadata:
   version: 0.2.0
   resolution: "eastasianwidth@npm:0.2.0"
   checksum: 10c0/26f364ebcdb6395f95124fda411f63137a4bfb5d3a06453f7f23dfe52502905bd84e0488172e0f9ec295fdc45f05c23d5d91baf16bd26f0fe9acd777a188dc39
+  languageName: node
+  linkType: hard
+
+"ejs@npm:^3.1.10":
+  version: 3.1.10
+  resolution: "ejs@npm:3.1.10"
+  dependencies:
+    jake: "npm:^10.8.5"
+  bin:
+    ejs: bin/cli.js
+  checksum: 10c0/52eade9e68416ed04f7f92c492183340582a36482836b11eab97b159fcdcfdedc62233a1bf0bf5e5e1851c501f2dca0e2e9afd111db2599e4e7f53ee29429ae1
   languageName: node
   linkType: hard
 
@@ -4675,7 +4751,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"http-call@npm:^5.1.2":
+"http-call@npm:^5.1.2, http-call@npm:^5.2.2":
   version: 5.3.0
   resolution: "http-call@npm:5.3.0"
   dependencies:
@@ -5937,6 +6013,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lilconfig@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "lilconfig@npm:3.1.2"
+  checksum: 10c0/f059630b1a9bddaeba83059db00c672b64dc14074e9f232adce32b38ca1b5686ab737eb665c5ba3c32f147f0002b4bee7311ad0386a9b98547b5623e87071fbe
+  languageName: node
+  linkType: hard
+
 "lines-and-columns@npm:^1.1.6":
   version: 1.2.4
   resolution: "lines-and-columns@npm:1.2.4"
@@ -6197,7 +6280,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:^9.0.3":
+"minimatch@npm:^9.0.3, minimatch@npm:^9.0.4":
   version: 9.0.4
   resolution: "minimatch@npm:9.0.4"
   dependencies:
@@ -8065,7 +8148,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supports-color@npm:^8.0.0, supports-color@npm:^8.1.0, supports-color@npm:^8.1.1":
+"supports-color@npm:^8, supports-color@npm:^8.0.0, supports-color@npm:^8.1.0, supports-color@npm:^8.1.1":
   version: 8.1.1
   resolution: "supports-color@npm:8.1.1"
   dependencies:

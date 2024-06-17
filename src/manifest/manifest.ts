@@ -43,7 +43,7 @@ export function loadManifestFile(
   if (!fs.statSync(squidDir).isDirectory()) {
     throw new Error(
       [
-        `The squid directory is not a directoru`,
+        `The squid directory is not a directory`,
         ``,
         `Squid directory    ${squidDir}`,
         ``,
