@@ -24,14 +24,6 @@ const SQUID_PATH_DESC = [
   `  - a github URL to a git repo with a branch or commit tag`,
 ];
 
-const PACKAGE_JSON = 'package.json';
-
-const lockFiles = {
-  npm: 'package-lock.json',
-  yarn: 'yarn.lock',
-  pnpm: 'pnpm-lock.yaml',
-};
-
 export function resolveManifest(
   localPath: string,
   manifestPath: string,
@@ -176,35 +168,6 @@ export default class Deploy extends DeployCommand {
     CliUx.ux.action.start(`◷ Compressing the squid to ${archiveName} `);
 
     const squidIgnore = createSquidIgnore(squidDir);
-
-    if (!hasPackageJson(squidDir) || squidIgnore?.ignores(PACKAGE_JSON)) {
-      return this.showError(
-        [
-          `The ${PACKAGE_JSON} file was not found in the squid directory`,
-          ``,
-          `Squid directory: ${squidDir}`,
-          ``,
-          `Please provide a path to the root of a squid directory`,
-          ``,
-        ].join('\n'),
-        'PACKING_FAILED',
-      );
-    }
-
-    // const lockFile = get(lockFiles, manifest.build.package_manager);
-    // if (!hasLockFile(squidDir, lockFile)) {
-    //   return this.error(
-    //     [
-    //       `${lockFile || 'Lockfile'} is not found in the squid directory`,
-    //       ``,
-    //       `Squid directory    ${squidDir}`,
-    //       ``,
-    //       `Please provide a path to the root of a squid directory`,
-    //       ``,
-    //     ].join('\n'),
-    //   );
-    // }
-
     const squidArtifact = path.join(buildDir, archiveName);
 
     let filesCount = 0;
@@ -254,18 +217,6 @@ export default class Deploy extends DeployCommand {
     CliUx.ux.action.stop('✔️');
 
     return artifactUrl;
-  }
-}
-
-function hasPackageJson(squidDir: string) {
-  return fs.existsSync(path.join(squidDir, PACKAGE_JSON));
-}
-
-function hasLockFile(squidDir: string, lockFile?: string) {
-  if (lockFile) {
-    return fs.existsSync(path.join(squidDir, lockFile));
-  } else {
-    return Object.values(lockFiles).some((lf) => fs.existsSync(path.join(squidDir, lf)));
   }
 }
 
