@@ -43,6 +43,31 @@ export type SquidProcessor = {
   };
 };
 
+export interface SquidApi {
+  url: string;
+  status: 'AVAILABLE' | 'NOT_AVAILABLE';
+}
+
+export interface AddonNeon {
+  connections: {
+    uri: string;
+    params: {
+      host: string;
+      database: string;
+      user: string;
+      password: string;
+    };
+  }[];
+}
+
+export interface AddonPostgres extends AddonNeon {
+  disk: {
+    usageStatus: 'WARNING' | 'CRITICAL';
+    totalBytes?: number;
+    usedBytes?: number;
+  };
+}
+
 export type VersionResponse = {
   id: number;
   name: string;
@@ -54,26 +79,21 @@ export type VersionResponse = {
   deploy: {
     status: 'HIBERNATED' | 'DEPLOYED' | 'DEPLOYING';
   };
-  api: {
-    status: 'NOT_AVAILABLE' | 'AVAILABLE';
-  };
+  api?: SquidApi;
   processors: SquidProcessor[];
-  db: {
-    disk: {
-      totalBytes: number;
-      usedBytes: number;
-      usageStatus: 'LOW' | 'NORMAL' | 'WARNING' | 'CRITICAL' | 'UNKNOWN';
-    };
-    ingress: {
-      url: number;
-      db: string;
-      user: string;
-      password: string;
-    };
-  };
+
   runningDeploy?: {
     id: string;
     type: 'DELETE' | 'DEPLOY' | 'RESTART' | 'HIBERNATE';
+  };
+
+  addons: {
+    postgres?: AddonPostgres;
+    neon?: AddonNeon;
+    hasura?: {
+      profile: string;
+      replicas: number;
+    };
   };
 
   aliases: { name: string }[];
