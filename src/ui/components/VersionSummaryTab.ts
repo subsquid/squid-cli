@@ -21,17 +21,12 @@ export class VersionSummaryTab implements VersionTab {
   async append(parent: Element, squid: SquidVersion) {
     const lines = [];
 
-    const dbUsedPercent = (squid.version.db.disk.usedBytes * 100) / squid.version.db.disk.totalBytes;
-    const dbState = `Used ${dbUsedPercent.toFixed(2)}% ${bytes(squid.version.db.disk.usedBytes)} / ${bytes(
-      squid.version.db.disk.totalBytes,
-    )}`;
-
     if (squid.version.description) {
       lines.push(squid.version.description);
       lines.push('');
     }
 
-    lines.push(`${chalkMainColor(`API`)} ${chalkMainColor(squid.version.api.status)}`);
+    lines.push(`${chalkMainColor(`API`)} ${chalkMainColor(squid.version.api?.status)}`);
     lines.push(`${squid.version.deploymentUrl}`);
     lines.push('');
 
@@ -45,9 +40,18 @@ export class VersionSummaryTab implements VersionTab {
       },
     });
 
-    lines.push(`${chalkMainColor(`DB`)} ${chalkMainColor(squid.version.db.disk.usageStatus)}`);
-    lines.push(dbState);
-    lines.push('');
+    const addonPostgres = squid.version.addons.postgres;
+    if (addonPostgres) {
+      const usedBytes = addonPostgres.disk.usedBytes || 0;
+      const totalBytes = addonPostgres.disk.totalBytes || 0;
+
+      const dbUsedPercent = totalBytes > 0 ? (usedBytes * 100) / totalBytes : 0;
+      const dbState = `Used ${dbUsedPercent.toFixed(2)}% ${bytes(usedBytes)} / ${bytes(totalBytes)}`;
+
+      lines.push(`${chalkMainColor(`DB`)} ${chalkMainColor(addonPostgres.disk.usageStatus)}`);
+      lines.push(dbState);
+      lines.push('');
+    }
 
     // table is an Array, so you can `push`, `unshift`, `splice` and friends
     for (const processor of squid.version.processors) {

@@ -2,7 +2,7 @@ import { format } from 'date-fns';
 import { defaultsDeep } from 'lodash';
 import blessed, { List, TextElement, Widgets } from 'reblessed';
 
-import { VersionResponse } from '../../api';
+import { AddonPostgres, SquidApi, VersionResponse } from '../../api';
 import { mainColor } from '../theme';
 
 import { SquidVersion } from './types';
@@ -21,14 +21,14 @@ function unicodePadEnd(str: string, need: number) {
   return str + new Array(need - length).fill(' ').join('');
 }
 
-function apiStatus(status: VersionResponse['api']['status']) {
+function apiStatus(status?: SquidApi['status']) {
   switch (status) {
     case 'AVAILABLE':
       return '✓';
     case 'NOT_AVAILABLE':
       return 'x';
     default:
-      return status;
+      return status || '';
   }
 }
 
@@ -46,7 +46,7 @@ function processorStatus(version: VersionResponse) {
   }
 }
 
-function dbUsage(status: VersionResponse['db']['disk']['usageStatus']) {
+function dbUsage(status?: AddonPostgres['disk']['usageStatus']) {
   switch (status) {
     case 'LOW':
       return ' ▰▱▱▱ ';
@@ -59,7 +59,7 @@ function dbUsage(status: VersionResponse['db']['disk']['usageStatus']) {
     case 'UNKNOWN':
       return ' ---- ';
     default:
-      return status;
+      return status || '';
   }
 }
 
@@ -174,9 +174,9 @@ export class SquidList extends List {
       return [
         s.name,
         versionStatus(s.version.deploy.status),
-        !s.isHibernated() ? apiStatus(s.version.api.status) : '',
+        !s.isHibernated() ? apiStatus(s.version.api?.status) : '',
         !s.isHibernated() ? processorStatus(s.version) : '',
-        !s.isHibernated() ? dbUsage(s.version.db.disk.usageStatus) : '',
+        !s.isHibernated() ? dbUsage(s.version.addons.postgres?.disk.usageStatus) : '',
         s.version.deployedAt ? format(new Date(s.version.deployedAt), 'dd.MM.yy') : '',
       ];
     });
