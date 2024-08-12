@@ -62,6 +62,7 @@ Do you want to attach to the running deploy process?`,
 
         this.printDebug();
 
+        if (this.isFailed()) return this.showError(`An error occurred while deploying the squid`);
         if (this.deploy.status === lastStatus) return false;
         lastStatus = this.deploy.status;
         CliUx.ux.action.stop('✔️');
@@ -69,12 +70,10 @@ Do you want to attach to the running deploy process?`,
         switch (this.deploy.status) {
           case 'UNPACKING':
             CliUx.ux.action.start('◷ Preparing the squid');
-            if (this.isFailed()) return this.showError(`❌ An error occurred while unpacking the squid`);
 
             return false;
           case 'RESETTING':
             CliUx.ux.action.start('◷ Resetting the squid');
-            if (this.isFailed()) return this.showError(`❌ An error occurred while resetting the squid`);
 
             return false;
           case 'IMAGE_BUILDING':
@@ -88,33 +87,26 @@ Do you want to attach to the running deploy process?`,
               validatedPrinted = true;
             }
 
-            if (this.isFailed()) return this.showError(`An error occurred while building the squid`);
-
             return false;
           case 'SQUID_DELETING':
             CliUx.ux.action.start('◷ Deleting the squid');
-            if (this.isFailed()) return this.showError(`An error occurred while deploying the squid`);
 
             return false;
           case 'ADDONS_DELETING':
             CliUx.ux.action.start('◷ Deleting the squid addons');
-            if (this.isFailed()) return this.showError(`An error occurred while deploying the squid`);
 
             return false;
           case 'DEPLOYING':
           case 'SQUID_SYNCING':
             CliUx.ux.action.start('◷ Deploying the squid');
-            if (this.isFailed()) return this.showError(`An error occurred while deploying the squid`);
 
             return false;
           case 'ADDONS_SYNCING':
             CliUx.ux.action.start('◷ Syncing the squid addons');
-            if (this.isFailed()) return this.showError(`An error occurred while deploying the squid`);
 
             return false;
           case 'TAGGING':
             CliUx.ux.action.start('◷ Tagging the squid');
-            if (this.isFailed()) return this.showError(`An error occurred while deploying the squid`);
 
             return false;
           case 'OK':

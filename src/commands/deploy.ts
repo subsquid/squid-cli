@@ -222,20 +222,6 @@ export default class Deploy extends DeployCommand {
       }
     }
 
-    const squids = await listSquids({ organization, name: manifest.name });
-
-    CliUx.ux.table(
-      squids,
-      {
-        slot: {},
-        name: {},
-        tags: {},
-      },
-      {
-        extended: true,
-      },
-    );
-
     // this.log([buildTable(newSquids, { changes, limit: LIMIT }), '']);
   }
 
