@@ -37,7 +37,7 @@ export default class Set extends CliCommand {
       args: { name, value },
     } = await this.parse(Set);
 
-    const orgCode = await this.promptOrganization(org, 'using "-o" flag');
+    const organization = await this.promptOrganization(org, 'using "-o" flag');
 
     let secretValue = value;
     if (!secretValue) {
@@ -46,9 +46,9 @@ export default class Set extends CliCommand {
       secretValue = await readFromStdin();
     }
 
-    await setSecret({ name, value: secretValue, orgCode });
+    await setSecret({ name, value: secretValue, organization });
 
-    this.logSuccess(`Set secret ${name} for organization ${orgCode}`);
+    this.logSuccess(`Set secret ${name} for organization ${organization.code}`);
   }
 }
 

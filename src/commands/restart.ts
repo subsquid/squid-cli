@@ -1,18 +1,19 @@
 import { Args, Flags } from '@oclif/core';
+import chalk from 'chalk';
 
 import { restartSquid } from '../api';
+import { SquidNameArg } from '../command';
 import { DeployCommand } from '../deploy-command';
-import { parseNameAndVersion } from '../utils';
+import { parseSquidName } from '../utils';
+
+import { UPDATE_COLOR } from './deploy';
 
 export default class Restart extends DeployCommand {
   static aliases = ['squid:redeploy', 'redeploy'];
 
   static description = 'Restart a squid deployed to the Cloud';
   static args = {
-    nameAndVersion: Args.string({
-      description: 'name@version',
-      required: true,
-    }),
+    squidName: SquidNameArg,
   };
 
   static flags = {
@@ -45,16 +46,24 @@ export default class Restart extends DeployCommand {
   async run(): Promise<void> {
     const {
       flags: { 'no-stream-logs': disableStreamLogs, org },
-      args: { nameAndVersion },
+      args: { squidName },
     } = await this.parse(Restart);
-    const { squidName, versionName } = parseNameAndVersion(nameAndVersion, this);
 
-    const orgCode = await this.promptSquidOrganization(org, squidName, 'using "-o" flag');
+    const filter = parseSquidName(squidName);
 
-    const deploy = await restartSquid({ orgCode, squidName, versionName });
+    const organization = await this.promptSquidOrganization(org, filter.name, 'using "-o" flag');
+    const squid = await this.findOrThrowSquid({ organization, ...filter });
 
-    await this.pollDeploy({ orgCode, deployId: deploy.id, streamLogs: !disableStreamLogs });
+    const deploy = await restartSquid({ organization, squid });
+    await this.pollDeploy({ organization, deploy });
 
-    this.log('✔️ Done!');
+    this.log(
+      [
+        '',
+        chalk[UPDATE_COLOR](`=================================================`),
+        `The squid ${squid.name}#${squid.slot} has been successfully restarted`,
+        chalk[UPDATE_COLOR](`=================================================`),
+      ].join('\n'),
+    );
   }
 }

@@ -2,10 +2,10 @@ import { format } from 'date-fns';
 import { defaultsDeep } from 'lodash';
 import blessed, { List, TextElement, Widgets } from 'reblessed';
 
-import { AddonPostgres, SquidApi, VersionResponse } from '../../api';
+import { SquidAddonsPostgres, SquidApi } from '../../api';
 import { mainColor } from '../theme';
 
-import { SquidVersion } from './types';
+import { Squid } from './types';
 
 function unicodeLength(str: string) {
   return [...str.replace(/{[^}]+}/g, '')].length;
@@ -32,8 +32,8 @@ function apiStatus(status?: SquidApi['status']) {
   }
 }
 
-function processorStatus(version: VersionResponse) {
-  const processor = version.processors[0];
+function processorStatus(squid: Squid) {
+  const processor = squid.processors?.[0];
   if (!processor) return '';
 
   switch (processor.status) {
@@ -46,7 +46,7 @@ function processorStatus(version: VersionResponse) {
   }
 }
 
-function dbUsage(status?: AddonPostgres['disk']['usageStatus']) {
+function dbUsage(status?: SquidAddonsPostgres['disk']['usageStatus']) {
   switch (status) {
     case 'LOW':
       return ' ▰▱▱▱ ';
@@ -63,8 +63,10 @@ function dbUsage(status?: AddonPostgres['disk']['usageStatus']) {
   }
 }
 
-function versionStatus(status: VersionResponse['deploy']['status']) {
+function versionStatus(status: Squid['status']) {
   switch (status) {
+    case undefined:
+      return 'UNKNOWN';
     case 'HIBERNATED':
       return status;
     case 'DEPLOYED':
@@ -79,7 +81,7 @@ function versionStatus(status: VersionResponse['deploy']['status']) {
 export class SquidList extends List {
   rows: List;
   text: TextElement;
-  squids: SquidVersion[] = [];
+  squids: Squid[] = [];
 
   constructor(options: Widgets.BoxOptions) {
     super(
@@ -167,17 +169,17 @@ export class SquidList extends List {
     };
   }
 
-  recalculateTable(squids: SquidVersion[]) {
+  recalculateTable(squids: Squid[]) {
     this.screen.debug('recalculate table');
 
     const data: string[][] = squids.map((s) => {
       return [
         s.name,
-        versionStatus(s.version.deploy.status),
-        !s.isHibernated() ? apiStatus(s.version.api?.status) : '',
-        !s.isHibernated() ? processorStatus(s.version) : '',
-        !s.isHibernated() ? dbUsage(s.version.addons.postgres?.disk.usageStatus) : '',
-        s.version.deployedAt ? format(new Date(s.version.deployedAt), 'dd.MM.yy') : '',
+        versionStatus(s.status),
+        !s.isHibernated() ? apiStatus(s.api?.status) : '',
+        !s.isHibernated() ? processorStatus(s) : '',
+        !s.isHibernated() ? dbUsage(s.addons?.postgres?.disk.usageStatus) : '',
+        s.deployedAt ? format(new Date(s.deployedAt), 'dd.MM.yy') : '',
       ];
     });
 
@@ -198,7 +200,7 @@ export class SquidList extends List {
     this.squids = squids;
   }
 
-  colorize(data: string, squid: SquidVersion) {
+  colorize(data: string, squid: Squid) {
     const color = squid.getColor();
 
     if (!color) return data;

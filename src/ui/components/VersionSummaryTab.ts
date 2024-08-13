@@ -7,7 +7,7 @@ import { SquidProcessor } from '../../api';
 import { chalkMainColor, mainColor, scrollBarTheme } from '../theme';
 
 import { VersionTab } from './Tabs';
-import { SquidVersion } from './types';
+import { Squid } from './types';
 
 export function numberWithSpaces(n: number) {
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
@@ -18,16 +18,16 @@ export function getProcessors(processor: SquidProcessor) {
 }
 
 export class VersionSummaryTab implements VersionTab {
-  async append(parent: Element, squid: SquidVersion) {
+  async append(parent: Element, squid: Squid) {
     const lines = [];
 
-    if (squid.version.description) {
-      lines.push(squid.version.description);
+    if (squid.description) {
+      lines.push(squid.description);
       lines.push('');
     }
 
-    lines.push(`${chalkMainColor(`API`)} ${chalkMainColor(squid.version.api?.status)}`);
-    lines.push(`${squid.version.deploymentUrl}`);
+    lines.push(`${chalkMainColor(`API`)} ${chalkMainColor(squid.api?.status)}`);
+    lines.push(`${squid.api?.url}`);
     lines.push('');
 
     const table = new Table({
@@ -40,7 +40,7 @@ export class VersionSummaryTab implements VersionTab {
       },
     });
 
-    const addonPostgres = squid.version.addons.postgres;
+    const addonPostgres = squid.addons?.postgres;
     if (addonPostgres) {
       const usedBytes = addonPostgres.disk.usedBytes || 0;
       const totalBytes = addonPostgres.disk.totalBytes || 0;
@@ -53,14 +53,16 @@ export class VersionSummaryTab implements VersionTab {
       lines.push('');
     }
 
-    // table is an Array, so you can `push`, `unshift`, `splice` and friends
-    for (const processor of squid.version.processors) {
-      const processorPercent = (processor.syncState.currentBlock * 100) / processor.syncState.totalBlocks;
-      const processorState = `${processorPercent.toFixed(2)}%\n${numberWithSpaces(
-        processor.syncState.currentBlock,
-      )} / ${numberWithSpaces(processor.syncState.totalBlocks)}`;
+    if (squid.processors) {
+      // table is an Array, so you can `push`, `unshift`, `splice` and friends
+      for (const processor of squid.processors) {
+        const processorPercent = (processor.syncState.currentBlock * 100) / processor.syncState.totalBlocks;
+        const processorState = `${processorPercent.toFixed(2)}%\n${numberWithSpaces(
+          processor.syncState.currentBlock,
+        )} / ${numberWithSpaces(processor.syncState.totalBlocks)}`;
 
-      table.push([processor.name, processor.status, chalk.dim(processorState)]);
+        table.push([processor.name, processor.status, chalk.dim(processorState)]);
+      }
     }
 
     lines.push(table.toString());
