@@ -7,7 +7,6 @@ import inquirer from 'inquirer';
 import { simpleGit } from 'simple-git';
 import { adjectives, animals, colors, uniqueNamesGenerator } from 'unique-names-generator';
 
-import { squidNameIsAvailable } from '../api';
 import { CliCommand } from '../command';
 import { readManifest, saveManifest } from '../manifest';
 
@@ -145,17 +144,15 @@ export default class Init extends CliCommand {
       : resolvedTemplate;
 
     try {
-      if (!(await squidNameIsAvailable(name))) {
-        const uniqueNameSuggestion = uniqueNamesGenerator({
-          dictionaries: [adjectives, colors, animals],
-          separator: '-',
-          length: 2,
-        });
-        return this.error(
-          `There is already a squid with name "${name}" deployed to the Cloud. Squid names are globally unique. ` +
-            `Please pick a new memorable name, e.g. "${uniqueNameSuggestion}".`,
-        );
-      }
+      const uniqueNameSuggestion = uniqueNamesGenerator({
+        dictionaries: [adjectives, colors, animals],
+        separator: '-',
+        length: 2,
+      });
+      return this.error(
+        `There is already a squid with name "${name}" deployed to the Cloud. Squid names are globally unique. ` +
+          `Please pick a new memorable name, e.g. "${uniqueNameSuggestion}".`,
+      );
     } catch (e) {}
 
     CliUx.ux.action.start(`◷ Downloading the template: ${githubRepository}... `);

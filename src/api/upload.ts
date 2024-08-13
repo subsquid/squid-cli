@@ -4,9 +4,13 @@ import FormData from 'form-data';
 
 import { api } from './api';
 import { getUploadUrl } from './squids';
+import { OrganizationRequest } from './types';
 
-export async function uploadFile(orgCode: string, path: string): Promise<{ error: string | null; fileUrl?: string }> {
-  const { uploadFields, uploadUrl, maxUploadBytes, fileUrl } = await getUploadUrl({ orgCode });
+export async function uploadFile({ organization, path }: OrganizationRequest & { path: string }): Promise<{
+  error: string | null;
+  fileUrl?: string;
+}> {
+  const { uploadFields, uploadUrl, maxUploadBytes, fileUrl } = await getUploadUrl({ organization });
 
   const fileStream = fs.createReadStream(path);
   const { size } = fs.statSync(path);

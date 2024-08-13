@@ -1,10 +1,11 @@
-import { Command } from '@oclif/core';
+import { Args, Command } from '@oclif/core';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
-import { isNil } from 'lodash';
+import { isNil, uniqBy } from 'lodash';
 
-import { ApiError, SquidOrganizationResponse, listOrganizations, listSquids } from './api';
+import { ApiError, getOrganization, listOrganizations, listSquids, listUserSquids, OrganizationRequest } from './api';
 import { getTTY } from './tty';
+import { formatSquidName } from './utils';
 
 export const RELEASE_DEPRECATE = [
   chalk.yellow('*******************************************************'),
@@ -82,34 +83,81 @@ export abstract class CliCommand extends Command {
     throw error;
   }
 
-  async promptOrganization(orgCode: string | null | undefined, using: string): Promise<string> {
-    if (orgCode) return orgCode;
+  async findSquid({
+    organization,
+    name,
+    tag,
+    slot,
+    tagOrSlot,
+  }: OrganizationRequest & { name: string } & (
+      | { tag: string; slot?: undefined; tagOrSlot?: undefined }
+      | { tag?: undefined; slot: string; tagOrSlot?: undefined }
+      | { tag?: undefined; slot?: undefined; tagOrSlot: string }
+    )) {
+    const squids = await listSquids({ organization, name });
+
+    if (slot) {
+      return squids.find((s) => s.slot === slot);
+    }
+
+    if (tag) {
+      return squids.find((s) => s.tags.some((t) => t.name === tag));
+    }
+
+    if (tagOrSlot) {
+      return squids.find((s) => s.slot === tagOrSlot || s.tags.some((t) => t.name === tagOrSlot));
+    }
+  }
+
+  async findOrThrowSquid(opts: Parameters<typeof this.findSquid>[0]) {
+    const squid = await this.findSquid(opts);
+    if (!squid) {
+      throw new Error(
+        `The squid ${formatSquidName(opts.tagOrSlot != null ? { name: opts.name, slot: opts.tagOrSlot } : opts)} is not found`,
+      );
+    }
+
+    return squid;
+  }
+
+  async promptOrganization(code: string | null | undefined, using: string) {
+    if (code) {
+      return await getOrganization({ organization: { code } });
+    }
 
     const organizations = await listOrganizations();
     if (organizations.length === 0) {
       return this.error(`You have no organizations. Please create organization first.`);
     } else if (organizations.length === 1) {
-      return organizations[0].code;
+      return organizations[0];
     }
 
     return await this.getOrganizationPromt(organizations, using);
   }
 
-  async promptSquidOrganization(orgCode: string | null | undefined, squidName: string, using: string): Promise<string> {
-    if (orgCode) return orgCode;
+  async promptSquidOrganization(code: string | null | undefined, name: string, using: string) {
+    if (code) {
+      return await getOrganization({ organization: { code } });
+    }
 
-    const squids = await listSquids({ squidName });
-    const organizations = squids.map((s) => s.organization).filter((o): o is SquidOrganizationResponse => !isNil(o));
+    const squids = await listUserSquids({ name });
+
+    let organizations = squids.map((s) => s.organization).filter((o) => !isNil(o));
+    organizations = uniqBy(organizations, (o) => o.code);
+
     if (organizations.length === 0) {
-      return this.error(`Squid "${squidName}" was not found.`);
+      return this.error(`Squid "${name}" was not found.`);
     } else if (organizations.length === 1) {
-      return organizations[0].code;
+      return organizations[0];
     }
 
     return await this.getOrganizationPromt(organizations, using);
   }
 
-  private async getOrganizationPromt(organizations: { code: string; name: string }[], using: string) {
+  private async getOrganizationPromt<T extends { code: string; name: string }>(
+    organizations: T[],
+    using: string,
+  ): Promise<T> {
     const { stdin, stdout } = getTTY();
     if (!stdin || !stdout) {
       this.log(chalk.dim(`You have ${organizations.length} organizations:`));
@@ -128,7 +176,7 @@ export abstract class CliCommand extends Command {
         choices: organizations.map((o) => {
           return {
             name: o.name ? `${o.name} (${o.code})` : o.code,
-            value: o.code,
+            value: o,
           };
         }),
       },
@@ -141,3 +189,15 @@ export abstract class CliCommand extends Command {
     return organization;
   }
 }
+
+export const SquidNameArg = Args.string({
+  description: '<name#id> or <name@tag>',
+  required: true,
+  parse: async (input) => {
+    input = input.toLowerCase();
+    if (!/^[a-z0-9\-]+[#@][a-z0-9\-]+$/.test(input)) {
+      throw new Error(`Expected a squid name but received: ${input}`);
+    }
+    return input;
+  },
+});

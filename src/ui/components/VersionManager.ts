@@ -1,20 +1,20 @@
 import { defaultsDeep, flatten } from 'lodash';
 import { List, Widgets } from 'reblessed';
 
-import { squidList } from '../../api';
+import { listSquids, Organization } from '../../api';
 
 import { SquidList } from './SquidList';
-import { SquidVersion } from './types';
+import { Squid } from './types';
 import { VersionView } from './VersionView';
 
 export class VersionManager extends List {
   list: SquidList;
   view: VersionView;
-  squids: SquidVersion[] = [];
+  squids: Squid[] = [];
   currentIndex?: number;
 
   constructor(
-    public organization: string,
+    public organization: Organization,
     options: Widgets.BoxOptions,
   ) {
     super(
@@ -52,15 +52,15 @@ export class VersionManager extends List {
   }
 
   async load() {
-    const squids = await squidList({ orgCode: this.organization });
+    const squids = await listSquids({ organization: this.organization });
 
-    this.squids = flatten(
-      squids.map((squid) =>
-        squid.versions.map((v) => {
-          return new SquidVersion(squid, v);
-        }),
-      ),
-    ).sort((a, b) => a.name.localeCompare(b.name));
+    // this.squids = flatten(
+    //   squids.map((squid) =>
+    //     squid.versions.map((v) => {
+    //       return new SquidVersion(squid, v);
+    //     }),
+    //   ),
+    // ).sort((a, b) => a.name.localeCompare(b.name));
 
     await this.list.recalculateTable(this.squids);
 
