@@ -5,9 +5,9 @@ import blessed, { Element, List, Widgets } from 'reblessed';
 import { defaultBoxTheme, mainColor } from '../theme';
 
 import { Tabs } from './Tabs';
-import { SquidVersion } from './types';
+import { Squid } from './types';
 import { VersionDbAccessTab } from './VersionDbAccessTab';
-import { VersionDeployTab } from './VersionDeployTab';
+import { SquidDeployTab } from './VersionDeployTab';
 import { VersionLogTab } from './VersionLogsTab';
 import { VersionSummaryTab } from './VersionSummaryTab';
 
@@ -78,7 +78,7 @@ export class VersionView extends List {
     this.append(this.tabs);
   }
 
-  async setSquid(squid: SquidVersion) {
+  async setSquid(squid: Squid) {
     const width = typeof this.width === 'string' ? parseInt(this.width) : this.width;
 
     const title = await figletAsync(squid.name, { width: width - 3, whitespaceBreak: true });

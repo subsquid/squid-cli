@@ -1,5 +1,5 @@
 import { api, ApiError } from './api';
-import { HttpResponse, SquidResponse } from './types';
+import { HttpResponse, Organization, OrganizationRequest, Squid } from './types';
 
 export type Profile = {
   username?: string;
@@ -36,17 +36,29 @@ export async function profile({
 }
 
 export async function listOrganizations() {
-  const { organizations } = await profile();
+  const { body } = await api<HttpResponse<Organization[]>>({
+    method: 'get',
+    path: `/orgs`,
+  });
 
-  return organizations || [];
+  return body.payload;
 }
 
-export async function listSquids({ squidName }: { squidName?: string }) {
-  const { body } = await api<HttpResponse<SquidResponse[]>>({
+export async function getOrganization({ organization }: OrganizationRequest) {
+  const { body } = await api<HttpResponse<Organization>>({
+    method: 'get',
+    path: `/orgs/${organization.code}`,
+  });
+
+  return body.payload;
+}
+
+export async function listUserSquids({ name }: { name?: string }) {
+  const { body } = await api<HttpResponse<Squid[]>>({
     method: 'get',
     path: `/user/squids`,
     query: {
-      name: squidName,
+      name: name,
     },
   });
 

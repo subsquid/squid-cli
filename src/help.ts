@@ -1,7 +1,8 @@
 import { Help as OclifHelp, ux as CliUx } from '@oclif/core';
-import chalk from 'chalk';
-import { getSquidCommands } from './utils';
 import * as Interfaces from '@oclif/core/lib/interfaces';
+import chalk from 'chalk';
+
+import { getSquidCommands } from './utils';
 
 const TABLE_OPTIONS = {
   'no-header': true,
@@ -74,7 +75,9 @@ export default class Help extends OclifHelp {
       }));
   }
 
-  static getVisibleCloudCommands(config: Interfaces.Config): { name: string; description?: string; aliases: string[] }[] {
+  static getVisibleCloudCommands(
+    config: Interfaces.Config,
+  ): { name: string; description?: string; aliases: string[] }[] {
     const aliases = new Set<string>();
 
     return config.commands

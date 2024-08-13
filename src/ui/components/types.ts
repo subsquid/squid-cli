@@ -1,31 +1,32 @@
-import { SquidResponse, VersionResponse } from '../../api';
+import { Squid as ApiSquid } from '../../api';
+import { formatSquidName } from '../../utils';
 
-export class SquidVersion {
-  name: string;
+export interface Squid extends ApiSquid {}
+export class Squid {
+  readonly displayName: string;
 
-  constructor(
-    public squid: SquidResponse,
-    public version: VersionResponse,
-  ) {
-    this.name = `${this.squid.name}@${this.version.name}`;
+  constructor(squid: ApiSquid) {
+    Object.assign(this, squid);
 
-    if (this.version.aliases.length) {
-      this.name += ` (${this.version.aliases.map((a) => a.name).join(', ')})`;
+    this.displayName = formatSquidName(this);
+
+    if (this.tags.length) {
+      this.displayName += ` (${this.tags.map((a) => a.name).join(', ')})`;
     }
   }
 
   isHibernated() {
-    return this.version.deploy.status === 'HIBERNATED';
+    return this.status === 'HIBERNATED';
   }
 
   getColor(): string | null {
     if (this.isHibernated()) {
       return 'bright-black';
-    } else if (this.version.api?.status === 'NOT_AVAILABLE') {
+    } else if (this.api?.status === 'NOT_AVAILABLE') {
       return 'red';
     } else if (
-      this.version.addons.postgres?.disk.usageStatus === 'CRITICAL' ||
-      this.version.addons.postgres?.disk.usageStatus === 'WARNING'
+      this.addons?.postgres?.disk.usageStatus === 'CRITICAL' ||
+      this.addons?.postgres?.disk.usageStatus === 'WARNING'
     ) {
       return 'yellow';
     }
