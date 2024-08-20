@@ -77,7 +77,7 @@
     "@oclif/plugin-autocomplete": "3.0.13",
     "@oclif/plugin-warn-if-update-available": "^3.1.6",
     "@subsquid/commands": "^2.3.1",
-    "@subsquid/manifest": "^0.0.1-beta.17",
+    "@subsquid/manifest": "^1.0.0-beta.11",
     "@subsquid/manifest-expr": "^0.0.1",
     "@types/fast-levenshtein": "^0.0.4",
     "@types/lodash": "^4.17.0",
