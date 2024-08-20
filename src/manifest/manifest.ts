@@ -1,20 +1,20 @@
 import fs from 'fs';
 import path from 'path';
 
-import { Manifest, ManifestValue } from '@subsquid/manifest';
+import { Manifest } from '@subsquid/manifest';
 import { Expression, Parser } from '@subsquid/manifest-expr';
 import yaml from 'js-yaml';
 import { mapValues } from 'lodash';
 
 export function readManifest(path: string) {
-  return yaml.load(fs.readFileSync(path).toString()) as Partial<ManifestValue>;
+  return yaml.load(fs.readFileSync(path).toString()) as Partial<Manifest>;
 }
 
-export function saveManifest(path: string, manifest: Partial<ManifestValue>) {
+export function saveManifest(path: string, manifest: Partial<Manifest>) {
   fs.writeFileSync(path, formatManifest(manifest));
 }
 
-export function formatManifest(manifest: Partial<ManifestValue>): string {
+export function formatManifest(manifest: Partial<Manifest>): string {
   return yaml.dump(manifest, {
     styles: {
       'tag:yaml.org,2002:null': 'empty',
@@ -34,10 +34,7 @@ export function parseManifestEnv(env: Record<string, any>) {
   return mapValues(env, (value) => (typeof value === 'string' ? parser.parse(value) : value));
 }
 
-export function loadManifestFile(
-  localPath: string,
-  manifestPath: string,
-): { squidDir: string; manifest: ManifestValue } {
+export function loadManifestFile(localPath: string, manifestPath: string): { squidDir: string; manifest: Manifest } {
   const squidDir = path.resolve(localPath);
 
   if (!fs.statSync(squidDir).isDirectory()) {
@@ -98,19 +95,18 @@ export function loadManifestFile(
   let manifest;
   try {
     const raw = fs.readFileSync(manifestFullPath).toString();
-    manifest = Manifest.parse(raw, { validation: { allowUnknown: true } });
+    const { value, error } = Manifest.parse(raw, { validation: { allowUnknown: true } });
+    if (error) {
+      throw error;
+    }
+    manifest = value as Manifest;
   } catch (e: any) {
     throw new Error(
       `The manifest file on ${manifestFullPath} can not be parsed: ${e instanceof Error ? e.message : e}`,
     );
   }
-
-  if (manifest.hasError()) {
-    throw new Error(manifest.getErrors().join('\n'));
-  }
-
   return {
     squidDir,
-    manifest: manifest.values() as ManifestValue,
+    manifest: manifest,
   };
 }

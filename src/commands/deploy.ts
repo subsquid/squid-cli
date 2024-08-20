@@ -3,7 +3,7 @@ import path from 'node:path';
 import { promisify } from 'util';
 
 import { Args, Flags, ux as CliUx } from '@oclif/core';
-import { ManifestValue } from '@subsquid/manifest';
+import { Manifest } from '@subsquid/manifest';
 import chalk from 'chalk';
 import { globSync } from 'glob';
 import ignore from 'ignore';
@@ -33,7 +33,7 @@ export const DELETE_COLOR = 'red';
 export function resolveManifest(
   localPath: string,
   manifestPath: string,
-): { error: string } | { buildDir: string; squidDir: string; manifest: ManifestValue } {
+): { error: string } | { buildDir: string; squidDir: string; manifest: Manifest } {
   try {
     const { squidDir, manifest } = loadManifestFile(localPath, manifestPath);
 
