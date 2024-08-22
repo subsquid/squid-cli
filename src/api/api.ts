@@ -9,11 +9,21 @@ import ms from 'ms';
 import { getConfig } from '../config';
 
 const API_DEBUG = process.env.API_DEBUG === 'true';
-
+const delayFactor = 10;
 const DEFAULT_RETRY: IAxiosRetryConfig = {
   retries: 10,
-  retryDelay: axiosRetry.exponentialDelay,
+  retryDelay: (retryCount, error) => axiosRetry.exponentialDelay(retryCount, error, delayFactor),
   retryCondition: isNetworkOrIdempotentRequestError,
+  onRetry: (retryCount, error) => {
+    if (!error.response) {
+      if (retryCount === 1) {
+        console.log(chalk.dim(`There appears to be trouble with your network connection. Retrying...`));
+      } else if (retryCount > 6) {
+        const next = ms(Math.round(axiosRetry.exponentialDelay(retryCount, error, delayFactor)));
+        console.log(chalk.dim(`There appears to be trouble with your network connection. Retrying in ${next}...`));
+      }
+    }
+  },
 };
 
 axiosRetry(axios, DEFAULT_RETRY);
