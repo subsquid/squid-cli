@@ -3,23 +3,14 @@ import path from 'path';
 
 import { Manifest } from '@subsquid/manifest';
 import { Expression, Parser } from '@subsquid/manifest-expr';
-import yaml from 'js-yaml';
 import { mapValues } from 'lodash';
 
 export function readManifest(path: string) {
-  return yaml.load(fs.readFileSync(path).toString()) as Partial<Manifest>;
+  return fs.readFileSync(path).toString();
 }
 
-export function saveManifest(path: string, manifest: Partial<Manifest>) {
-  fs.writeFileSync(path, formatManifest(manifest));
-}
-
-export function formatManifest(manifest: Partial<Manifest>): string {
-  return yaml.dump(manifest, {
-    styles: {
-      'tag:yaml.org,2002:null': 'empty',
-    },
-  });
+export function saveManifest(path: string, manifest: string) {
+  fs.writeFileSync(path, manifest);
 }
 
 export function evalManifestEnv(env: Record<string, any>, context: Record<string, any>) {

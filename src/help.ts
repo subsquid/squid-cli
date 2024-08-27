@@ -90,7 +90,7 @@ export default class Help extends OclifHelp {
         const [description] = (c.summary || c.description || '').split('\n');
 
         return {
-          name: c.id,
+          name: c.id.replace(':', ' '),
           aliases: c.aliases,
           description: description,
         };

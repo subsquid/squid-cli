@@ -3,23 +3,15 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { isNil, uniqBy } from 'lodash';
 
-import { ApiError, getOrganization, listOrganizations, listSquids, listUserSquids, OrganizationRequest } from './api';
+import { ApiError, getOrganization, getSquid, listOrganizations, listUserSquids, SquidRequest } from './api';
 import { getTTY } from './tty';
-import { formatSquidName } from './utils';
+import { parseSquidReference, SQUID_HASH_SYMBOL, SQUID_TAG_SYMBOL } from './utils';
 
-export const RELEASE_DEPRECATE = [
-  chalk.yellow('*******************************************************'),
-  chalk.yellow('*                                                     *'),
-  chalk.yellow('* WARNING! This command has been deprecated           *'),
-  chalk.yellow('* Please check the migration guide                    *'),
-  chalk.yellow('* https://docs.subsquid.io/deploy-squid/migration/    *'),
-  chalk.yellow('*                                                     *'),
-  chalk.yellow('*******************************************************'),
-].join('\n');
+export const SUCCESS_CHECK_MARK = chalk.green('✓');
 
 export abstract class CliCommand extends Command {
   logSuccess(message: string) {
-    this.log(chalk.green(`✓ `) + message);
+    this.log(SUCCESS_CHECK_MARK + message);
   }
 
   logQuestion(message: string) {
@@ -83,44 +75,28 @@ export abstract class CliCommand extends Command {
     throw error;
   }
 
-  async findSquid({
-    organization,
-    name,
-    tag,
-    slot,
-    tagOrSlot,
-  }: OrganizationRequest & { name: string } & (
-      | { tag: string; slot?: undefined; tagOrSlot?: undefined }
-      | { tag?: undefined; slot: string; tagOrSlot?: undefined }
-      | { tag?: undefined; slot?: undefined; tagOrSlot: string }
-    )) {
-    const squids = await listSquids({ organization, name });
+  async findSquid({ organization, reference }: SquidRequest) {
+    try {
+      return getSquid({ organization, reference });
+    } catch (e) {
+      if (e instanceof ApiError && e.request.status === 404) {
+        return null;
+      }
 
-    if (slot) {
-      return squids.find((s) => s.slot === slot);
-    }
-
-    if (tag) {
-      return squids.find((s) => s.tags.some((t) => t.name === tag));
-    }
-
-    if (tagOrSlot) {
-      return squids.find((s) => s.slot === tagOrSlot || s.tags.some((t) => t.name === tagOrSlot));
+      throw e;
     }
   }
 
-  async findOrThrowSquid(opts: Parameters<typeof this.findSquid>[0]) {
-    const squid = await this.findSquid(opts);
+  async findOrThrowSquid({ organization, reference }: SquidRequest) {
+    const squid = await this.findSquid({ organization, reference });
     if (!squid) {
-      throw new Error(
-        `The squid ${formatSquidName(opts.tagOrSlot != null ? { name: opts.name, slot: opts.tagOrSlot } : opts)} is not found`,
-      );
+      throw new Error(`The squid "${reference}" is not found`);
     }
 
     return squid;
   }
 
-  async promptOrganization(code: string | null | undefined, using: string) {
+  async promptOrganization(code: string | null | undefined, using?: string) {
     if (code) {
       return await getOrganization({ organization: { code } });
     }
@@ -132,13 +108,26 @@ export abstract class CliCommand extends Command {
       return organizations[0];
     }
 
-    return await this.getOrganizationPromt(organizations, using);
+    return await this.getOrganizationPrompt(organizations, using);
   }
 
-  async promptSquidOrganization(code: string | null | undefined, name: string, using: string) {
+  async promptSquidOrganization({
+    code,
+    reference,
+    using,
+  }: {
+    code?: string | null;
+    reference: string;
+    using?: string;
+  }) {
     if (code) {
       return await getOrganization({ organization: { code } });
     }
+
+    const name =
+      reference.includes(SQUID_TAG_SYMBOL) || reference.includes(SQUID_HASH_SYMBOL)
+        ? parseSquidReference(reference).name
+        : reference;
 
     const squids = await listUserSquids({ name });
 
@@ -151,12 +140,12 @@ export abstract class CliCommand extends Command {
       return organizations[0];
     }
 
-    return await this.getOrganizationPromt(organizations, using);
+    return await this.getOrganizationPrompt(organizations, using);
   }
 
-  private async getOrganizationPromt<T extends { code: string; name: string }>(
+  private async getOrganizationPrompt<T extends { code: string; name: string }>(
     organizations: T[],
-    using: string,
+    using: string = 'using "-o" flag',
   ): Promise<T> {
     const { stdin, stdout } = getTTY();
     if (!stdin || !stdout) {
@@ -190,13 +179,13 @@ export abstract class CliCommand extends Command {
   }
 }
 
-export const SquidNameArg = Args.string({
-  description: '<name#id> or <name@tag>',
+export const SquidReferenceArg = Args.string({
+  description: `<name${SQUID_HASH_SYMBOL}hash> or <name${SQUID_TAG_SYMBOL}tag>`,
   required: true,
   parse: async (input) => {
     input = input.toLowerCase();
-    if (!/^[a-z0-9\-]+[#@][a-z0-9\-]+$/.test(input)) {
-      throw new Error(`Expected a squid name but received: ${input}`);
+    if (!/^[a-z0-9\-]+[:@][a-z0-9\-]+$/.test(input)) {
+      throw new Error(`Expected a squid reference but received: ${input}`);
     }
     return input;
   },

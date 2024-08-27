@@ -5,22 +5,23 @@ import { promisify } from 'util';
 import { Args, Flags, ux as CliUx } from '@oclif/core';
 import { Manifest } from '@subsquid/manifest';
 import chalk from 'chalk';
+import diff from 'cli-diff';
 import { globSync } from 'glob';
 import ignore from 'ignore';
 import inquirer from 'inquirer';
 import prettyBytes from 'pretty-bytes';
 import targz from 'targz';
 
-import { deploySquid, listSquids, OrganizationRequest, Squid, uploadFile } from '../api';
-// import { buildTable, CREATE_COLOR, deployDemoSquid, listDemoSquids, UPDATE_COLOR } from '../api/demoStore';
+import { deploySquid, OrganizationRequest, uploadFile } from '../api';
+import { SUCCESS_CHECK_MARK } from '../command';
 import { DeployCommand } from '../deploy-command';
 import { loadManifestFile } from '../manifest';
-import { formatSquidName } from '../utils';
+import { formatSquidName, parseSquidReference, SQUID_HASH_SYMBOL, SQUID_TAG_SYMBOL } from '../utils';
 
 const compressAsync = promisify(targz.compress);
 
-const SQUID_PATH_DESC = [
-  `Squid source. Could be:`,
+const SQUID_WORKDIR_DESC = [
+  `Squid working directory. Could be:`,
   `  - a relative or absolute path to a local folder (e.g. ".")`,
   `  - a URL to a .tar.gz archive`,
   `  - a github URL to a git repo with a branch or commit tag`,
@@ -50,39 +51,59 @@ export function resolveManifest(
   }
 }
 
-const LIMIT = 10;
+function example(command: string, description: string) {
+  // return [chalk.dim(`// ${description}`), command].join('\r\n');
+  return `${command} ${chalk.dim(`// ${description}`)}`;
+}
 
 export default class Deploy extends DeployCommand {
   static description = 'Deploy new or update an existing squid in the Cloud';
+  static examples = [
+    example('sqd deploy', 'Create a new squid with name provided in the manifest file'),
+    example(
+      'sqd deploy my-squid-override',
+      'Create a new squid deployment and override it\'s name to "my-squid-override"',
+    ),
+    example('sqd deploy my-squid#asmzf5', 'Update the "my-squid" squid with hash "asmzf5"'),
+    example(
+      'sqd deploy -d ./path-to-the-squid -m squid.prod.yaml',
+      'Use a manifest file located in ./path-to-the-squid/squid.prod.yaml',
+    ),
+    example(
+      'sqd deploy -d /Users/dev/path-to-the-squid -m /Users/dev/path-to-the-squid/squid.prod.yaml',
+      'Full paths are also fine',
+    ),
+  ];
 
   static args = {
-    source: Args.string({
-      description: SQUID_PATH_DESC.join('\n'),
-      required: true,
-      default: '.',
+    squid_name_or_reference: Args.string({
+      description: [
+        `Reference to squid for the update.`,
+        `If argument not specified, the squid name will be retrieved from the manifest or prompted and a new squid will be created.`,
+        ``,
+        `Alternatively, you can overwrite the name of the squid from the manifest by explicitly providing a new name instead of a reference.`,
+        ``,
+        `See Examples section for more information`,
+      ].join('\n'),
+      required: false,
     }),
   };
 
   static flags = {
     manifest: Flags.string({
       char: 'm',
-      description: 'Relative local path to a squid manifest file in squid source',
+      description: 'Relative local path to a squid manifest file in squid working directory',
       required: false,
       default: 'squid.yaml',
       helpValue: '<manifest_path>',
     }),
-    update: Flags.string({
-      char: 'u',
-      description: [
-        'Reference on a deployment to update in-place. Could be:',
-        '- "@{tag}" or "{tag}", i.e. the tag assigned to the squid deployment',
-        '- "#{id}" or "{id}", i.e. the corresponding deployment ID',
-        'If it is not provided, a new squid will be created. ',
-      ].join('\n'),
+    dir: Flags.string({
+      char: 'd',
+      description: SQUID_WORKDIR_DESC.join('\n'),
       required: false,
-      helpValue: '<deploy_id or tag>',
+      default: '.',
+      helpValue: '<source>',
     }),
-
     tag: Flags.string({
       char: 't',
       description: [
@@ -91,10 +112,8 @@ export default class Deploy extends DeployCommand {
         'Tag must contain only alphanumeric characters, dashes, and underscores',
       ].join('\n'),
       required: false,
-      exclusive: ['update'],
       helpValue: '<tag>',
     }),
-
     'hard-reset': Flags.boolean({
       char: 'r',
       description:
@@ -108,7 +127,7 @@ export default class Deploy extends DeployCommand {
     }),
     org: Flags.string({
       char: 'o',
-      description: 'Organization',
+      description: 'Organization code',
       helpValue: '<code>',
       required: false,
     }),
@@ -116,11 +135,11 @@ export default class Deploy extends DeployCommand {
 
   async run(): Promise<void> {
     const {
-      args: { source },
-      flags: { manifest: manifestPath, 'hard-reset': hardReset, update, 'no-stream-logs': disableStreamLogs, org, tag },
+      args: { squid_name_or_reference },
+      flags: { dir, manifest: manifestPath, 'hard-reset': hardReset, 'no-stream-logs': disableStreamLogs, org, tag },
     } = await this.parse(Deploy);
 
-    const isUrl = source.startsWith('http://') || source.startsWith('https://');
+    const isUrl = dir.startsWith('http://') || dir.startsWith('https://');
     if (isUrl) {
       // this.log(`🦑 Releasing the squid from remote`);
       //
@@ -137,11 +156,11 @@ export default class Deploy extends DeployCommand {
       return this.error('Not implemented yet');
     }
 
-    const organization = await this.promptOrganization(org, 'using "-o" flag');
+    const organization = await this.promptOrganization(org);
 
     this.log(`🦑 Releasing the squid from local folder`);
 
-    const res = resolveManifest(source, manifestPath);
+    const res = resolveManifest(dir, manifestPath);
     if ('error' in res) return this.showError(res.error, 'MANIFEST_VALIDATION_FAILED');
 
     const { buildDir, squidDir, manifest } = res;
@@ -150,31 +169,42 @@ export default class Deploy extends DeployCommand {
     this.log(chalk.dim(`Build directory: ${buildDir}`));
     this.log(chalk.dim(`Manifest: ${manifestPath}`));
 
-    let target: Squid | undefined;
-    if (update) {
-      const filter = update.startsWith('#')
-        ? { slot: update.slice(1) }
-        : update.startsWith('@')
-          ? { tag: update.slice(1) }
-          : { tagOrSlot: update };
-      target = await this.findOrThrowSquid({ organization, name: manifest.name, ...filter });
+    let reference = squid_name_or_reference?.trim();
+    if (!reference) {
+      reference = manifest.name;
     }
 
+    const isUpdate = reference.includes(SQUID_HASH_SYMBOL) || reference.includes(SQUID_TAG_SYMBOL);
+    const overrideName = isUpdate ? parseSquidReference(reference).name : reference;
+
+    await this.checkNameMismatch({ fileName: path.basename(manifestPath), manifest, overrideName });
+
+    const finalName = await this.getFinalSquidName(manifest, overrideName);
+
     if (tag) {
-      const normalizedTag = tag.startsWith('@') ? tag.slice(1) : tag;
-      const oldSquid = await this.findSquid({ organization, name: manifest.name, tag: normalizedTag });
+      const oldSquid = await this.findSquid({
+        organization,
+        reference: `${finalName}${tag.padStart(1, SQUID_TAG_SYMBOL)}`,
+      });
       if (oldSquid) {
         const { confirm } = await inquirer.prompt([
           {
             name: 'confirm',
             type: 'confirm',
-            message: `A squid tag @${normalizedTag} has already been assigned to the previous squid deployment ${formatSquidName(oldSquid)}. Are you sure?`,
+            message: [
+              chalk.reset(
+                `A squid tag "${tag}" has already been assigned to the previous squid deployment ${formatSquidName(oldSquid)}.`,
+              ),
+              chalk.reset(`The tag URL will be assigned to the newly created deployment.`),
+              chalk.bold(`Are you sure?`),
+            ].join('\n'),
           },
         ]);
         if (!confirm) return;
       }
     }
 
+    const target = reference && isUpdate ? await this.findOrThrowSquid({ organization, reference }) : null;
     if (target) {
       /**
        * Squid exists we should check running deploys
@@ -184,45 +214,98 @@ export default class Deploy extends DeployCommand {
     }
 
     const archiveName = `${manifest.name}.tar.gz`;
-
     const artifactPath = await this.pack({ buildDir, squidDir, archiveName });
     const artifactUrl = await this.upload({ organization, artifactPath });
 
     const deploy = await deploySquid({
       organization,
       data: {
-        hardReset,
         artifactUrl,
         manifestPath,
-        updateSlot: target?.slot,
-        tag,
+        options: {
+          hardReset,
+          overrideName: finalName !== manifest.name ? finalName : undefined,
+          updateByHash: target?.hash,
+          tag,
+        },
       },
     });
 
-    const squid = await this.pollDeploy({ organization, deploy });
-    if (squid) {
-      if (update) {
-        this.log(
-          [
-            '',
-            chalk[UPDATE_COLOR](`=================================================`),
-            `The squid ${squid.name}#${squid.slot} has been successfully updated`,
-            chalk[UPDATE_COLOR](`=================================================`),
-          ].join('\n'),
-        );
-      } else {
-        this.log(
-          [
-            '',
-            chalk[CREATE_COLOR](`+++++++++++++++++++++++++++++++++++++++++++++++++`),
-            `A squid deployment ${squid.name}#${squid.slot} was successfully created`, //${tag ? ` using tag ${chalk.bold(tag)} ` : ''}
-            chalk[CREATE_COLOR](`+++++++++++++++++++++++++++++++++++++++++++++++++`),
-          ].join('\n'),
-        );
-      }
+    const deployment = await this.pollDeploy({ organization, deploy });
+    if (!deployment || !deployment.squid) return;
+
+    if (isUpdate) {
+      this.logDeployResult(
+        UPDATE_COLOR,
+        `The squid ${formatSquidName(deployment.squid)} has been successfully updated`,
+      );
+    } else {
+      this.logDeployResult(
+        CREATE_COLOR,
+        `A new squid ${formatSquidName(deployment.squid)}${tag ? ` with tag ${chalk.bold(tag)}` : ''} was successfully created`,
+      );
     }
 
-    // this.log([buildTable(newSquids, { changes, limit: LIMIT }), '']);
+    if (!disableStreamLogs) {
+      await this.streamLogs(organization, deployment.squid);
+    }
+  }
+
+  private async checkNameMismatch({
+    fileName,
+    overrideName,
+    manifest,
+  }: {
+    fileName: string;
+    manifest: Manifest;
+    overrideName?: string;
+  }) {
+    if (!manifest.name) return;
+    else if (!overrideName) return;
+
+    if (manifest.name !== overrideName) {
+      this.log(
+        [
+          chalk.bold('Name conflict detected!'),
+
+          `A manifest squid name ${chalk.bold(manifest.name)} does not match with specified in the argument: ${chalk.bold(overrideName)}.`,
+          `If it is intended and you'd like to override the name, just skip this message and confirm, the manifest name will be overridden automatically in the Cloud during the deploy.`,
+          ``,
+          `Patch:`,
+          diff(
+            { name: fileName, content: `name: ${manifest.name}\n` },
+            { name: fileName, content: `name: ${overrideName}\n` },
+          ),
+        ].join('\n'),
+      );
+
+      const { confirm } = await inquirer.prompt([
+        {
+          name: 'confirm',
+          type: 'confirm',
+          message: 'Are you sure?',
+        },
+      ]);
+      if (!confirm) return;
+    }
+  }
+
+  private async getFinalSquidName(manifest: Manifest, overrideName?: string) {
+    if (overrideName) return overrideName;
+    else if (manifest.name) return manifest.name;
+
+    const { input } = await inquirer.prompt([
+      {
+        name: 'input',
+        type: 'input',
+        message: [
+          chalk.reset(`The squid name is not defined either in the manifest or via CLI argument.`),
+          chalk.reset(`Please enter the name of the squid:`),
+        ].join('\n'),
+      },
+    ]);
+
+    return input.name;
   }
 
   private async pack({ buildDir, squidDir, archiveName }: { buildDir: string; squidDir: string; archiveName: string }) {
@@ -260,7 +343,7 @@ export default class Deploy extends DeployCommand {
 
     const squidArtifactStats = fs.statSync(squidArtifact);
 
-    CliUx.ux.action.stop(`${filesCount} files, ${prettyBytes(squidArtifactStats.size)} ✔️`);
+    CliUx.ux.action.stop(`${filesCount} files, ${prettyBytes(squidArtifactStats.size)} ${SUCCESS_CHECK_MARK}`);
 
     return squidArtifact;
   }
@@ -275,7 +358,7 @@ export default class Deploy extends DeployCommand {
       return this.showError('The artifact URL is missing', 'UPLOAD_FAILED');
     }
 
-    CliUx.ux.action.stop('✔️');
+    CliUx.ux.action.stop(SUCCESS_CHECK_MARK);
 
     return artifactUrl;
   }

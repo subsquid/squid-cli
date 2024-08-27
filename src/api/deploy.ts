@@ -1,19 +1,19 @@
 import { api } from './api';
-import { Deploy, DeployRequest, HttpResponse, OrganizationRequest } from './types';
+import { Deployment, DeployRequest, HttpResponse, OrganizationRequest } from './types';
 
-export async function getDeploy({ organization, deploy }: DeployRequest): Promise<Deploy> {
-  const { body } = await api<HttpResponse<Deploy>>({
+export async function getDeploy({ organization, deploy }: DeployRequest): Promise<Deployment> {
+  const { body } = await api<HttpResponse<Deployment>>({
     method: 'get',
-    path: `/orgs/${organization.code}/deploys/${deploy.id}`,
+    path: `/orgs/${organization.code}/deployments/${deploy.id}`,
   });
 
   return body.payload;
 }
 
-export async function getDeploys({ organization }: OrganizationRequest): Promise<Deploy[]> {
-  const { body } = await api<HttpResponse<Deploy[]>>({
+export async function getDeploys({ organization }: OrganizationRequest): Promise<Deployment[]> {
+  const { body } = await api<HttpResponse<Deployment[]>>({
     method: 'get',
-    path: `/orgs/${organization.code}/deploys`,
+    path: `/orgs/${organization.code}/deployments`,
   });
 
   return body.payload;
