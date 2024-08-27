@@ -27,7 +27,10 @@ export class VersionSummaryTab implements VersionTab {
     }
 
     lines.push(`${chalkMainColor(`API`)} ${chalkMainColor(squid.api?.status)}`);
-    lines.push(`${squid.api?.url}`);
+    for (const url of squid.api?.urls || []) {
+      lines.push(`${url.url}`);
+    }
+
     lines.push('');
 
     const table = new Table({

@@ -1,41 +1,18 @@
-import { Args, Flags } from '@oclif/core';
-import chalk from 'chalk';
+import { Flags } from '@oclif/core';
 
 import { restartSquid } from '../api';
-import { SquidNameArg } from '../command';
+import { SquidReferenceArg } from '../command';
 import { DeployCommand } from '../deploy-command';
-import { parseSquidName } from '../utils';
 
 import { UPDATE_COLOR } from './deploy';
 
 export default class Restart extends DeployCommand {
-  static aliases = ['squid:redeploy', 'redeploy'];
-
   static description = 'Restart a squid deployed to the Cloud';
   static args = {
-    squidName: SquidNameArg,
+    squid_reference: SquidReferenceArg,
   };
 
   static flags = {
-    env: Flags.string({
-      char: 'e',
-      description: 'environment variable',
-      required: false,
-      deprecated: true,
-      multiple: true,
-      hidden: true,
-    }),
-    envFile: Flags.string({
-      description: 'file with environment variables',
-      deprecated: true,
-      required: false,
-      hidden: true,
-    }),
-    'no-stream-logs': Flags.boolean({
-      description: 'Do not attach and stream squid logs after the deploy',
-      required: false,
-      default: false,
-    }),
     org: Flags.string({
       char: 'o',
       description: 'Organization',
@@ -45,25 +22,17 @@ export default class Restart extends DeployCommand {
 
   async run(): Promise<void> {
     const {
-      flags: { 'no-stream-logs': disableStreamLogs, org },
-      args: { squidName },
+      flags: { org },
+      args: { squid_reference: reference },
     } = await this.parse(Restart);
 
-    const filter = parseSquidName(squidName);
+    const organization = await this.promptSquidOrganization({ code: org, reference });
 
-    const organization = await this.promptSquidOrganization(org, filter.name, 'using "-o" flag');
-    const squid = await this.findOrThrowSquid({ organization, ...filter });
+    await this.findOrThrowSquid({ organization, reference });
 
-    const deploy = await restartSquid({ organization, squid });
+    const deploy = await restartSquid({ organization, reference });
     await this.pollDeploy({ organization, deploy });
 
-    this.log(
-      [
-        '',
-        chalk[UPDATE_COLOR](`=================================================`),
-        `The squid ${squid.name}#${squid.slot} has been successfully restarted`,
-        chalk[UPDATE_COLOR](`=================================================`),
-      ].join('\n'),
-    );
+    this.logDeployResult(UPDATE_COLOR, `The squid ${reference} has been successfully restarted`);
   }
 }

@@ -1,5 +1,5 @@
-import { Command } from '@oclif/core';
 import { ConfigNotFound, getConfig } from '@subsquid/commands';
+import chalk from 'chalk';
 
 export async function getSquidCommands() {
   try {
@@ -23,19 +23,21 @@ export async function doUntil(fn: () => Promise<boolean>, { pause }: { pause: nu
   }
 }
 
-export function parseSquidName(squidName: string) {
-  if (squidName.includes('#')) {
-    const [name, slot] = squidName.split('#');
-    return { name, slot };
-  } else if (squidName.includes('#')) {
-    const [name, tag] = squidName.split('@');
+export const SQUID_HASH_SYMBOL = ':';
+export const SQUID_TAG_SYMBOL = '@';
+
+export function parseSquidReference(reference: string) {
+  if (reference.includes(SQUID_HASH_SYMBOL)) {
+    const [name, hash] = reference.split(SQUID_HASH_SYMBOL);
+    return { name, hash };
+  } else if (reference.includes(SQUID_TAG_SYMBOL)) {
+    const [name, tag] = reference.split(SQUID_TAG_SYMBOL);
     return { name, tag };
-  } else {
-    throw new Error(`Invalid squid name: "${squidName}"`);
   }
+
+  throw new Error(`Invalid squid reference: "${reference}"`);
 }
-export function formatSquidName(
-  opts: { name: string; tag: string; slot?: undefined } | { name: string; slot: string; tag?: undefined },
-) {
-  return 'tag' in opts ? `${opts.name}@${opts.tag}` : `${opts.name}#${opts.slot}`;
+
+export function formatSquidName({ reference }: { reference: string }) {
+  return chalk.bold(reference);
 }

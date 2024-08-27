@@ -4,416 +4,7 @@
  */
 
 export interface paths {
-    "/auth/signin": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Sign in */
-        post: operations["signin"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/auth/signin": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Sign in */
-        post: operations["signin"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/auth/signup": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Sign up */
-        post: operations["signup"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/auth/signup": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Sign up */
-        post: operations["signup"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/auth/restore": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Restore */
-        post: operations["restore"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/auth/restore": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Restore */
-        post: operations["restore"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/auth/restore/confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Confirm restore */
-        post: operations["restore-confirm"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/auth/restore/confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Confirm restore */
-        post: operations["restore-confirm"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/auth/email/confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Confirm email */
-        get: operations["confirm-email"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/auth/email/confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Confirm email */
-        get: operations["confirm-email"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/oauth/github/url": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Github OAuth URL */
-        get: operations["github"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/oauth/github/url": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Github OAuth URL */
-        get: operations["github"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/oauth/github/auth": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Github auth */
-        post: operations["github-auth"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/oauth/github/auth": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Github auth */
-        post: operations["github-auth"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/oauth/google/url": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Google OAuth URL */
-        get: operations["google"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/oauth/google/url": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Google OAuth URL */
-        get: operations["google"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/oauth/google/auth": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Google auth */
-        post: operations["google-auth"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/oauth/google/auth": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Google auth */
-        post: operations["google-auth"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/squids/deploy": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Deploy a squid to organization */
-        post: operations["deploy-squid"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/squids": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List organization squids */
-        get: operations["list-squids"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/squids/{squid}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get all squid versions */
-        get: operations["get-squid"];
-        put?: never;
-        post?: never;
-        /** Delete all squid versions by name */
-        delete: operations["delete-squid"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/squids/{squid}/version/{version}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Delete a squid */
-        delete: operations["destroy-squid-version"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/squids/{squid}/version/{version}/redeploy": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Restart a squid */
-        put: operations["restart-squid-version"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/squids/{squid}/version/{version}/hibernate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Hibernate a squid */
-        post: operations["hibernate-squid"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/squids/metrics/ingress": {
+    "/v1/orgs/{code}/metrics/ingress": {
         parameters: {
             query?: never;
             header?: never;
@@ -421,7 +12,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get all requests count */
-        get: operations["daily-requests"];
+        get: operations["SquidMetricsController_dailyRequests"];
         put?: never;
         post?: never;
         delete?: never;
@@ -430,24 +21,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/orgs/{code}/squids/metrics/ingress": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get all requests count */
-        get: operations["daily-requests"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/squids/metrics/ingress/{id}": {
+    "/v1/orgs/{code}/metrics/ingress/{squid_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -455,7 +29,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get full squid ingress metrics */
-        get: operations["ingress-stats"];
+        get: operations["SquidMetricsController_ingressStats"];
         put?: never;
         post?: never;
         delete?: never;
@@ -464,24 +38,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/orgs/{code}/squids/metrics/ingress/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get full squid ingress metrics */
-        get: operations["ingress-stats"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/squids/metrics/usage/{id}": {
+    "/v1/orgs/{code}/metrics/usage/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -489,7 +46,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get squid usage metrics */
-        get: operations["usage"];
+        get: operations["SquidMetricsController_usage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -498,75 +55,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/orgs/{code}/squids/metrics/usage/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get squid usage metrics */
-        get: operations["usage"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/squids/{squidName}/versions/{versionName}/logs/history": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get squid logs history */
-        get: operations["fetch-logs-history"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/squids/{squidName}/versions/{versionName}/logs/follow": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Follow the squid logs */
-        get: operations["tail-logs"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/squids/{squid}/versions/{version}/prod": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Set alias to a squid */
-        put: operations["squid"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/deploys/upload-url": {
+    "/v1/orgs/{code}/deployments/upload-url": {
         parameters: {
             query?: never;
             header?: never;
@@ -575,40 +64,23 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Get an upload url */
-        post: operations["upload-url"];
+        /** Create an upload url */
+        post: operations["DeploymentController_uploadUrl"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/v1/orgs/{code}/deploys/upload-url": {
+    "/v1/orgs/{code}/deployments": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
-        /** Get an upload url */
-        post: operations["upload-url"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/deploys": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get version deploys */
-        get: operations["get-all"];
+        /** Get deployments */
+        get: operations["DeploymentController_getAll"];
         put?: never;
         post?: never;
         delete?: never;
@@ -617,49 +89,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/orgs/{code}/deploys/{id}": {
+    "/v1/orgs/{code}/deployments/{id}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Retrieve a deploy */
-        get: operations["get-one"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/orgs/{code}/deploys": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get version deploys */
-        get: operations["get-all"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/orgs/{code}/deploys/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Retrieve a deploy */
-        get: operations["get-one"];
+        /** Retrieve a deployment */
+        get: operations["DeploymentController_getOne"];
         put?: never;
         post?: never;
         delete?: never;
@@ -677,8 +115,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Deploy a squid to organization */
-        post: operations["deploy-squid"];
+        /** Deploy a squid */
+        post: operations["SquidController_deploySquid"];
         delete?: never;
         options?: never;
         head?: never;
@@ -692,8 +130,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List organization squids */
-        get: operations["list-squids"];
+        /** List squids */
+        get: operations["SquidController_listSquids"];
         put?: never;
         post?: never;
         delete?: never;
@@ -702,42 +140,25 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/orgs/{org}/squids/{squid}": {
+    "/v1/orgs/{org}/squids/{reference}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** List organization squids */
-        get: operations["list-squids"];
+        /** Retrieve a squid */
+        get: operations["SquidController_getSquid"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete a squid */
+        delete: operations["SquidController_deleteSquid"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/v1/orgs/{org}/squids/{squid}/slots/{slot}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a squid deployment */
-        get: operations["get-squid"];
-        put?: never;
-        post?: never;
-        /** Delete a squid deployment */
-        delete: operations["delete-squid"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/orgs/{org}/squids/{squid}/slots/{slot}/restart": {
+    "/v1/orgs/{org}/squids/{reference}/restart": {
         parameters: {
             query?: never;
             header?: never;
@@ -747,14 +168,14 @@ export interface paths {
         get?: never;
         put?: never;
         /** Restart a squid */
-        post: operations["restart-squid"];
+        post: operations["SquidController_restartSquid"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/v1/orgs/{org}/squids/{squid}/slots/{slot}/hibernate": {
+    "/v1/orgs/{org}/squids/{reference}/hibernate": {
         parameters: {
             query?: never;
             header?: never;
@@ -763,15 +184,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Hibernate a squid deployment */
-        post: operations["hibernate-squid"];
+        /** Hibernate a squid */
+        post: operations["SquidController_hibernateSquid"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/v1/orgs/{org}/squids/{squid}/slots/{slot}/tag": {
+    "/v1/orgs/{org}/squids/{reference}/tag": {
         parameters: {
             query?: never;
             header?: never;
@@ -780,23 +201,23 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Set tag to a squid deployment */
-        post: operations["tag-squid"];
+        /** Assign tag to a squid  */
+        post: operations["SquidController_setTag"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/orgs/{code}/squids/{squid}/slots/{slot}/logs/history": {
+    "/v1/orgs/{code}/squids/{reference}/logs/history": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get squid logs history */
-        get: operations["fetch-logs-history"];
+        /** Fetch squid logs */
+        get: operations["SquidLogsController_fetchLogsHistory"];
         put?: never;
         post?: never;
         delete?: never;
@@ -805,68 +226,16 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/orgs/{code}/squids/{squid}/slots/{slot}/logs/history": {
+    "/v1/orgs/{code}/squids/{reference}/logs/follow": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get squid logs history */
-        get: operations["fetch-logs-history"];
+        /** Stream squid logs */
+        get: operations["SquidLogsController_tailLogs"];
         put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/squids/{squid}/slots/{slot}/logs/follow": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Follow the squid logs */
-        get: operations["tail-logs"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/orgs/{code}/squids/{squid}/slots/{slot}/logs/follow": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Follow the squid logs */
-        get: operations["tail-logs"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Retrieve a user */
-        get: operations["get-profile"];
-        /** Update a user */
-        put: operations["update-profile"];
         post?: never;
         delete?: never;
         options?: never;
@@ -881,231 +250,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Retrieve a user */
-        get: operations["get-profile"];
-        /** Update a user */
-        put: operations["update-profile"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user/onboarding": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Apply user onboarding */
-        put: operations["on-boarding-form"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/onboarding": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Apply user onboarding */
-        put: operations["on-boarding-form"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user/password/change": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Change password */
-        post: operations["change-password"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/password/change": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Change password */
-        post: operations["change-password"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user/coinlist/email/confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Resend Coinlist email confirmation */
-        post: operations["resend-coinlist-email-confirm"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/coinlist/email/confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Resend Coinlist email confirmation */
-        post: operations["resend-coinlist-email-confirm"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user/email/confirm/resend": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Resend email confirmation */
-        post: operations["resend-email-confirm"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/email/confirm/resend": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Resend email confirmation */
-        post: operations["resend-email-confirm"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user/sqd-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Refresh sqd access key */
-        post: operations["key"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/sqd-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Refresh sqd access key */
-        post: operations["key"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user/invites": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Retrieve all invites */
-        get: operations["get-invites"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/invites": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Retrieve all invites */
-        get: operations["get-invites"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user/squids": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get list of squids from all users organizations */
-        get: operations["get-squids-v-0"];
-        put?: never;
+        /** Get profile */
+        get: operations["UserController_getProfile"];
+        /** Update profile */
+        put: operations["UserController_updateProfile"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1121,167 +269,9 @@ export interface paths {
             cookie?: never;
         };
         /** Get list of squids from all users organizations */
-        get: operations["get-squids-v-1"];
+        get: operations["UserController_getSquidsV1"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user/tokens": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get list of user tokens */
-        get: operations["get-tokens"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/tokens": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get list of user tokens */
-        get: operations["get-tokens"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user/api-tokens": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get tokens list */
-        get: operations["get-tokens"];
-        put?: never;
-        /** Create new token */
-        post: operations["create-token"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/api-tokens": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get tokens list */
-        get: operations["get-tokens"];
-        put?: never;
-        /** Create new token */
-        post: operations["create-token"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/user/api-tokens/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Delete token */
-        delete: operations["deactivate-token"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/api-tokens/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Delete token */
-        delete: operations["deactivate-token"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/organizations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List all organizations */
-        get: operations["list-organizations"];
-        put?: never;
-        /** Create new organization */
-        post: operations["create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List all organizations */
-        get: operations["list-organizations"];
-        put?: never;
-        /** Create new organization */
-        post: operations["create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/organizations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List all organizations */
-        get: operations["list-organizations"];
-        put?: never;
-        /** Create new organization */
-        post: operations["create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1296,61 +286,10 @@ export interface paths {
             cookie?: never;
         };
         /** List all organizations */
-        get: operations["list-organizations"];
+        get: operations["OrganizationController_listOrganizations"];
         put?: never;
         /** Create new organization */
-        post: operations["create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/organizations/{org}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get an organizations */
-        get: operations["get-organization"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{org}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get an organizations */
-        get: operations["get-organization"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/organizations/{org}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get an organizations */
-        get: operations["get-organization"];
-        put?: never;
-        post?: never;
+        post: operations["OrganizationController_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1364,65 +303,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get an organizations */
-        get: operations["get-organization"];
+        /** Get an organization */
+        get: operations["OrganizationController_getOrganization"];
         put?: never;
         post?: never;
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/organizations/{code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Edit an organization */
-        put: operations["edit"];
-        post?: never;
-        /** Delete an organization */
-        delete: operations["delete-one"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Edit an organization */
-        put: operations["edit"];
-        post?: never;
-        /** Delete an organization */
-        delete: operations["delete-one"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/organizations/{code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Edit an organization */
-        put: operations["edit"];
-        post?: never;
-        /** Delete an organization */
-        delete: operations["delete-one"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1437,61 +322,10 @@ export interface paths {
         };
         get?: never;
         /** Edit an organization */
-        put: operations["edit"];
+        put: operations["OrganizationController_edit"];
         post?: never;
         /** Delete an organization */
-        delete: operations["delete-one"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/organizations/{code}/send-verify-email": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Send verification email */
-        post: operations["send-email-verification"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/send-verify-email": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Send verification email */
-        post: operations["send-email-verification"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/organizations/{code}/send-verify-email": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Send verification email */
-        post: operations["send-email-verification"];
-        delete?: never;
+        delete: operations["OrganizationController_deleteOne"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1507,58 +341,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Send verification email */
-        post: operations["send-email-verification"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/organizations/verify-email": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Verify organization email by token */
-        get: operations["verify-email"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/verify-email": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Verify organization email by token */
-        get: operations["verify-email"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/organizations/verify-email": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Verify organization email by token */
-        get: operations["verify-email"];
-        put?: never;
-        post?: never;
+        post: operations["OrganizationController_sendEmailVerification"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1573,63 +356,9 @@ export interface paths {
             cookie?: never;
         };
         /** Verify organization email by token */
-        get: operations["verify-email"];
+        get: operations["OrganizationController_verifyEmail"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/organizations/{code}/roles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get user roles */
-        get: operations["get-one"];
-        put?: never;
-        /** Add user role */
-        post: operations["add-user"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/roles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get user roles */
-        get: operations["get-one"];
-        put?: never;
-        /** Add user role */
-        post: operations["add-user"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/organizations/{code}/roles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get user roles */
-        get: operations["get-one"];
-        put?: never;
-        /** Add user role */
-        post: operations["add-user"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1644,65 +373,11 @@ export interface paths {
             cookie?: never;
         };
         /** Get user roles */
-        get: operations["get-one"];
+        get: operations["OrganizationController_getOne"];
         put?: never;
         /** Add user role */
-        post: operations["add-user"];
+        post: operations["OrganizationController_addUser"];
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/organizations/{code}/roles/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Edit user role */
-        put: operations["edit-user"];
-        post?: never;
-        /** Remove user role */
-        delete: operations["delete-user"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/roles/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Edit user role */
-        put: operations["edit-user"];
-        post?: never;
-        /** Remove user role */
-        delete: operations["delete-user"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/organizations/{code}/roles/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Edit user role */
-        put: operations["edit-user"];
-        post?: never;
-        /** Remove user role */
-        delete: operations["delete-user"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1717,61 +392,10 @@ export interface paths {
         };
         get?: never;
         /** Edit user role */
-        put: operations["edit-user"];
+        put: operations["OrganizationController_editUser"];
         post?: never;
         /** Remove user role */
-        delete: operations["delete-user"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/organizations/{code}/roles/{id}/accept": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Accept user role */
-        post: operations["accept-user-role"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/roles/{id}/accept": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Accept user role */
-        post: operations["accept-user-role"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/organizations/{code}/roles/{id}/accept": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Accept user role */
-        post: operations["accept-user-role"];
-        delete?: never;
+        delete: operations["OrganizationController_deleteUser"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1787,58 +411,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Accept user role */
-        post: operations["accept-user-role"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/organizations/{code}/roles/{id}/reject": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Reject user role */
-        post: operations["decline-user-role"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/roles/{id}/reject": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Reject user role */
-        post: operations["decline-user-role"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/organizations/{code}/roles/{id}/reject": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Reject user role */
-        post: operations["decline-user-role"];
+        post: operations["OrganizationController_acceptUserRole"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1855,26 +428,26 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reject user role */
-        post: operations["decline-user-role"];
+        post: operations["OrganizationController_declineUserRole"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/orgs/{code}/billing/settings": {
+    "/v1/orgs/{code}/integrations/neon": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get billing settings */
-        get: operations["get-settings"];
-        /** Update billing settings */
-        put: operations["setup-intent"];
+        get?: never;
+        /** Setup Neon API integration */
+        put: operations["OrganizationController_setNeonApiToken"];
         post?: never;
-        delete?: never;
+        /** Delete Neon integration */
+        delete: operations["OrganizationController_deleteNeonApiToken"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1888,26 +461,9 @@ export interface paths {
             cookie?: never;
         };
         /** Get billing settings */
-        get: operations["get-settings"];
+        get: operations["OrganizationBillingController_getSettings"];
         /** Update billing settings */
-        put: operations["setup-intent"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/billing/receipts/{year}/{month}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get billing month usage total */
-        get: operations["get-monthly"];
-        put?: never;
+        put: operations["OrganizationBillingController_setupIntent"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1923,26 +479,8 @@ export interface paths {
             cookie?: never;
         };
         /** Get billing month usage total */
-        get: operations["get-monthly"];
+        get: operations["OrganizationBillingController_getMonthly"];
         put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/secrets": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List secrets */
-        get: operations["list-secrets"];
-        /** Update secrets */
-        put: operations["put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1958,9 +496,9 @@ export interface paths {
             cookie?: never;
         };
         /** List secrets */
-        get: operations["list-secrets"];
+        get: operations["SecretController_listSecrets"];
         /** Update secrets */
-        put: operations["put"];
+        put: operations["SecretController_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1968,7 +506,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/rpc/{code}/chains": {
+    "/v1/orgs/{code}/rpc/chains": {
         parameters: {
             query?: never;
             header?: never;
@@ -1976,7 +514,7 @@ export interface paths {
             cookie?: never;
         };
         /** List chains */
-        get: operations["list-chains"];
+        get: operations["RpcController_listChains"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1985,24 +523,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/rpc/{code}/chains": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List chains */
-        get: operations["list-chains"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/rpc/{code}/token": {
+    "/v1/orgs/{code}/rpc/token": {
         parameters: {
             query?: never;
             header?: never;
@@ -2010,35 +531,17 @@ export interface paths {
             cookie?: never;
         };
         /** Get organization token */
-        get: operations["get-token"];
+        get: operations["RpcController_getToken"];
         put?: never;
         /** Refresh organization token */
-        post: operations["refresh-token"];
+        post: operations["RpcController_refreshToken"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/v1/rpc/{code}/token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get organization token */
-        get: operations["get-token"];
-        put?: never;
-        /** Refresh organization token */
-        post: operations["refresh-token"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/quotas/{code}": {
+    "/v1/orgs/{code}/quotas": {
         parameters: {
             query?: never;
             header?: never;
@@ -2046,41 +549,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get quotas */
-        get: operations["get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/quotas/{code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get quotas */
-        get: operations["get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/monitoring/squids/{query}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get squids metric */
-        get: operations["squids"];
+        get: operations["QuotaController_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2097,24 +566,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get squids metric */
-        get: operations["squids"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/orgs/{code}/monitoring/squids": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Scrape metrics */
-        get: operations["squids-all-prom"];
+        get: operations["MonitoringController_squids"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2131,7 +583,7 @@ export interface paths {
             cookie?: never;
         };
         /** Scrape metrics */
-        get: operations["squids-all-prom"];
+        get: operations["MonitoringController_squidsAllProm"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2144,183 +596,9 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        AuthResponse: {
-            /** @example  */
-            token: string;
-        };
-        ResetPasswordResponse: {
-            /** @example true */
-            success: boolean;
-        };
         UnauthorizedResponse: {
             /** @example CREDENTIALS_INVALID */
             error: string;
-        };
-        DeployLog: {
-            severity: string;
-            message: string;
-        };
-        DeployUserResponse: {
-            /** @example 90046784-ef9a-42b4-9dcf-ca4e4ed2cf4a */
-            id: string;
-            /** @example user@gmail.com */
-            email: string;
-            /** @example John Doe */
-            fullName: string;
-        };
-        DeployResponseV0: {
-            id: number;
-            /** @enum {string} */
-            type: DeployResponseV0Type;
-            /** @enum {string} */
-            status: DeployResponseV0Status;
-            /** @enum {string} */
-            failed: DeployResponseV0Failed;
-            logs: components["schemas"]["DeployLog"][];
-            squidName: string;
-            versionName: string;
-            orgCode: string;
-            deploymentUrl: string;
-            /** Format: date-time */
-            updatedAt: string;
-            /** Format: date-time */
-            createdAt: string;
-            user: components["schemas"]["DeployUserResponse"];
-        };
-        SquidOrganizationResponseV0: {
-            /** @example 550e8400-e29b-41d4-a716-446655440000 */
-            id: string;
-            /** @example Subsquid GmbH */
-            name: string;
-            /** @example subsquid-org */
-            code: string;
-        };
-        SquidApiResponseV0: {
-            /** @example https://squid.subsquid.io/mysquid/graphql */
-            url: string;
-            /** @enum {string} */
-            status: SquidApiResponseV0Status;
-        };
-        SquidSyncStatusResponse: {
-            /** @example 1 */
-            totalBlocks: number;
-            /** @example 1 */
-            currentBlock: number;
-        };
-        SquidProcessorResponseV0: {
-            /** @example processor */
-            name: string;
-            /** @enum {string} */
-            status: SquidProcessorResponseV0Status;
-            syncState: components["schemas"]["SquidSyncStatusResponse"];
-        };
-        SquidDBResponseV0: Record<string, unknown>;
-        SquidAddonsHasuraResponseV0: {
-            replicas: number;
-            profile: string;
-        };
-        SquidDiskResponseV0: {
-            /** @enum {string} */
-            usageStatus: SquidDiskResponseV0UsageStatus;
-            usedBytes: number;
-            totalBytes: number;
-        };
-        SquidAddonsPostgresResponseV0: {
-            connections: string[];
-            disk: components["schemas"]["SquidDiskResponseV0"];
-        };
-        SquidAddonsNeonResponseV0: {
-            connections: string[];
-        };
-        SquidAddonsResponseV0: {
-            hasura?: components["schemas"]["SquidAddonsHasuraResponseV0"];
-            postgres?: components["schemas"]["SquidAddonsPostgresResponseV0"];
-            neon?: components["schemas"]["SquidAddonsNeonResponseV0"];
-        };
-        SquidLastDeployV0: {
-            /** @example 123 */
-            id: number;
-            /**
-             * @example DEPLOY
-             * @enum {string}
-             */
-            type: SquidLastDeployV0Type;
-            /**
-             * @example UNPACKING
-             * @enum {string}
-             */
-            status: SquidLastDeployV0Status;
-            /**
-             * @example NO
-             * @enum {string}
-             */
-            failed: SquidLastDeployV0Failed;
-            /** @example true */
-            running: boolean;
-        };
-        SquidRunningDeployV0: {
-            /** @example 123 */
-            id: number;
-            /**
-             * @example DELETE
-             * @enum {string}
-             */
-            type: SquidRunningDeployV0Type;
-        };
-        VersionResponseV0: {
-            id: number;
-            name: string;
-            version: string;
-            description?: Record<string, unknown>;
-            tags: string[];
-            imageUrl?: string;
-            aliases: string[];
-            urls: string[];
-            /** @description The unmodified squid manifest */
-            manifestYaml?: Record<string, unknown>;
-            /** @description The package.json found in source code */
-            packageJson: Record<string, unknown>;
-            /** @example {
-             *       "default for v1": "query { ... }",
-             *       "another query label": "query { ... }"
-             *     } */
-            queries: Record<string, unknown>;
-            artifactUrl: string;
-            api: components["schemas"]["SquidApiResponseV0"];
-            processors: components["schemas"]["SquidProcessorResponseV0"][];
-            db?: components["schemas"]["SquidDBResponseV0"];
-            addons?: components["schemas"]["SquidAddonsResponseV0"];
-            spec: string;
-            /** Format: date-time */
-            createdAt: string;
-            lastDeploy?: components["schemas"]["SquidLastDeployV0"] | null;
-            /** @enum {string|null} */
-            status?: VersionResponseV0Status;
-            /**
-             * @deprecated
-             * @description Use `lastDeploy` fields instead.
-             */
-            runningDeploy?: components["schemas"]["SquidRunningDeployV0"] | null;
-            /**
-             * @deprecated
-             * @description Use `status` fields instead.
-             */
-            deploy: Record<string, unknown>;
-            deployCount: number;
-            deployedAt?: Record<string, unknown>;
-            hibernatedAt?: Record<string, unknown>;
-            /** @deprecated */
-            manifest?: Record<string, unknown>;
-            /** @deprecated */
-            deploymentUrl?: string;
-        };
-        SquidResponseV0: {
-            /** @example 1 */
-            id: number;
-            /** @example my-squid */
-            name: string;
-            organization: components["schemas"]["SquidOrganizationResponseV0"];
-            versions: components["schemas"]["VersionResponseV0"][];
         };
         IngressRequestsMetric: {
             /** Format: date-time */
@@ -2372,17 +650,17 @@ export interface components {
             timeGroup: SquidUsageMetricTimeGroup;
             metrics: components["schemas"]["SquidUsageMetricValue"][];
         };
-        SquidHistoryLogsResponse: {
-            logs: string[];
-            nextPage: Record<string, unknown>;
-        };
         UploadUrlResponse: {
             uploadUrl: string;
             uploadFields: Record<string, unknown>;
             fileUrl: string;
             maxUploadBytes: number;
         };
-        DeployOrganizationResponse: {
+        DeployLog: {
+            severity: string;
+            message: string;
+        };
+        DeploymentOrganizationResponse: {
             /** @example 550e8400-e29b-41d4-a716-446655440000 */
             id: string;
             /** @example Subsquid GmbH */
@@ -2390,48 +668,82 @@ export interface components {
             /** @example subsquid-org */
             code: string;
         };
-        DeploySquidResponse: {
+        DeployUserResponse: {
+            /** @example 90046784-ef9a-42b4-9dcf-ca4e4ed2cf4a */
+            id: string;
+            /** @example user@gmail.com */
+            email: string;
+            /** @example John Doe */
+            fullName: string;
+        };
+        DeploymentSquidResponse: {
             /** @example 1 */
             id: number;
             /** @example my-squid */
             name: string;
             /** @example abc12 */
-            slot: string;
+            hash: string;
+            /** @example my-squid:abc12 */
+            reference: string;
         };
-        DeployResponse: {
+        DeploymentOptionsResponse: {
+            /** @example dev */
+            tag: string;
+            /** @example false */
+            hardReset: boolean;
+        };
+        DeploymentResponse: {
             id: number;
             /** @enum {string} */
-            type: DeployResponseType;
+            type: DeploymentResponseType;
             /** @enum {string} */
-            status: DeployResponseStatus;
+            status: DeploymentResponseStatus;
             /** @enum {string} */
-            failed: DeployResponseFailed;
+            failed: DeploymentResponseFailed;
             logs: components["schemas"]["DeployLog"][];
-            organization: components["schemas"]["DeployOrganizationResponse"];
-            deploymentUrl: string;
+            organization: components["schemas"]["DeploymentOrganizationResponse"];
+            user: components["schemas"]["DeployUserResponse"] | null;
+            squid: components["schemas"]["DeploymentSquidResponse"] | null;
+            options: components["schemas"]["DeploymentOptionsResponse"];
+            /**
+             * @description Total elapsed time in milliseconds
+             * @example 50379
+             */
+            totalElapsedTimeMs: number;
             /** Format: date-time */
             updatedAt: string;
             /** Format: date-time */
             createdAt: string;
-            user: components["schemas"]["DeployUserResponse"] | null;
-            squid: components["schemas"]["DeploySquidResponse"] | null;
         };
         SquidTagResponse: {
+            /** @example prod */
             name: string;
         };
+        Manifest: Record<string, unknown>;
+        SquidManifestResponse: {
+            /** @description The actual squid manifest */
+            current: components["schemas"]["Manifest"];
+            /** @description The unmodified squid manifest */
+            raw: string;
+        };
         SquidUrlResponse: {
-            /** @example api */
-            component: string;
-            /** @example canonical */
+            /** @example tag */
             type: string;
-            /** @example https://squid.subsquid.io/mysquid/graphql */
+            /** @example prod */
+            name?: string;
+            /** @example https://squid.subsquid.io/mysquid/-/a1b2c3/ */
             url: string;
         };
         SquidApiResponse: {
-            /** @example https://squid.subsquid.io/mysquid/graphql */
-            url: string;
             /** @enum {string} */
             status: SquidApiResponseStatus;
+            urls: components["schemas"]["SquidUrlResponse"][];
+        };
+        SquidSyncStatusResponse: {
+            /** @example 1 */
+            totalBlocks: number;
+            /** @example 1 */
+            currentBlock: number;
         };
         SquidProcessorResponse: {
             /** @example processor */
@@ -2439,10 +751,14 @@ export interface components {
             /** @enum {string} */
             status: SquidProcessorResponseStatus;
             syncState: components["schemas"]["SquidSyncStatusResponse"];
+            metrics: string;
         };
         SquidAddonsHasuraResponse: {
             replicas: number;
             profile: string;
+            /** @enum {string} */
+            status: SquidAddonsHasuraResponseStatus;
+            urls: components["schemas"]["SquidUrlResponse"][];
         };
         PostgresConnectionParams: {
             /** @example pg.sqd.dev */
@@ -2506,106 +822,62 @@ export interface components {
             /** @example subsquid-org */
             code: string;
         };
+        SquidLinks: {
+            /** @description https://cloud.sqd.dev/squids/test/76zvzw */
+            cloudUrl: string;
+            /** @description eu.gcr.io/bright-meridian-316511/test-13484-76zvzw:8ba4f6c0ad1eb097de435d5458c5365d447fe481 */
+            dockerImageUrl: string;
+        };
         SquidResponse: {
+            /** @example 123 */
             id: number;
+            /** @example my-squid */
             name: string;
-            slot: string;
-            description?: Record<string, unknown>;
-            imageUrl?: string;
+            /** @example my-squid:4fush9 */
+            reference: string;
+            /** @example 4fush9 */
+            hash: string;
+            description?: string | null;
             tags: components["schemas"]["SquidTagResponse"][];
-            urls: components["schemas"]["SquidUrlResponse"][];
-            /** @description The unmodified squid manifest */
-            manifestYaml?: Record<string, unknown>;
+            manifest: components["schemas"]["SquidManifestResponse"];
             /** @description The package.json found in source code */
             packageJson: Record<string, unknown>;
-            artifactUrl: string;
             api?: components["schemas"]["SquidApiResponse"];
             processors?: components["schemas"]["SquidProcessorResponse"][];
             addons?: components["schemas"]["SquidAddonsResponse"];
-            spec: string;
-            /** Format: date-time */
-            createdAt: string;
+            spec: number;
             lastDeploy?: components["schemas"]["SquidLastDeploy"];
             /** @enum {string} */
             status?: SquidResponseStatus;
-            deployCount: number;
-            /** Format: date-time */
-            deployedAt?: string;
-            /** Format: date-time */
-            hibernatedAt?: string;
             organization: components["schemas"]["SquidOrganizationResponse"];
-        };
-        EmailResponse: {
-            /** @example user@gmail.com */
-            current: string;
-            /** @example user_new@gmail.com */
-            pendingVerification: string;
-        };
-        UserResponse: {
-            /** @example 90046784-ef9a-42b4-9dcf-ca4e4ed2cf4a */
-            id: string;
-            /** @example user@gmail.com */
-            email: string;
-            /** @example user@gmail.com */
-            coinlistEmail: components["schemas"]["EmailResponse"];
-            /** @example John Doe */
-            fullName: string;
-            /** @example user */
-            username: string;
-            /** @example https://gravatar.com/1.jpg */
-            avatarUrl: string;
-            /** @example {
-             *       "occupation": "Backend developer",
-             *       "source": "Twitter",
-             *       "customSource": "",
-             *       "usage": "DeFi",
-             *       "customUsage": ""
-             *     } */
-            onboardingForm: Record<string, unknown>;
-            /** @example true */
-            policyAccepted: boolean;
-            /** @example false */
-            onboardingFormCompleted: boolean;
-            /** @example false */
-            emailVerified: boolean;
-            organizations?: string[];
-            /** @example false */
-            wallet: Record<string, unknown>;
-            /** @example false */
-            social: Record<string, unknown>;
-        };
-        KeyResponse: {
-            key: string;
-        };
-        UserInviteProjectResponse: {
-            /** @example new-project */
-            code: string;
-            /** @example New project */
-            name: string;
-        };
-        UserInviteResponse: {
-            /** @example 90046784-ef9a-42b4-9dcf-ca4e4ed2cf4a */
-            id: string;
-            /** @example admin@subsquid.io */
-            invitedBy: string;
-            organization: components["schemas"]["UserInviteProjectResponse"];
-        };
-        UserTokenResponse: {
-            /** @example my-token */
-            name: string;
-        };
-        ApiTokenResponse: {
-            /** @example 50e8400-e29b-41d4-a716-446655440000 */
-            id: string;
-            /** @example my-token */
-            name: string;
             /**
              * Format: date-time
-             * @example 2024-01-01T11:00:00.000Z
+             * @example 2025-01-01T00:00:00.000Z
+             */
+            hibernatedAt?: string;
+            /**
+             * Format: date-time
+             * @example 2025-01-01T00:00:00.000Z
+             */
+            deployedAt?: string;
+            links: components["schemas"]["SquidLinks"];
+            /**
+             * Format: date-time
+             * @example 2025-01-01T00:00:00.000Z
              */
             createdAt: string;
-            /** @example 2039-12-31T11:00:00.000Z */
-            expiresAt: Record<string, unknown>;
+        };
+        SquidLogResponse: {
+            id: string | null;
+            /** Format: date-time */
+            timestamp: string | null;
+            container: string;
+            level: string;
+            payload: Record<string, unknown>;
+        };
+        SquidHistoryLogsResponse: {
+            logs: components["schemas"]["SquidLogResponse"][];
+            nextPage: string | null;
         };
         NotificationEmailResponse: {
             /** @example current@example.com */
@@ -2633,6 +905,12 @@ export interface components {
             /** @example 10004 */
             zipCode: string;
         };
+        OrganizationIntegrationsNeon: {
+            apiTokenMasked: string;
+        };
+        OrganizationIntegrations: {
+            neon: components["schemas"]["OrganizationIntegrationsNeon"];
+        };
         OrganizationResponse: {
             /** @example org_DI4wZx0FAJa93tq3iNr1wc7H */
             id: string;
@@ -2650,6 +928,34 @@ export interface components {
             status: OrganizationResponseStatus;
             limits: components["schemas"]["OrganizationLimitsResponse"];
             billingDetails: components["schemas"]["OrganizationBillingsDetails"];
+            integrations: components["schemas"]["OrganizationIntegrations"];
+        };
+        UserResponse: {
+            /** @example 90046784-ef9a-42b4-9dcf-ca4e4ed2cf4a */
+            id: string;
+            /** @example user@gmail.com */
+            email: string;
+            /** @example John Doe */
+            fullName: string;
+            /** @example user */
+            username: string;
+            /** @example https://gravatar.com/1.jpg */
+            avatarUrl: string;
+            /** @example {
+             *       "occupation": "Backend developer",
+             *       "source": "Twitter",
+             *       "customSource": "",
+             *       "usage": "DeFi",
+             *       "customUsage": ""
+             *     } */
+            onboardingForm: Record<string, unknown>;
+            /** @example true */
+            policyAccepted: boolean;
+            /** @example false */
+            onboardingFormCompleted: boolean;
+            /** @example false */
+            emailVerified: boolean;
+            organizations?: components["schemas"]["OrganizationResponse"][];
         };
         OrganizationRoleResponse: {
             /** @example 88a02891-c461-4c1b-b705-13c8e6fdf7c0 */
@@ -2718,912 +1024,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    signin: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    email: string;
-                    password: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["AuthResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    signin: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    email: string;
-                    password: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["AuthResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    signup: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    fullName: string;
-                    email: string;
-                    password: string;
-                    subscribeToNewsletter?: boolean;
-                    turnstileToken: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["AuthResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    signup: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    fullName: string;
-                    email: string;
-                    password: string;
-                    subscribeToNewsletter?: boolean;
-                    turnstileToken: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["AuthResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    restore: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    email: string;
-                };
-            };
-        };
-        responses: {
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    restore: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    email: string;
-                };
-            };
-        };
-        responses: {
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "restore-confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    token: string;
-                    password: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["ResetPasswordResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "restore-confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    token: string;
-                    password: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["ResetPasswordResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "confirm-email": {
-        parameters: {
-            query: {
-                code: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "confirm-email": {
-        parameters: {
-            query: {
-                code: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    github: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    github: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "github-auth": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    code: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["AuthResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "github-auth": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    code: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["AuthResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    google: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    google: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "google-auth": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    code: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["AuthResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "google-auth": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    code: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["AuthResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "deploy-squid": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    hardReset?: boolean;
-                    artifactUrl: string;
-                    /** @default squid.yaml */
-                    manifestPath?: string;
-                    updateSlot?: string;
-                    tag?: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["DeployResponseV0"][];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "list-squids": {
-        parameters: {
-            query?: {
-                search?: string;
-                organization?: string;
-            };
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["SquidResponseV0"][];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-squid": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                squid: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["SquidResponseV0"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "delete-squid": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                squid: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["SquidResponseV0"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "destroy-squid-version": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                squid: string;
-                version: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["SquidResponseV0"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "restart-squid-version": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                squid: string;
-                version: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["DeployResponseV0"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "hibernate-squid": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                squid: string;
-                version: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["DeployResponseV0"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "daily-requests": {
+    SquidMetricsController_dailyRequests: {
         parameters: {
             query: {
                 organization?: string;
@@ -3638,6 +1039,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -3650,21 +1052,23 @@ export interface operations {
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3675,7 +1079,7 @@ export interface operations {
             };
         };
     };
-    "daily-requests": {
+    SquidMetricsController_ingressStats: {
         parameters: {
             query: {
                 organization?: string;
@@ -3685,64 +1089,13 @@ export interface operations {
             header?: never;
             path: {
                 code: string;
+                squid_id: number;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["IngressRequestsMetric"][];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "ingress-stats": {
-        parameters: {
-            query: {
-                organization?: string;
-                from: string;
-                to: string;
-            };
-            header?: never;
-            path: {
-                code: string;
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -3755,21 +1108,23 @@ export interface operations {
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3780,7 +1135,7 @@ export interface operations {
             };
         };
     };
-    "ingress-stats": {
+    SquidMetricsController_usage: {
         parameters: {
             query: {
                 organization?: string;
@@ -3796,59 +1151,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["IngressSquidRequestsMetric"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    usage: {
-        parameters: {
-            query: {
-                organization?: string;
-                from: string;
-                to: string;
-            };
-            header?: never;
-            path: {
-                code: string;
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -3861,21 +1164,23 @@ export interface operations {
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -3886,217 +1191,7 @@ export interface operations {
             };
         };
     };
-    usage: {
-        parameters: {
-            query: {
-                organization?: string;
-                from: string;
-                to: string;
-            };
-            header?: never;
-            path: {
-                code: string;
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["SquidUsageMetric"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "fetch-logs-history": {
-        parameters: {
-            query: {
-                level?: PathsOrgsCodeSquidsSquidNameVersionsVersionNameLogsHistoryGetParametersQueryLevel[];
-                container?: string[];
-                search?: string;
-                nextPage?: string;
-                from: string;
-                limit?: number;
-            };
-            header?: never;
-            path: {
-                code: string;
-                squidName: string;
-                versionName: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SquidHistoryLogsResponse"];
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "tail-logs": {
-        parameters: {
-            query?: {
-                level?: PathsOrgsCodeSquidsSquidNameVersionsVersionNameLogsFollowGetParametersQueryLevel[];
-                container?: string[];
-                search?: string;
-            };
-            header?: never;
-            path: {
-                code: string;
-                squidName: string;
-                versionName: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    squid: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                squid: string;
-                version: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    allowedOrigins?: string[];
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["SquidResponseV0"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "upload-url": {
+    DeploymentController_uploadUrl: {
         parameters: {
             query?: never;
             header?: never;
@@ -4105,6 +1200,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -4117,6 +1213,7 @@ export interface operations {
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4127,42 +1224,11 @@ export interface operations {
             };
         };
     };
-    "upload-url": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UploadUrlResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-all": {
+    DeploymentController_getAll: {
         parameters: {
             query?: {
                 squidId?: number;
-                statusGroup?: PathsOrgsCodeDeploysGetParametersQueryStatusGroup;
+                statusGroup?: PathsV1OrgsCodeDeploymentsGetParametersQueryStatusGroup;
             };
             header?: never;
             path: {
@@ -4172,6 +1238,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -4180,25 +1247,27 @@ export interface operations {
                     "application/json": {
                         /** @example null */
                         error?: string;
-                        payload?: components["schemas"]["DeployResponseV0"][];
+                        payload?: components["schemas"]["DeploymentResponse"][];
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4209,7 +1278,7 @@ export interface operations {
             };
         };
     };
-    "get-one": {
+    DeploymentController_getOne: {
         parameters: {
             query?: never;
             header?: never;
@@ -4221,6 +1290,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -4229,10 +1299,11 @@ export interface operations {
                     "application/json": {
                         /** @example null */
                         error?: string;
-                        payload?: components["schemas"]["DeployResponseV0"];
+                        payload?: components["schemas"]["DeploymentResponse"];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4243,92 +1314,7 @@ export interface operations {
             };
         };
     };
-    "get-all": {
-        parameters: {
-            query?: {
-                squidId?: number;
-                statusGroup?: PathsV1OrgsCodeDeploysGetParametersQueryStatusGroup;
-            };
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["DeployResponse"][];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-one": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["DeployResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "deploy-squid": {
+    SquidController_deploySquid: {
         parameters: {
             query?: never;
             header?: never;
@@ -4340,16 +1326,21 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    hardReset?: boolean;
                     artifactUrl: string;
                     /** @default squid.yaml */
                     manifestPath?: string;
-                    updateSlot?: string;
-                    tag?: string;
+                    /** @default {} */
+                    options?: {
+                        updateByHash?: string;
+                        hardReset?: boolean;
+                        overrideName: string;
+                        tag?: string;
+                    };
                 };
             };
         };
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -4358,25 +1349,27 @@ export interface operations {
                     "application/json": {
                         /** @example null */
                         error?: string;
-                        payload?: components["schemas"]["DeployResponse"][];
+                        payload?: components["schemas"]["DeploymentResponse"];
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4387,11 +1380,11 @@ export interface operations {
             };
         };
     };
-    "list-squids": {
+    SquidController_listSquids: {
         parameters: {
             query?: {
                 search?: string;
-                organization?: string;
+                name?: string;
             };
             header?: never;
             path: {
@@ -4401,6 +1394,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -4413,21 +1407,23 @@ export interface operations {
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4438,70 +1434,19 @@ export interface operations {
             };
         };
     };
-    "list-squids": {
-        parameters: {
-            query?: {
-                search?: string;
-                organization?: string;
-            };
-            header?: never;
-            path: {
-                org: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["SquidResponse"][];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-squid": {
+    SquidController_getSquid: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 org: string;
-                squid: string;
-                slot: string;
+                reference: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -4514,6 +1459,7 @@ export interface operations {
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4524,19 +1470,19 @@ export interface operations {
             };
         };
     };
-    "delete-squid": {
+    SquidController_deleteSquid: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 org: string;
-                squid: string;
-                slot: string;
+                reference: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -4545,10 +1491,11 @@ export interface operations {
                     "application/json": {
                         /** @example null */
                         error?: string;
-                        payload?: components["schemas"]["DeployResponse"];
+                        payload?: components["schemas"]["DeploymentResponse"];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4559,19 +1506,19 @@ export interface operations {
             };
         };
     };
-    "restart-squid": {
+    SquidController_restartSquid: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 org: string;
-                squid: string;
-                slot: string;
+                reference: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -4580,10 +1527,11 @@ export interface operations {
                     "application/json": {
                         /** @example null */
                         error?: string;
-                        payload?: components["schemas"]["DeployResponse"];
+                        payload?: components["schemas"]["DeploymentResponse"];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4594,19 +1542,19 @@ export interface operations {
             };
         };
     };
-    "hibernate-squid": {
+    SquidController_hibernateSquid: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 org: string;
-                squid: string;
-                slot: string;
+                reference: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -4615,10 +1563,11 @@ export interface operations {
                     "application/json": {
                         /** @example null */
                         error?: string;
-                        payload?: components["schemas"]["DeployResponse"];
+                        payload?: components["schemas"]["DeploymentResponse"];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4629,14 +1578,13 @@ export interface operations {
             };
         };
     };
-    "tag-squid": {
+    SquidController_setTag: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 org: string;
-                squid: string;
-                slot: string;
+                reference: string;
             };
             cookie?: never;
         };
@@ -4648,6 +1596,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -4656,25 +1605,27 @@ export interface operations {
                     "application/json": {
                         /** @example null */
                         error?: string;
-                        payload?: components["schemas"]["DeployResponse"];
+                        payload?: components["schemas"]["DeploymentResponse"];
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4685,10 +1636,10 @@ export interface operations {
             };
         };
     };
-    "fetch-logs-history": {
+    SquidLogsController_fetchLogsHistory: {
         parameters: {
             query: {
-                level?: PathsOrgsCodeSquidsSquidSlotsSlotLogsHistoryGetParametersQueryLevel[];
+                level?: PathsV1OrgsCodeSquidsReferenceLogsHistoryGetParametersQueryLevel[];
                 container?: string[];
                 search?: string;
                 nextPage?: string;
@@ -4698,13 +1649,13 @@ export interface operations {
             header?: never;
             path: {
                 code: string;
-                squid: string;
-                slot: string;
+                reference: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -4717,21 +1668,23 @@ export interface operations {
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4742,101 +1695,46 @@ export interface operations {
             };
         };
     };
-    "fetch-logs-history": {
-        parameters: {
-            query: {
-                level?: PathsV1OrgsCodeSquidsSquidSlotsSlotLogsHistoryGetParametersQueryLevel[];
-                container?: string[];
-                search?: string;
-                nextPage?: string;
-                from: string;
-                limit?: number;
-            };
-            header?: never;
-            path: {
-                code: string;
-                squid: string;
-                slot: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["SquidHistoryLogsResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "tail-logs": {
+    SquidLogsController_tailLogs: {
         parameters: {
             query?: {
-                level?: PathsOrgsCodeSquidsSquidSlotsSlotLogsFollowGetParametersQueryLevel[];
+                level?: PathsV1OrgsCodeSquidsReferenceLogsFollowGetParametersQueryLevel[];
                 container?: string[];
                 search?: string;
             };
             header?: never;
             path: {
                 code: string;
-                squid: string;
-                slot: string;
+                reference: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4847,55 +1745,7 @@ export interface operations {
             };
         };
     };
-    "tail-logs": {
-        parameters: {
-            query?: {
-                level?: PathsV1OrgsCodeSquidsSquidSlotsSlotLogsFollowGetParametersQueryLevel[];
-                container?: string[];
-                search?: string;
-            };
-            header?: never;
-            path: {
-                code: string;
-                squid: string;
-                slot: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-profile": {
+    UserController_getProfile: {
         parameters: {
             query?: never;
             header?: never;
@@ -4904,6 +1754,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -4916,6 +1767,7 @@ export interface operations {
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4926,7 +1778,7 @@ export interface operations {
             };
         };
     };
-    "update-profile": {
+    UserController_updateProfile: {
         parameters: {
             query?: never;
             header?: never;
@@ -4941,6 +1793,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -4953,21 +1806,23 @@ export interface operations {
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -4978,7 +1833,7 @@ export interface operations {
             };
         };
     };
-    "get-profile": {
+    UserController_getSquidsV1: {
         parameters: {
             query?: never;
             header?: never;
@@ -4987,634 +1842,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "update-profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    fullName: string;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "on-boarding-form": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    policyAccepted?: boolean;
-                    subscribeNewsletter?: boolean;
-                    onboardingForm?: {
-                        occupation: string;
-                        source: string;
-                        usage: string;
-                    };
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "on-boarding-form": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    policyAccepted?: boolean;
-                    subscribeNewsletter?: boolean;
-                    onboardingForm?: {
-                        occupation: string;
-                        source: string;
-                        usage: string;
-                    };
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "change-password": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    oldPassword: string;
-                    newPassword: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "change-password": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    oldPassword: string;
-                    newPassword: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "resend-coinlist-email-confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** Format: email */
-                    coinlistEmail: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "resend-coinlist-email-confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** Format: email */
-                    coinlistEmail: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "resend-email-confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "resend-email-confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    key: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["KeyResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    key: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["KeyResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-invites": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserInviteResponse"][];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-invites": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserInviteResponse"][];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-squids-v-0": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["SquidResponseV0"][];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-squids-v-1": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -5627,6 +1855,7 @@ export interface operations {
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5637,7 +1866,7 @@ export interface operations {
             };
         };
     };
-    "get-tokens": {
+    OrganizationController_listOrganizations: {
         parameters: {
             query?: never;
             header?: never;
@@ -5646,304 +1875,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserTokenResponse"][];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-tokens": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["UserTokenResponse"][];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-tokens": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["ApiTokenResponse"][];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "create-token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    name: string;
-                    /** Format: date-time */
-                    expiresAt?: string | null;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["ApiTokenResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-tokens": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["ApiTokenResponse"][];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "create-token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    name: string;
-                    /** Format: date-time */
-                    expiresAt?: string | null;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["ApiTokenResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "deactivate-token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["ApiTokenResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "deactivate-token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["ApiTokenResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "list-organizations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -5956,6 +1888,7 @@ export interface operations {
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -5966,7 +1899,7 @@ export interface operations {
             };
         };
     };
-    create: {
+    OrganizationController_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -5984,6 +1917,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -5996,21 +1930,23 @@ export interface operations {
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6021,265 +1957,7 @@ export interface operations {
             };
         };
     };
-    "list-organizations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"][];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    code: string;
-                    name: string;
-                    /** Format: email */
-                    email: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "list-organizations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"][];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    code: string;
-                    name: string;
-                    /** Format: email */
-                    email: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "list-organizations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"][];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    code: string;
-                    name: string;
-                    /** Format: email */
-                    email: string;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-organization": {
+    OrganizationController_getOrganization: {
         parameters: {
             query?: never;
             header?: never;
@@ -6290,6 +1968,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -6302,6 +1981,7 @@ export interface operations {
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6312,106 +1992,7 @@ export interface operations {
             };
         };
     };
-    "get-organization": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                org: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-organization": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                org: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-organization": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                org: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    edit: {
+    OrganizationController_edit: {
         parameters: {
             query?: never;
             header?: never;
@@ -6430,6 +2011,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -6442,21 +2024,23 @@ export interface operations {
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6467,7 +2051,7 @@ export interface operations {
             };
         };
     };
-    "delete-one": {
+    OrganizationController_deleteOne: {
         parameters: {
             query?: never;
             header?: never;
@@ -6478,6 +2062,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -6492,250 +2077,7 @@ export interface operations {
             };
         };
     };
-    edit: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    name: string;
-                    /** Format: email */
-                    email: string;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "delete-one": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-        };
-    };
-    edit: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    name: string;
-                    /** Format: email */
-                    email: string;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "delete-one": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-        };
-    };
-    edit: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    name: string;
-                    /** Format: email */
-                    email: string;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "delete-one": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-        };
-    };
-    "send-email-verification": {
+    OrganizationController_sendEmailVerification: {
         parameters: {
             query?: never;
             header?: never;
@@ -6752,21 +2094,23 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -6777,133 +2121,7 @@ export interface operations {
             };
         };
     };
-    "send-email-verification": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    email: string;
-                };
-            };
-        };
-        responses: {
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "send-email-verification": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    email: string;
-                };
-            };
-        };
-        responses: {
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "send-email-verification": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    email: string;
-                };
-            };
-        };
-        responses: {
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "verify-email": {
+    OrganizationController_verifyEmail: {
         parameters: {
             query: {
                 code: string;
@@ -6914,6 +2132,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -6922,64 +2141,7 @@ export interface operations {
             };
         };
     };
-    "verify-email": {
-        parameters: {
-            query: {
-                code: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "verify-email": {
-        parameters: {
-            query: {
-                code: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "verify-email": {
-        parameters: {
-            query: {
-                code: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    "get-one": {
+    OrganizationController_getOne: {
         parameters: {
             query?: never;
             header?: never;
@@ -6990,6 +2152,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -7004,226 +2167,7 @@ export interface operations {
             };
         };
     };
-    "add-user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    email: string;
-                    /** @enum {string} */
-                    roleType: PathsOrganizationsCodeRolesPostRequestBodyApplicationJsonRoleType;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationRoleResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "get-one": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationRoleResponse"][];
-                    };
-                };
-            };
-        };
-    };
-    "add-user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    email: string;
-                    /** @enum {string} */
-                    roleType: PathsOrgsCodeRolesPostRequestBodyApplicationJsonRoleType;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationRoleResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "get-one": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationRoleResponse"][];
-                    };
-                };
-            };
-        };
-    };
-    "add-user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    email: string;
-                    /** @enum {string} */
-                    roleType: PathsV1OrganizationsCodeRolesPostRequestBodyApplicationJsonRoleType;
-                };
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationRoleResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "get-one": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationRoleResponse"][];
-                    };
-                };
-            };
-        };
-    };
-    "add-user": {
+    OrganizationController_addUser: {
         parameters: {
             query?: never;
             header?: never;
@@ -7242,6 +2186,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -7254,246 +2199,25 @@ export interface operations {
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
         };
     };
-    "edit-user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @enum {string} */
-                    roleType: PathsOrganizationsCodeRolesIdPutRequestBodyApplicationJsonRoleType;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationRoleResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "delete-user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationRoleResponse"];
-                    };
-                };
-            };
-        };
-    };
-    "edit-user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @enum {string} */
-                    roleType: PathsOrgsCodeRolesIdPutRequestBodyApplicationJsonRoleType;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationRoleResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "delete-user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationRoleResponse"];
-                    };
-                };
-            };
-        };
-    };
-    "edit-user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @enum {string} */
-                    roleType: PathsV1OrganizationsCodeRolesIdPutRequestBodyApplicationJsonRoleType;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationRoleResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
-    "delete-user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationRoleResponse"];
-                    };
-                };
-            };
-        };
-    };
-    "edit-user": {
+    OrganizationController_editUser: {
         parameters: {
             query?: never;
             header?: never;
@@ -7512,6 +2236,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -7524,24 +2249,25 @@ export interface operations {
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
         };
     };
-    "delete-user": {
+    OrganizationController_deleteUser: {
         parameters: {
             query?: never;
             header?: never;
@@ -7553,6 +2279,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -7567,7 +2294,7 @@ export interface operations {
             };
         };
     };
-    "accept-user-role": {
+    OrganizationController_acceptUserRole: {
         parameters: {
             query?: never;
             header?: never;
@@ -7579,6 +2306,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -7593,7 +2321,7 @@ export interface operations {
             };
         };
     };
-    "accept-user-role": {
+    OrganizationController_declineUserRole: {
         parameters: {
             query?: never;
             header?: never;
@@ -7605,6 +2333,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -7619,18 +2348,66 @@ export interface operations {
             };
         };
     };
-    "accept-user-role": {
+    OrganizationController_setNeonApiToken: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 code: string;
-                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example null */
+                        error?: string;
+                        payload?: components["schemas"]["OrganizationResponse"];
+                    };
+                };
+            };
+            /** @description Bad user input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    OrganizationController_deleteNeonApiToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -7645,137 +2422,7 @@ export interface operations {
             };
         };
     };
-    "accept-user-role": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-        };
-    };
-    "decline-user-role": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-        };
-    };
-    "decline-user-role": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-        };
-    };
-    "decline-user-role": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-        };
-    };
-    "decline-user-role": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"];
-                    };
-                };
-            };
-        };
-    };
-    "get-settings": {
+    OrganizationBillingController_getSettings: {
         parameters: {
             query?: never;
             header?: never;
@@ -7786,12 +2433,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7802,7 +2451,7 @@ export interface operations {
             };
         };
     };
-    "setup-intent": {
+    OrganizationBillingController_setupIntent: {
         parameters: {
             query?: never;
             header?: never;
@@ -7826,27 +2475,30 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7857,89 +2509,7 @@ export interface operations {
             };
         };
     };
-    "get-settings": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "setup-intent": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    name: string;
-                    /** Format: email */
-                    email: string;
-                    country: string;
-                    addressLine1: string;
-                    city: string;
-                    postalCode: string;
-                    vatId?: string;
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-monthly": {
+    OrganizationBillingController_getMonthly: {
         parameters: {
             query: {
                 bySquid: string;
@@ -7954,6 +2524,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -7966,6 +2537,7 @@ export interface operations {
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -7976,44 +2548,7 @@ export interface operations {
             };
         };
     };
-    "get-monthly": {
-        parameters: {
-            query: {
-                bySquid: string;
-            };
-            header?: never;
-            path: {
-                code: string;
-                year: string;
-                month: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["OrganizationResponse"][];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "list-secrets": {
+    SecretController_listSecrets: {
         parameters: {
             query?: never;
             header?: never;
@@ -8024,6 +2559,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -8036,6 +2572,7 @@ export interface operations {
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8046,7 +2583,7 @@ export interface operations {
             };
         };
     };
-    put: {
+    SecretController_put: {
         parameters: {
             query?: never;
             header?: never;
@@ -8058,100 +2595,6 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    organization?: string;
-                    secrets: {
-                        name: string;
-                        /** @enum {string} */
-                        action: PathsOrgsCodeSecretsPutRequestBodyApplicationJsonSecretsAction;
-                        value?: string & unknown;
-                    }[];
-                };
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["SecretsResponse"];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "list-secrets": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["SecretsResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    put: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    organization?: string;
                     secrets: {
                         name: string;
                         /** @enum {string} */
@@ -8162,6 +2605,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -8174,21 +2618,23 @@ export interface operations {
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8199,7 +2645,7 @@ export interface operations {
             };
         };
     };
-    "list-chains": {
+    RpcController_listChains: {
         parameters: {
             query?: never;
             header?: never;
@@ -8210,6 +2656,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -8222,6 +2669,7 @@ export interface operations {
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8232,7 +2680,7 @@ export interface operations {
             };
         };
     };
-    "list-chains": {
+    RpcController_getToken: {
         parameters: {
             query?: never;
             header?: never;
@@ -8243,39 +2691,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["ChainResponse"][];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "get-token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -8288,6 +2704,7 @@ export interface operations {
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8298,7 +2715,7 @@ export interface operations {
             };
         };
     };
-    "refresh-token": {
+    RpcController_refreshToken: {
         parameters: {
             query?: never;
             header?: never;
@@ -8309,6 +2726,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -8321,6 +2739,7 @@ export interface operations {
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8331,7 +2750,7 @@ export interface operations {
             };
         };
     };
-    "get-token": {
+    QuotaController_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -8342,72 +2761,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["TokenResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "refresh-token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["TokenResponse"];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -8420,6 +2774,7 @@ export interface operations {
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8430,44 +2785,12 @@ export interface operations {
             };
         };
     };
-    get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["QuotaResponse"][];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    squids: {
+    MonitoringController_squids: {
         parameters: {
             query: {
                 from: string;
                 to: string;
+                maxPoints?: number;
             };
             header?: never;
             path: {
@@ -8478,6 +2801,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -8490,21 +2814,23 @@ export interface operations {
                     };
                 };
             };
+            /** @description Bad user input */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
                         }[];
                     };
                 };
             };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8515,59 +2841,7 @@ export interface operations {
             };
         };
     };
-    squids: {
-        parameters: {
-            query: {
-                from: string;
-                to: string;
-            };
-            header?: never;
-            path: {
-                code: string;
-                query: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @example null */
-                        error?: string;
-                        payload?: components["schemas"]["MetricResponse"][];
-                    };
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        error?: string;
-                        invalidFields?: {
-                            message?: string;
-                            path?: string[];
-                            type?: string;
-                        }[];
-                    };
-                };
-            };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "squids-all-prom": {
+    MonitoringController_squidsAllProm: {
         parameters: {
             query?: never;
             header?: never;
@@ -8578,39 +2852,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Successful response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnauthorizedResponse"];
-                };
-            };
-        };
-    };
-    "squids-all-prom": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
+            /** @description Unauthorized */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -8622,29 +2871,10 @@ export interface operations {
         };
     };
 }
-export enum PathsOrgsCodeSquidsSquidNameVersionsVersionNameLogsHistoryGetParametersQueryLevel {
-    ERROR = "ERROR",
-    DEBUG = "DEBUG",
-    INFO = "INFO",
-    NOTICE = "NOTICE",
-    WARNING = "WARNING",
-    CRITICAL = "CRITICAL"
-}
-export enum PathsOrgsCodeSquidsSquidNameVersionsVersionNameLogsFollowGetParametersQueryLevel {
-    ERROR = "ERROR",
-    DEBUG = "DEBUG",
-    INFO = "INFO",
-    NOTICE = "NOTICE",
-    WARNING = "WARNING",
-    CRITICAL = "CRITICAL"
-}
-export enum PathsOrgsCodeDeploysGetParametersQueryStatusGroup {
+export enum PathsV1OrgsCodeDeploymentsGetParametersQueryStatusGroup {
     IN_PROGRESS = "IN_PROGRESS"
 }
-export enum PathsV1OrgsCodeDeploysGetParametersQueryStatusGroup {
-    IN_PROGRESS = "IN_PROGRESS"
-}
-export enum PathsOrgsCodeSquidsSquidSlotsSlotLogsHistoryGetParametersQueryLevel {
+export enum PathsV1OrgsCodeSquidsReferenceLogsHistoryGetParametersQueryLevel {
     ERROR = "ERROR",
     DEBUG = "DEBUG",
     INFO = "INFO",
@@ -8652,55 +2882,15 @@ export enum PathsOrgsCodeSquidsSquidSlotsSlotLogsHistoryGetParametersQueryLevel 
     WARNING = "WARNING",
     CRITICAL = "CRITICAL"
 }
-export enum PathsV1OrgsCodeSquidsSquidSlotsSlotLogsHistoryGetParametersQueryLevel {
+export enum PathsV1OrgsCodeSquidsReferenceLogsFollowGetParametersQueryLevel {
     ERROR = "ERROR",
     DEBUG = "DEBUG",
     INFO = "INFO",
     NOTICE = "NOTICE",
     WARNING = "WARNING",
     CRITICAL = "CRITICAL"
-}
-export enum PathsOrgsCodeSquidsSquidSlotsSlotLogsFollowGetParametersQueryLevel {
-    ERROR = "ERROR",
-    DEBUG = "DEBUG",
-    INFO = "INFO",
-    NOTICE = "NOTICE",
-    WARNING = "WARNING",
-    CRITICAL = "CRITICAL"
-}
-export enum PathsV1OrgsCodeSquidsSquidSlotsSlotLogsFollowGetParametersQueryLevel {
-    ERROR = "ERROR",
-    DEBUG = "DEBUG",
-    INFO = "INFO",
-    NOTICE = "NOTICE",
-    WARNING = "WARNING",
-    CRITICAL = "CRITICAL"
-}
-export enum PathsOrganizationsCodeRolesPostRequestBodyApplicationJsonRoleType {
-    admin = "admin",
-    developer = "developer"
-}
-export enum PathsOrgsCodeRolesPostRequestBodyApplicationJsonRoleType {
-    admin = "admin",
-    developer = "developer"
-}
-export enum PathsV1OrganizationsCodeRolesPostRequestBodyApplicationJsonRoleType {
-    admin = "admin",
-    developer = "developer"
 }
 export enum PathsV1OrgsCodeRolesPostRequestBodyApplicationJsonRoleType {
-    admin = "admin",
-    developer = "developer"
-}
-export enum PathsOrganizationsCodeRolesIdPutRequestBodyApplicationJsonRoleType {
-    admin = "admin",
-    developer = "developer"
-}
-export enum PathsOrgsCodeRolesIdPutRequestBodyApplicationJsonRoleType {
-    admin = "admin",
-    developer = "developer"
-}
-export enum PathsV1OrganizationsCodeRolesIdPutRequestBodyApplicationJsonRoleType {
     admin = "admin",
     developer = "developer"
 }
@@ -8708,106 +2898,9 @@ export enum PathsV1OrgsCodeRolesIdPutRequestBodyApplicationJsonRoleType {
     admin = "admin",
     developer = "developer"
 }
-export enum PathsOrgsCodeSecretsPutRequestBodyApplicationJsonSecretsAction {
-    UPDATE = "UPDATE",
-    DELETE = "DELETE"
-}
 export enum PathsV1OrgsCodeSecretsPutRequestBodyApplicationJsonSecretsAction {
     UPDATE = "UPDATE",
     DELETE = "DELETE"
-}
-export enum DeployResponseV0Type {
-    DEPLOY = "DEPLOY",
-    DEPLOY_HARD_RESET = "DEPLOY_HARD_RESET",
-    RESTART = "RESTART",
-    HIBERNATE = "HIBERNATE",
-    DELETE = "DELETE",
-    SCALE = "SCALE",
-    TAG = "TAG"
-}
-export enum DeployResponseV0Status {
-    UNPACKING = "UNPACKING",
-    IMAGE_BUILDING = "IMAGE_BUILDING",
-    RESETTING = "RESETTING",
-    TAGGING = "TAGGING",
-    SQUID_SYNCING = "SQUID_SYNCING",
-    SQUID_DELETING = "SQUID_DELETING",
-    ADDONS_SYNCING = "ADDONS_SYNCING",
-    ADDONS_DELETING = "ADDONS_DELETING",
-    OK = "OK",
-    DEPLOYING = "DEPLOYING"
-}
-export enum DeployResponseV0Failed {
-    NO = "NO",
-    UNEXPECTED = "UNEXPECTED",
-    PERMISSIONS = "PERMISSIONS",
-    REQUIREMENTS = "REQUIREMENTS",
-    REQUIRED_SOURCE_FILE_MISSED = "REQUIRED_SOURCE_FILE_MISSED",
-    REQUIRED_SOURCE_FILE_INVALID = "REQUIRED_SOURCE_FILE_INVALID",
-    SOURCE_FILES_BUILD_FAILED = "SOURCE_FILES_BUILD_FAILED"
-}
-export enum SquidApiResponseV0Status {
-    AVAILABLE = "AVAILABLE",
-    NOT_AVAILABLE = "NOT_AVAILABLE"
-}
-export enum SquidProcessorResponseV0Status {
-    SYNCING = "SYNCING",
-    UNKNOWN = "UNKNOWN",
-    STARTING = "STARTING",
-    SYNCED = "SYNCED",
-    STUCK = "STUCK"
-}
-export enum SquidDiskResponseV0UsageStatus {
-    LOW = "LOW",
-    NORMAL = "NORMAL",
-    WARNING = "WARNING",
-    CRITICAL = "CRITICAL",
-    UNKNOWN = "UNKNOWN"
-}
-export enum SquidLastDeployV0Type {
-    DEPLOY = "DEPLOY",
-    DEPLOY_HARD_RESET = "DEPLOY_HARD_RESET",
-    RESTART = "RESTART",
-    HIBERNATE = "HIBERNATE",
-    DELETE = "DELETE",
-    SCALE = "SCALE",
-    TAG = "TAG"
-}
-export enum SquidLastDeployV0Status {
-    UNPACKING = "UNPACKING",
-    IMAGE_BUILDING = "IMAGE_BUILDING",
-    RESETTING = "RESETTING",
-    TAGGING = "TAGGING",
-    SQUID_SYNCING = "SQUID_SYNCING",
-    SQUID_DELETING = "SQUID_DELETING",
-    ADDONS_SYNCING = "ADDONS_SYNCING",
-    ADDONS_DELETING = "ADDONS_DELETING",
-    OK = "OK",
-    DEPLOYING = "DEPLOYING"
-}
-export enum SquidLastDeployV0Failed {
-    NO = "NO",
-    UNEXPECTED = "UNEXPECTED",
-    PERMISSIONS = "PERMISSIONS",
-    REQUIREMENTS = "REQUIREMENTS",
-    REQUIRED_SOURCE_FILE_MISSED = "REQUIRED_SOURCE_FILE_MISSED",
-    REQUIRED_SOURCE_FILE_INVALID = "REQUIRED_SOURCE_FILE_INVALID",
-    SOURCE_FILES_BUILD_FAILED = "SOURCE_FILES_BUILD_FAILED"
-}
-export enum SquidRunningDeployV0Type {
-    DEPLOY = "DEPLOY",
-    DEPLOY_HARD_RESET = "DEPLOY_HARD_RESET",
-    RESTART = "RESTART",
-    HIBERNATE = "HIBERNATE",
-    DELETE = "DELETE",
-    SCALE = "SCALE",
-    TAG = "TAG"
-}
-export enum VersionResponseV0Status {
-    DEPLOYING = "DEPLOYING",
-    DEPLOY_ERROR = "DEPLOY_ERROR",
-    DEPLOYED = "DEPLOYED",
-    HIBERNATED = "HIBERNATED"
 }
 export enum IngressRequestsMetricRes {
     error = "error",
@@ -8825,20 +2918,21 @@ export enum SquidUsageMetricTimeGroup {
     Day = "Day",
     Month = "Month"
 }
-export enum DeployResponseType {
+export enum DeploymentResponseType {
     DEPLOY = "DEPLOY",
     DEPLOY_HARD_RESET = "DEPLOY_HARD_RESET",
     RESTART = "RESTART",
     HIBERNATE = "HIBERNATE",
     DELETE = "DELETE",
     SCALE = "SCALE",
-    TAG = "TAG"
+    SET_TAG = "SET_TAG",
+    REMOVE_TAG = "REMOVE_TAG"
 }
-export enum DeployResponseStatus {
+export enum DeploymentResponseStatus {
     UNPACKING = "UNPACKING",
     IMAGE_BUILDING = "IMAGE_BUILDING",
     RESETTING = "RESETTING",
-    TAGGING = "TAGGING",
+    CONFIGURING_INGRESS = "CONFIGURING_INGRESS",
     SQUID_SYNCING = "SQUID_SYNCING",
     SQUID_DELETING = "SQUID_DELETING",
     ADDONS_SYNCING = "ADDONS_SYNCING",
@@ -8846,7 +2940,7 @@ export enum DeployResponseStatus {
     OK = "OK",
     DEPLOYING = "DEPLOYING"
 }
-export enum DeployResponseFailed {
+export enum DeploymentResponseFailed {
     NO = "NO",
     UNEXPECTED = "UNEXPECTED",
     PERMISSIONS = "PERMISSIONS",
@@ -8863,8 +2957,11 @@ export enum SquidProcessorResponseStatus {
     SYNCING = "SYNCING",
     UNKNOWN = "UNKNOWN",
     STARTING = "STARTING",
-    SYNCED = "SYNCED",
-    STUCK = "STUCK"
+    SYNCED = "SYNCED"
+}
+export enum SquidAddonsHasuraResponseStatus {
+    AVAILABLE = "AVAILABLE",
+    NOT_AVAILABLE = "NOT_AVAILABLE"
 }
 export enum SquidDiskResponseUsageStatus {
     LOW = "LOW",
@@ -8880,13 +2977,14 @@ export enum SquidLastDeployType {
     HIBERNATE = "HIBERNATE",
     DELETE = "DELETE",
     SCALE = "SCALE",
-    TAG = "TAG"
+    SET_TAG = "SET_TAG",
+    REMOVE_TAG = "REMOVE_TAG"
 }
 export enum SquidLastDeployStatus {
     UNPACKING = "UNPACKING",
     IMAGE_BUILDING = "IMAGE_BUILDING",
     RESETTING = "RESETTING",
-    TAGGING = "TAGGING",
+    CONFIGURING_INGRESS = "CONFIGURING_INGRESS",
     SQUID_SYNCING = "SQUID_SYNCING",
     SQUID_DELETING = "SQUID_DELETING",
     ADDONS_SYNCING = "ADDONS_SYNCING",

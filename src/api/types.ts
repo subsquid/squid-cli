@@ -6,11 +6,9 @@ export type HttpResponse<T> = {
   payload: T;
 };
 
-export type { DeployResponseStatus as DeployStatus } from './schema';
-
 export type Organization = components['schemas']['OrganizationResponse'];
 
-export type Deploy = components['schemas']['DeployResponse'];
+export type Deployment = components['schemas']['DeploymentResponse'];
 
 export type UploadUrl = components['schemas']['UploadUrlResponse'];
 
@@ -23,10 +21,6 @@ export type SquidAddonsNeon = components['schemas']['SquidAddonsNeonResponse'];
 export type SquidAddonsPostgres = components['schemas']['SquidAddonsPostgresResponse'];
 
 export type Squid = components['schemas']['SquidResponse'];
-
-export type SquidNameIsAvailableResponse = {
-  available: boolean;
-};
 
 export type SecretsListResponse = {
   secrets: Record<string, string>;
@@ -55,16 +49,8 @@ export type LogsResponse = {
   nextPage: string | null;
 };
 
-export type SquidVersionResponse = {
-  id: number;
-  name: string;
-  version: {
-    deploymentUrl: string;
-  };
-};
-
 export type OrganizationRequest = { organization: PickDeep<Organization, 'code'> };
 
-export type SquidRequest = OrganizationRequest & { squid: PickDeep<Squid, 'name' | 'slot'> };
+export type SquidRequest = OrganizationRequest & { reference: string };
 
-export type DeployRequest = OrganizationRequest & { deploy: PickDeep<Deploy, 'id'> };
+export type DeployRequest = OrganizationRequest & { deploy: PickDeep<Deployment, 'id'> };

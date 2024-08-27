@@ -1,10 +1,9 @@
-import { Args, ux as CliUx, Flags } from '@oclif/core';
+import { Flags, ux as CliUx } from '@oclif/core';
 import ms from 'ms';
 
-import { debugLog, SquidRequest, streamSquidLogs, squidHistoryLogs } from '../api';
-import { CliCommand, SquidNameArg } from '../command';
+import { debugLog, squidHistoryLogs, SquidRequest, streamSquidLogs } from '../api';
+import { CliCommand, SquidReferenceArg } from '../command';
 import { pretty } from '../logs';
-import { parseSquidName } from '../utils';
 
 type LogResult = {
   hasLogs: boolean;
@@ -21,11 +20,9 @@ function parseDate(str: string): Date {
 }
 
 export default class Logs extends CliCommand {
-  static aliases = ['squid:logs'];
-
   static description = 'Fetch logs from a squid deployed to the Cloud';
   static args = {
-    squidName: SquidNameArg,
+    squid_reference: SquidReferenceArg,
   };
 
   static flags = {
@@ -75,13 +72,12 @@ export default class Logs extends CliCommand {
 
   async run(): Promise<void> {
     const {
-      args: { squidName },
+      args: { squid_reference: reference },
       flags: { follow, pageSize, container, level, since, org, search },
     } = await this.parse(Logs);
-    const filter = parseSquidName(squidName);
 
-    const organization = await this.promptSquidOrganization(org, filter.name, 'using "-o" flag');
-    const squid = await this.findOrThrowSquid({ organization, ...filter });
+    const organization = await this.promptSquidOrganization({ code: org, reference });
+    const squid = await this.findOrThrowSquid({ organization, reference });
     if (!squid) return;
 
     const fromDate = parseDate(since);
@@ -89,7 +85,7 @@ export default class Logs extends CliCommand {
     if (follow) {
       await this.fetchLogs({
         organization,
-        squid,
+        reference,
         reverse: true,
         query: {
           limit: 30,
@@ -101,7 +97,7 @@ export default class Logs extends CliCommand {
       });
       await streamSquidLogs({
         organization,
-        squid,
+        reference,
         onLog: (l) => this.log(l),
         query: { container, level, search },
       });
@@ -112,7 +108,7 @@ export default class Logs extends CliCommand {
     do {
       const { hasLogs, nextPage }: LogResult = await this.fetchLogs({
         organization,
-        squid,
+        reference,
         query: {
           limit: pageSize,
           from: fromDate,
@@ -138,7 +134,7 @@ export default class Logs extends CliCommand {
 
   async fetchLogs({
     organization,
-    squid,
+    reference,
     query,
     reverse,
   }: SquidRequest & {
@@ -154,7 +150,8 @@ export default class Logs extends CliCommand {
     };
   }): Promise<LogResult> {
     // eslint-disable-next-line prefer-const
-    let { logs, nextPage } = await squidHistoryLogs({ organization, squid, query });
+    let { logs, nextPage } = await squidHistoryLogs({ organization, reference, query });
+
     if (reverse) {
       logs = logs.reverse();
     }
