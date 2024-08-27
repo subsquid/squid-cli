@@ -21,7 +21,7 @@ export default class Explorer extends CliCommand {
       flags: { org },
     } = await this.parse(Explorer);
 
-    const organization = await this.promptOrganization(org, 'using "-o" flag');
+    const organization = await this.promptOrganization(org);
     const screen = blessed.screen({
       smartCSR: true,
       fastCSR: true,
