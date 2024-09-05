@@ -220,8 +220,8 @@ export async function tagSquid({
   organization,
   reference,
   data,
-}: SquidRequest & { data: { tag: string } }): Promise<Squid> {
-  const { body } = await api<HttpResponse<Squid>>({
+}: SquidRequest & { data: { tag: string } }): Promise<Deployment> {
+  const { body } = await api<HttpResponse<Deployment>>({
     method: 'post',
     path: `/orgs/${organization.code}/squids/${reference}/tag`,
     data,
