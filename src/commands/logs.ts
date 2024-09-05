@@ -1,9 +1,11 @@
 import { Flags, ux as CliUx } from '@oclif/core';
+import { isNil, omitBy } from 'lodash';
 import ms from 'ms';
 
 import { debugLog, squidHistoryLogs, SquidRequest, streamSquidLogs } from '../api';
-import { CliCommand, SquidReferenceArg } from '../command';
+import { CliCommand, SqdFlags, SquidReferenceArg } from '../command';
 import { pretty } from '../logs';
+import { formatSquidFullname } from '../utils';
 
 type LogResult = {
   hasLogs: boolean;
@@ -21,11 +23,48 @@ function parseDate(str: string): Date {
 
 export default class Logs extends CliCommand {
   static description = 'Fetch logs from a squid deployed to the Cloud';
-  static args = {
-    squid_reference: SquidReferenceArg,
-  };
 
   static flags = {
+    org: SqdFlags.org({
+      required: false,
+      relationships: [
+        {
+          type: 'all',
+          flags: ['name'],
+        },
+        {
+          type: 'some',
+          flags: [
+            { name: 'ref', when: async (flags) => !flags['tag'] },
+            { name: 'tag', when: async (flags) => !flags['ref'] },
+          ],
+        },
+      ],
+    }),
+    name: SqdFlags.name({
+      required: false,
+      relationships: [
+        {
+          type: 'some',
+          flags: [
+            { name: 'ref', when: async (flags) => !flags['tag'] },
+            { name: 'tag', when: async (flags) => !flags['ref'] },
+          ],
+        },
+      ],
+    }),
+    ref: SqdFlags.ref({
+      required: false,
+      dependsOn: ['name'],
+    }),
+    tag: SqdFlags.tag({
+      required: false,
+      dependsOn: ['name'],
+      exclusive: ['ref'],
+    }),
+    fullname: SqdFlags.fullname({
+      required: false,
+    }),
     container: Flags.string({
       char: 'c',
       summary: `Container name`,
@@ -63,20 +102,19 @@ export default class Logs extends CliCommand {
       default: false,
       exclusive: ['fromDate', 'pageSize'],
     }),
-    org: Flags.string({
-      char: 'o',
-      description: 'Organization',
-      required: false,
-    }),
   };
 
   async run(): Promise<void> {
     const {
-      args: { squid_reference: reference },
-      flags: { follow, pageSize, container, level, since, org, search },
+      flags: { follow, pageSize, container, level, since, search, fullname, ...flags },
     } = await this.parse(Logs);
 
-    const organization = await this.promptSquidOrganization({ code: org, reference });
+    this.validateSquidNameFlags({ fullname, ...flags });
+
+    const { org, name, tag, ref } = fullname ? fullname : omitBy(flags, isNil);
+    const reference = formatSquidFullname({ name, ref, tag });
+
+    const organization = await this.promptSquidOrganization({ code: org, name });
     const squid = await this.findOrThrowSquid({ organization, reference });
     if (!squid) return;
 
