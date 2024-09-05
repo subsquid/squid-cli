@@ -1,11 +1,12 @@
 import { Args, Command } from '@oclif/core';
+import { FailedFlagValidationError } from '@oclif/core/lib/parser/errors';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { isNil, uniqBy } from 'lodash';
 
 import { ApiError, getOrganization, getSquid, listOrganizations, listUserSquids, SquidRequest } from './api';
 import { getTTY } from './tty';
-import { parseSquidReference, SQUID_HASH_SYMBOL, SQUID_TAG_SYMBOL } from './utils';
+import { parseSquidFullname } from './utils';
 
 export const SUCCESS_CHECK_MARK = chalk.green('✓');
 
@@ -20,6 +21,23 @@ export abstract class CliCommand extends Command {
 
   logDimmed(message: string) {
     this.log(chalk.dim(message));
+  }
+
+  // Haven't find a way to do it with native settings
+  validateSquidNameFlags(flags: { fullname?: any; name?: any }) {
+    if (flags.fullname || flags.name) return;
+
+    throw new FailedFlagValidationError({
+      failed: [
+        {
+          name: 'squid name',
+          validationFn: 'validateSquidName',
+          reason: 'One of the following must be provided: --fullname, --name',
+          status: 'failed',
+        },
+      ],
+      parse: {},
+    });
   }
 
   async catch(error: any) {
@@ -111,23 +129,10 @@ export abstract class CliCommand extends Command {
     return await this.getOrganizationPrompt(organizations, using);
   }
 
-  async promptSquidOrganization({
-    code,
-    reference,
-    using,
-  }: {
-    code?: string | null;
-    reference: string;
-    using?: string;
-  }) {
+  async promptSquidOrganization({ code, name, using }: { code?: string | null; name: string; using?: string }) {
     if (code) {
       return await getOrganization({ organization: { code } });
     }
-
-    const name =
-      reference.includes(SQUID_TAG_SYMBOL) || reference.includes(SQUID_HASH_SYMBOL)
-        ? parseSquidReference(reference).name
-        : reference;
 
     const squids = await listUserSquids({ name });
 
@@ -180,7 +185,7 @@ export abstract class CliCommand extends Command {
 }
 
 export const SquidReferenceArg = Args.string({
-  description: `<name${SQUID_HASH_SYMBOL}hash> or <name${SQUID_TAG_SYMBOL}tag>`,
+  // description: `<name${SQUID_HASH_SYMBOL}hash> or <name${SQUID_TAG_SYMBOL}tag>`,
   required: true,
   parse: async (input) => {
     input = input.toLowerCase();
@@ -190,3 +195,5 @@ export const SquidReferenceArg = Args.string({
     return input;
   },
 });
+
+export * as SqdFlags from './flags';

@@ -10,7 +10,7 @@ export abstract class DeployCommand extends CliCommand {
   deploy: Deployment | undefined;
   logsPrinted = 0;
 
-  async attachToParallelDeploy(squid: Squid) {
+  async promptAttachToDeploy(squid: Squid) {
     if (!squid.lastDeploy) return false;
     if (squid.status !== 'DEPLOYING') return false;
 

@@ -23,21 +23,28 @@ export async function doUntil(fn: () => Promise<boolean>, { pause }: { pause: nu
   }
 }
 
-export const SQUID_HASH_SYMBOL = ':';
-export const SQUID_TAG_SYMBOL = '@';
+export type ParsedSquidFullname = { org?: string; name: string } & (
+  | { ref: string; tag?: never }
+  | { ref?: never; tag: string }
+);
 
-export function parseSquidReference(reference: string) {
-  if (reference.includes(SQUID_HASH_SYMBOL)) {
-    const [name, hash] = reference.split(SQUID_HASH_SYMBOL);
-    return { name, hash };
-  } else if (reference.includes(SQUID_TAG_SYMBOL)) {
-    const [name, tag] = reference.split(SQUID_TAG_SYMBOL);
-    return { name, tag };
-  }
+export function formatSquidFullname({ org, name, ref, tag }: ParsedSquidFullname) {
+  let res = org ? `${org}/` : '';
+  res += name;
+  res += ref ? `@${ref}` : `:${tag}`;
 
-  throw new Error(`Invalid squid reference: "${reference}"`);
+  return res;
 }
 
-export function formatSquidName({ reference }: { reference: string }) {
-  return chalk.bold(reference);
+export const SQUID_FULLNAME_REGEXP = /^(([a-z0-9\-]+)\/)?([a-z0-9\-]+)([:@])([a-z0-9\-]+)$/;
+
+export function parseSquidFullname(fullname: string): ParsedSquidFullname {
+  const parsed = SQUID_FULLNAME_REGEXP.exec(fullname);
+  if (!parsed) {
+    throw new Error(`Invalid squid full name: "${fullname}"`);
+  }
+
+  const [, , org, name, type, tagOrRef] = parsed;
+
+  return { org, name, ...(type === ':' ? { tag: tagOrRef } : { ref: tagOrRef }) };
 }

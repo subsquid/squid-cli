@@ -2,15 +2,25 @@ import { ux as CliUx, Flags } from '@oclif/core';
 import chalk from 'chalk';
 
 import { listSquids } from '../api';
-import { CliCommand } from '../command';
+import { CliCommand, SqdFlags } from '../command';
 
 export default class Ls extends CliCommand {
   static description = 'List squids deployed to the Cloud';
 
   static flags = {
-    name: Flags.string({
-      char: 'n',
-      description: 'Filter by squid name',
+    org: SqdFlags.org({
+      required: false,
+      relationships: [
+        {
+          type: 'all',
+          flags: ['name'],
+        },
+      ],
+    }),
+    name: SqdFlags.name({
+      required: false,
+    }),
+    fullname: SqdFlags.fullname({
       required: false,
     }),
     truncate: Flags.boolean({
@@ -19,21 +29,18 @@ export default class Ls extends CliCommand {
       required: false,
       default: false,
     }),
-    org: Flags.string({
-      char: 'o',
-      description: 'Organization code',
-      required: false,
-    }),
   };
 
   async run(): Promise<void> {
     const {
-      flags: { org, truncate, name },
+      flags: { truncate, fullname, ...flags },
     } = await this.parse(Ls);
     const noTruncate = !truncate;
 
+    const { org, name } = fullname ? fullname : (flags as any);
+
     const organization = name
-      ? await this.promptSquidOrganization({ code: org, reference: name })
+      ? await this.promptSquidOrganization({ code: org, name })
       : await this.promptOrganization(org);
 
     const squids = await listSquids({ organization, name });
@@ -43,7 +50,7 @@ export default class Ls extends CliCommand {
         {
           name: {
             header: 'Squid',
-            get: (s) => `${s.name}${chalk.dim(`:${s.hash}`)}`,
+            get: (s) => `${s.name}${chalk.dim(`@${s.hash}`)}`,
           },
           tags: {
             header: 'Tags',
