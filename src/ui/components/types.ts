@@ -8,7 +8,7 @@ export class Squid {
   constructor(squid: ApiSquid) {
     Object.assign(this, squid);
 
-    this.displayName = formatSquidFullname({ name: this.name, ref: this.hash });
+    this.displayName = formatSquidFullname({ name: this.name, slot: this.slot });
 
     if (this.tags.length) {
       this.displayName += ` (${this.tags.map((a) => a.name).join(', ')})`;

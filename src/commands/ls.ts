@@ -1,5 +1,6 @@
 import { ux as CliUx, Flags } from '@oclif/core';
 import chalk from 'chalk';
+import { isNil, omitBy } from 'lodash';
 
 import { listSquids } from '../api';
 import { CliCommand, SqdFlags } from '../command';
@@ -37,7 +38,7 @@ export default class Ls extends CliCommand {
     } = await this.parse(Ls);
     const noTruncate = !truncate;
 
-    const { org, name } = fullname ? fullname : (flags as any);
+    const { org, name } = fullname ? fullname : omitBy(flags, isNil);
 
     const organization = name
       ? await this.promptSquidOrganization({ code: org, name })
@@ -50,7 +51,7 @@ export default class Ls extends CliCommand {
         {
           name: {
             header: 'Squid',
-            get: (s) => `${s.name}${chalk.dim(`@${s.hash}`)}`,
+            get: (s) => `${s.name}${chalk.dim(`@${s.slot}`)}`,
           },
           tags: {
             header: 'Tags',

@@ -23,13 +23,6 @@ export default class Rm extends DeployCommand {
           type: 'all',
           flags: ['name'],
         },
-        {
-          type: 'some',
-          flags: [
-            { name: 'ref', when: async (flags) => !flags['tag'] },
-            { name: 'tag', when: async (flags) => !flags['ref'] },
-          ],
-        },
       ],
     }),
     name: SqdFlags.name({
@@ -38,20 +31,20 @@ export default class Rm extends DeployCommand {
         {
           type: 'some',
           flags: [
-            { name: 'ref', when: async (flags) => !flags['tag'] },
-            { name: 'tag', when: async (flags) => !flags['ref'] },
+            { name: 'slot', when: async (flags) => !flags['tag'] },
+            { name: 'tag', when: async (flags) => !flags['slot'] },
           ],
         },
       ],
     }),
-    ref: SqdFlags.ref({
+    slot: SqdFlags.slot({
       required: false,
       dependsOn: ['name'],
     }),
     tag: SqdFlags.tag({
       required: false,
       dependsOn: ['name'],
-      exclusive: ['ref'],
+      exclusive: ['slot'],
     }),
     fullname: SqdFlags.fullname({
       required: false,
@@ -70,8 +63,8 @@ export default class Rm extends DeployCommand {
 
     this.validateSquidNameFlags({ fullname, ...flags });
 
-    const { org, name, tag, ref } = fullname ? fullname : (flags as any);
-    const reference = formatSquidFullname({ name, ref, tag });
+    const { org, name, tag, slot } = fullname ? fullname : (flags as any);
+    const reference = formatSquidFullname({ name, slot, tag });
 
     const organization = await this.promptSquidOrganization({ code: org, name });
     const squid = await this.findOrThrowSquid({ organization, reference });
@@ -81,7 +74,7 @@ export default class Rm extends DeployCommand {
         {
           name: 'confirm',
           type: 'confirm',
-          message: `Your squid ${formatSquidFullname({ org, name, ref: squid.hash })} will be completely removed. This action can not be undone. Are you sure?`,
+          message: `Your squid ${formatSquidFullname({ org, name, slot: squid.slot })} will be completely removed. This action can not be undone. Are you sure?`,
         },
       ]);
       if (!confirm) return;
@@ -96,7 +89,7 @@ export default class Rm extends DeployCommand {
       `A squid deployment ${formatSquidFullname({
         org: deployment.organization.code,
         name: deployment.squid.name,
-        ref: deployment.squid.hash,
+        slot: deployment.squid.slot,
       })} was successfully deleted`,
     );
   }
