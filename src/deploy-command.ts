@@ -4,7 +4,7 @@ import inquirer from 'inquirer';
 
 import { Deployment, DeployRequest, getDeploy, Organization, Squid, streamSquidLogs } from './api';
 import { CliCommand, SUCCESS_CHECK_MARK } from './command';
-import { doUntil } from './utils';
+import { doUntil, formatSquidFullname } from './utils';
 
 export abstract class DeployCommand extends CliCommand {
   deploy: Deployment | undefined;
@@ -21,7 +21,7 @@ export abstract class DeployCommand extends CliCommand {
           {
             name: 'confirm',
             type: 'confirm',
-            message: `Squid "${squid.name}#${squid.hash}" is being deploying. 
+            message: `Squid "${formatSquidFullname(squid)}" is being deploying. 
 You can not run deploys on the same squid in parallel.
 Do you want to attach to the running deploy process?`,
           },
@@ -170,7 +170,7 @@ Do you want to attach to the running deploy process?`,
       );
 
       if (this.deploy?.squid) {
-        errors.push(`${chalk.dim('Squid:')} ${this.deploy.squid.name}#${this.deploy.squid.hash}`);
+        errors.push(`${chalk.dim('Squid:')} ${formatSquidFullname(this.deploy.squid)}`);
       }
     }
 

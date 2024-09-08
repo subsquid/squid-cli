@@ -1,7 +1,8 @@
 import { Flags } from '@oclif/core';
+import { isNil, omitBy } from 'lodash';
 
 import { restartSquid } from '../api';
-import { SqdFlags, SquidReferenceArg } from '../command';
+import { SqdFlags } from '../command';
 import { DeployCommand } from '../deploy-command';
 import { formatSquidFullname } from '../utils';
 
@@ -18,13 +19,6 @@ export default class Restart extends DeployCommand {
           type: 'all',
           flags: ['name'],
         },
-        {
-          type: 'some',
-          flags: [
-            { name: 'ref', when: async (flags) => !flags['tag'] },
-            { name: 'tag', when: async (flags) => !flags['ref'] },
-          ],
-        },
       ],
     }),
     name: SqdFlags.name({
@@ -33,20 +27,20 @@ export default class Restart extends DeployCommand {
         {
           type: 'some',
           flags: [
-            { name: 'ref', when: async (flags) => !flags['tag'] },
-            { name: 'tag', when: async (flags) => !flags['ref'] },
+            { name: 'slot', when: async (flags) => !flags['tag'] },
+            { name: 'tag', when: async (flags) => !flags['slot'] },
           ],
         },
       ],
     }),
-    ref: SqdFlags.ref({
+    slot: SqdFlags.slot({
       required: false,
       dependsOn: ['name'],
     }),
     tag: SqdFlags.tag({
       required: false,
       dependsOn: ['name'],
-      exclusive: ['ref'],
+      exclusive: ['slot'],
     }),
     fullname: SqdFlags.fullname({
       required: false,
@@ -60,8 +54,8 @@ export default class Restart extends DeployCommand {
 
     this.validateSquidNameFlags({ fullname, ...flags });
 
-    const { org, name, tag, ref } = fullname ? fullname : (flags as any);
-    const reference = formatSquidFullname({ name, ref, tag });
+    const { org, name, tag, slot } = fullname ? fullname : omitBy(flags, isNil);
+    const reference = formatSquidFullname({ name, slot, tag });
 
     const organization = await this.promptSquidOrganization({ code: org, name });
     await this.findOrThrowSquid({ organization, reference });
@@ -75,7 +69,7 @@ export default class Restart extends DeployCommand {
       `The squid ${formatSquidFullname({
         org: deployment.organization.code,
         name: deployment.squid.name,
-        ref: deployment.squid.hash,
+        slot: deployment.squid.slot,
       })} has been successfully restarted`,
     );
   }

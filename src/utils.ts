@@ -24,14 +24,14 @@ export async function doUntil(fn: () => Promise<boolean>, { pause }: { pause: nu
 }
 
 export type ParsedSquidFullname = { org?: string; name: string } & (
-  | { ref: string; tag?: never }
-  | { ref?: never; tag: string }
+  | { slot: string; tag?: never }
+  | { slot?: never; tag: string }
 );
 
-export function formatSquidFullname({ org, name, ref, tag }: ParsedSquidFullname) {
+export function formatSquidFullname({ org, name, slot, tag }: ParsedSquidFullname) {
   let res = org ? `${org}/` : '';
   res += name;
-  res += ref ? `@${ref}` : `:${tag}`;
+  res += slot ? `@${slot}` : `:${tag}`;
 
   return res;
 }
@@ -44,7 +44,7 @@ export function parseSquidFullname(fullname: string): ParsedSquidFullname {
     throw new Error(`Invalid squid full name: "${fullname}"`);
   }
 
-  const [, , org, name, type, tagOrRef] = parsed;
+  const [, , org, name, type, tagOrSlot] = parsed;
 
-  return { org, name, ...(type === ':' ? { tag: tagOrRef } : { ref: tagOrRef }) };
+  return { org, name, ...(type === ':' ? { tag: tagOrSlot } : { slot: tagOrSlot }) };
 }

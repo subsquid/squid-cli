@@ -1,5 +1,5 @@
 export { fullname } from './fullname';
 export { name } from './name';
 export { org } from './org';
-export { ref } from './ref';
+export { slot } from './slot';
 export { tag } from './tag';

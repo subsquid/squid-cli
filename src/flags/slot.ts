@@ -1,11 +1,11 @@
 import { Flags } from '@oclif/core';
 
-export const ref = Flags.custom<string>({
+export const slot = Flags.custom<string>({
   helpGroup: 'COMMON',
-  char: 'r',
-  name: 'ref',
-  description: 'Squid ref',
-  helpValue: '<ref>',
+  char: 's',
+  name: 'slot',
+  description: 'Squid slot',
+  helpValue: '<slot>',
   parse: async (input) => {
     return input.toLowerCase();
   },

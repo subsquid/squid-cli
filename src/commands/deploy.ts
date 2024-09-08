@@ -110,7 +110,7 @@ export default class Deploy extends DeployCommand {
     tag: SqdFlags.tag({
       required: false,
     }),
-    ref: SqdFlags.ref({
+    slot: SqdFlags.slot({
       required: false,
     }),
     fullname: SqdFlags.fullname({
@@ -192,23 +192,29 @@ export default class Deploy extends DeployCommand {
     this.log(chalk.dim(`Build directory: ${buildDir}`));
     this.log(chalk.dim(`Manifest: ${manifestPath}`));
 
-    const overrides = fullname ? fullname : pick(flags, 'name', 'org', 'ref', 'tag');
+    const overrides = fullname ? fullname : flags;
+
+    // some hack to add slot name in case if version is used
+    {
+      manifest.slot = manifest.slotName();
+      delete manifest['version'];
+    }
 
     const override = await this.promptOverrideConflict(manifest, overrides);
     if (!override) return;
 
     // eslint-disable-next-line prefer-const
-    let { name, org, ref, tag } = defaults(overrides, manifest);
+    let { name, slot, org, tag } = defaults(overrides, manifest);
 
     const organization = await this.promptOrganization(org);
 
-    // name = await this.promptSquidName(name);
+    name = await this.promptSquidName(name);
 
     let target: Squid | null = null;
-    if (ref || tag) {
+    if (slot || tag) {
       target = await this.findSquid({
         organization,
-        reference: formatSquidFullname(ref ? { name, ref } : { name, tag: tag! }),
+        reference: formatSquidFullname(slot ? { name, slot } : { name, tag: tag! }),
       });
     }
 
@@ -231,7 +237,7 @@ export default class Deploy extends DeployCommand {
     /**
      * Squid exists we should check if tag belongs to another squid
      */
-    if (target && ref && tag && !applyTag) {
+    if (target && slot && tag && !applyTag) {
       const apply = await this.promptApplyTag(target, tag);
       if (!apply) return;
     }
@@ -248,7 +254,7 @@ export default class Deploy extends DeployCommand {
         options: {
           hardReset,
           overrideName: name,
-          updateByHash: target?.hash,
+          overrideSlot: slot,
           tag,
         },
       },
@@ -263,7 +269,7 @@ export default class Deploy extends DeployCommand {
         `The squid ${formatSquidFullname({
           org: deployment.organization.code,
           name: deployment.squid.name,
-          ref: deployment.squid.hash,
+          slot: deployment.squid.slot,
         })} has been successfully updated`,
       );
     } else {
@@ -272,7 +278,7 @@ export default class Deploy extends DeployCommand {
         `A new squid ${formatSquidFullname({
           org: deployment.organization.code,
           name: deployment.squid.name,
-          ref: deployment.squid.hash,
+          slot: deployment.squid.slot,
         })} has been successfully created`,
       );
     }
@@ -292,7 +298,7 @@ export default class Deploy extends DeployCommand {
             `A squid "${formatSquidFullname({
               org: target.organization.code,
               name: target.name,
-              ref: target.hash,
+              slot: target.slot,
             })}" will be updated. ${chalk.bold('Are you sure?')}`,
           ),
         ].join('\n'),
@@ -317,7 +323,7 @@ export default class Deploy extends DeployCommand {
         type: 'confirm',
         message: [
           chalk.reset(
-            `A squid tag "${tag}" has already been assigned to ${formatSquidFullname({ name: oldSquid.name, ref: oldSquid.hash })}.`,
+            `A squid tag "${tag}" has already been assigned to ${formatSquidFullname({ name: oldSquid.name, slot: oldSquid.slot })}.`,
           ),
           chalk.reset(`The tag will be assigned to the newly created squid. ${chalk.bold('Are you sure?')}`),
         ].join('\n'),
@@ -375,7 +381,7 @@ export default class Deploy extends DeployCommand {
       },
     ]);
 
-    return input.name;
+    return input.name as string;
   }
 
   private async pack({ buildDir, squidDir, archiveName }: { buildDir: string; squidDir: string; archiveName: string }) {

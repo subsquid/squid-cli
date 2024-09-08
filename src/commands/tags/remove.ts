@@ -1,8 +1,6 @@
-import { Args, Flags } from '@oclif/core';
-import chalk from 'chalk';
-import inquirer from 'inquirer';
+import { Args } from '@oclif/core';
 
-import { tagSquid } from '../../api';
+import { removeSquidTag } from '../../api';
 import { SqdFlags } from '../../command';
 import { DeployCommand } from '../../deploy-command';
 import { formatSquidFullname } from '../../utils';
@@ -11,7 +9,12 @@ import { UPDATE_COLOR } from '../deploy';
 export default class Remove extends DeployCommand {
   static description = 'Remove a tag from a squid';
 
-  static args = {};
+  static args = {
+    tag: Args.string({
+      description: `New tag to assign`,
+      required: true,
+    }),
+  };
 
   static flags = {
     org: SqdFlags.org({
@@ -24,8 +27,8 @@ export default class Remove extends DeployCommand {
         {
           type: 'some',
           flags: [
-            { name: 'ref', when: async (flags) => !flags['tag'] },
-            { name: 'tag', when: async (flags) => !flags['ref'] },
+            { name: 'slot', when: async (flags) => !flags['tag'] },
+            { name: 'tag', when: async (flags) => !flags['slot'] },
           ],
         },
       ],
@@ -36,20 +39,20 @@ export default class Remove extends DeployCommand {
         {
           type: 'some',
           flags: [
-            { name: 'ref', when: async (flags) => !flags['tag'] },
-            { name: 'tag', when: async (flags) => !flags['ref'] },
+            { name: 'slot', when: async (flags) => !flags['tag'] },
+            { name: 'tag', when: async (flags) => !flags['slot'] },
           ],
         },
       ],
     }),
-    ref: SqdFlags.ref({
+    slot: SqdFlags.slot({
       required: false,
       dependsOn: ['name'],
     }),
     tag: SqdFlags.tag({
       required: false,
       dependsOn: ['name'],
-      exclusive: ['ref'],
+      exclusive: ['slot'],
     }),
     fullname: SqdFlags.fullname({
       required: false,
@@ -58,53 +61,37 @@ export default class Remove extends DeployCommand {
 
   async run(): Promise<void> {
     const {
+      args: { tag: tagName },
       flags: { fullname, ...flags },
     } = await this.parse(Remove);
 
     this.validateSquidNameFlags({ fullname, ...flags });
 
-    const { org, name, tag, ref } = fullname ? fullname : (flags as any);
-    const reference = formatSquidFullname({ name, ref, tag });
+    const { org, name, tag, slot } = fullname ? fullname : (flags as any);
+    const reference = formatSquidFullname({ name, slot, tag });
 
     const organization = await this.promptSquidOrganization({ code: org, name });
     const squid = await this.findOrThrowSquid({ organization, reference });
 
-    throw new Error('API is not implemented yet');
+    if (!squid.tags.some((t) => t.name === tagName)) {
+      return this.log(`Tag "${tagName}" is not assigned to the squid ${formatSquidFullname({ org, name, tag, slot })}`);
+    }
 
-    // const oldSquid = await this.findSquid({ organization, reference: formatSquidFullname({ name, tag: newTag }) });
-    // if (oldSquid) {
-    //   const { confirm } = await inquirer.prompt([
-    //     {
-    //       name: 'confirm',
-    //       type: 'confirm',
-    //       message: [
-    //         chalk.reset(
-    //           `A squid tag "${tag}" has already been assigned to the previous squid deployment ${formatSquidFullname({ org, name, ref: oldSquid.hash })}.`,
-    //         ),
-    //         chalk.reset(`The tag URL will be assigned to the newly created deployment. ${chalk.bold(`Are you sure?`)}`),
-    //       ].join('\n'),
-    //     },
-    //   ]);
-    //   if (!confirm) return;
-    // }
+    const deployment = await removeSquidTag({
+      organization,
+      reference,
+      tag: tagName,
+    });
+    await this.pollDeploy({ organization, deploy: deployment });
+    if (!deployment || !deployment.squid) return;
 
-    // const deployment = await tagSquid({
-    //   organization,
-    //   reference,
-    //   data: {
-    //     tag: newTag,
-    //   },
-    // });
-    // await this.pollDeploy({ organization, deploy: deployment });
-    // if (!deployment || !deployment.squid) return;
-
-    // this.logDeployResult(
-    //   UPDATE_COLOR,
-    //   `The squid ${formatSquidFullname({
-    //     org: deployment.organization.code,
-    //     name: deployment.squid.name,
-    //     ref: deployment.squid.hash,
-    //   })} has been successfully updated`,
-    // );
+    this.logDeployResult(
+      UPDATE_COLOR,
+      `The squid ${formatSquidFullname({
+        org: deployment.organization.code,
+        name: deployment.squid.name,
+        slot: deployment.squid.slot,
+      })} has been successfully updated`,
+    );
   }
 }
