@@ -95,7 +95,7 @@ export abstract class CliCommand extends Command {
 
   async findSquid({ organization, reference }: SquidRequest) {
     try {
-      return getSquid({ organization, reference });
+      return await getSquid({ organization, reference });
     } catch (e) {
       if (e instanceof ApiError && e.request.status === 404) {
         return null;

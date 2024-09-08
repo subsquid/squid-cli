@@ -192,7 +192,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/orgs/{org}/squids/{reference}/tag": {
+    "/v1/orgs/{org}/squids/{reference}/tags/{tag}": {
         parameters: {
             query?: never;
             header?: never;
@@ -200,10 +200,11 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put?: never;
-        /** Assign tag to a squid  */
-        post: operations["SquidController_setTag"];
-        delete?: never;
+        /** Add tag to a squid  */
+        put: operations["SquidController_addTag"];
+        post?: never;
+        /** Remove tag from a squid  */
+        delete: operations["SquidController_removeTag"];
         options?: never;
         head?: never;
         patch?: never;
@@ -682,7 +683,7 @@ export interface components {
             /** @example my-squid */
             name: string;
             /** @example abc12 */
-            hash: string;
+            slot: string;
             /** @example my-squid:abc12 */
             reference: string;
         };
@@ -836,7 +837,7 @@ export interface components {
             /** @example my-squid:4fush9 */
             reference: string;
             /** @example 4fush9 */
-            hash: string;
+            slot: string;
             description?: string | null;
             tags: components["schemas"]["SquidTagResponse"][];
             manifest: components["schemas"]["SquidManifestResponse"];
@@ -1331,9 +1332,9 @@ export interface operations {
                     manifestPath?: string;
                     /** @default {} */
                     options?: {
-                        updateByHash?: string;
+                        overrideSlot?: string;
                         hardReset?: boolean;
-                        overrideName: string;
+                        overrideName?: string;
                         tag?: string;
                     };
                 };
@@ -1578,23 +1579,71 @@ export interface operations {
             };
         };
     };
-    SquidController_setTag: {
+    SquidController_addTag: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 org: string;
                 reference: string;
+                tag: string;
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": {
-                    tag: string;
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example null */
+                        error?: string;
+                        payload?: components["schemas"]["DeploymentResponse"];
+                    };
+                };
+            };
+            /** @description Bad user input */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                        invalidFields: {
+                            message: string;
+                            path: string[];
+                            type: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnauthorizedResponse"];
                 };
             };
         };
+    };
+    SquidController_removeTag: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                org: string;
+                reference: string;
+                tag: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful response */
             201: {

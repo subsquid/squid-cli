@@ -173,7 +173,7 @@ export async function deploySquid({
     artifactUrl: string;
     manifestPath: string;
     options: {
-      updateByHash?: string;
+      overrideSlot?: string;
       overrideName?: string;
       tag?: string;
       hardReset?: boolean;
@@ -216,15 +216,27 @@ export async function deleteSquid({ organization, reference }: SquidRequest): Pr
   return body.payload;
 }
 
-export async function tagSquid({
+export async function addSquidTag({
   organization,
   reference,
-  data,
-}: SquidRequest & { data: { tag: string } }): Promise<Deployment> {
+  tag,
+}: SquidRequest & { tag: string }): Promise<Deployment> {
   const { body } = await api<HttpResponse<Deployment>>({
-    method: 'post',
-    path: `/orgs/${organization.code}/squids/${reference}/tag`,
-    data,
+    method: 'PUT',
+    path: `/orgs/${organization.code}/squids/${reference}/tags/${tag}`,
+  });
+
+  return body.payload;
+}
+
+export async function removeSquidTag({
+  organization,
+  reference,
+  tag,
+}: SquidRequest & { tag: string }): Promise<Deployment> {
+  const { body } = await api<HttpResponse<Deployment>>({
+    method: 'DELETE',
+    path: `/orgs/${organization.code}/squids/${reference}/tags/${tag}`,
   });
 
   return body.payload;

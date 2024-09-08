@@ -32,13 +32,6 @@ export default class Logs extends CliCommand {
           type: 'all',
           flags: ['name'],
         },
-        {
-          type: 'some',
-          flags: [
-            { name: 'ref', when: async (flags) => !flags['tag'] },
-            { name: 'tag', when: async (flags) => !flags['ref'] },
-          ],
-        },
       ],
     }),
     name: SqdFlags.name({
@@ -47,20 +40,20 @@ export default class Logs extends CliCommand {
         {
           type: 'some',
           flags: [
-            { name: 'ref', when: async (flags) => !flags['tag'] },
-            { name: 'tag', when: async (flags) => !flags['ref'] },
+            { name: 'slot', when: async (flags) => !flags['tag'] },
+            { name: 'tag', when: async (flags) => !flags['slot'] },
           ],
         },
       ],
     }),
-    ref: SqdFlags.ref({
+    slot: SqdFlags.slot({
       required: false,
       dependsOn: ['name'],
     }),
     tag: SqdFlags.tag({
       required: false,
       dependsOn: ['name'],
-      exclusive: ['ref'],
+      exclusive: ['slot'],
     }),
     fullname: SqdFlags.fullname({
       required: false,
@@ -91,7 +84,6 @@ export default class Logs extends CliCommand {
       default: '1d',
     }),
     search: Flags.string({
-      char: 's',
       summary: 'Filter by content',
       required: false,
     }),
@@ -111,8 +103,8 @@ export default class Logs extends CliCommand {
 
     this.validateSquidNameFlags({ fullname, ...flags });
 
-    const { org, name, tag, ref } = fullname ? fullname : omitBy(flags, isNil);
-    const reference = formatSquidFullname({ name, ref, tag });
+    const { org, name, tag, slot } = fullname ? fullname : omitBy(flags, isNil);
+    const reference = formatSquidFullname({ name, slot, tag });
 
     const organization = await this.promptSquidOrganization({ code: org, name });
     const squid = await this.findOrThrowSquid({ organization, reference });
