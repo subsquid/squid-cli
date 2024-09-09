@@ -17,7 +17,7 @@ import { deploySquid, OrganizationRequest, Squid, uploadFile } from '../api';
 import { SqdFlags, SUCCESS_CHECK_MARK } from '../command';
 import { DeployCommand } from '../deploy-command';
 import { loadManifestFile } from '../manifest';
-import { formatSquidFullname, ParsedSquidFullname, parseSquidFullname } from '../utils';
+import { formatSquidFullname, ParsedSquidFullname, parseSquidFullname, printSquidFullname } from '../utils';
 
 const compressAsync = promisify(targz.compress);
 
@@ -188,10 +188,6 @@ export default class Deploy extends DeployCommand {
 
     const { buildDir, squidDir, manifest } = res;
 
-    this.log(chalk.dim(`Squid directory: ${squidDir}`));
-    this.log(chalk.dim(`Build directory: ${buildDir}`));
-    this.log(chalk.dim(`Manifest: ${manifestPath}`));
-
     const overrides = fullname ? fullname : flags;
 
     // some hack to add slot name in case if version is used
@@ -209,6 +205,20 @@ export default class Deploy extends DeployCommand {
     const organization = await this.promptOrganization(org);
 
     name = await this.promptSquidName(name);
+
+    this.log(chalk.dim(`Squid directory: ${squidDir}`));
+    this.log(chalk.dim(`Build directory: ${buildDir}`));
+    this.log(chalk.dim(`Manifest: ${manifestPath}`));
+    this.log(chalk.cyan(`-----------------------------`));
+    this.log(chalk.cyan(`Organization: ${organization.code}`));
+    this.log(chalk.cyan(`Squid name: ${name}`));
+    if (slot) {
+      this.log(chalk.cyan(`Squid slot: ${slot}`));
+    }
+    if (tag) {
+      this.log(chalk.cyan(`Squid tag: ${tag}`));
+    }
+    this.log(chalk.cyan(`-----------------------------`));
 
     let target: Squid | null = null;
     if (slot || tag) {
@@ -266,7 +276,7 @@ export default class Deploy extends DeployCommand {
     if (target) {
       this.logDeployResult(
         UPDATE_COLOR,
-        `The squid ${formatSquidFullname({
+        `The squid ${printSquidFullname({
           org: deployment.organization.code,
           name: deployment.squid.name,
           slot: deployment.squid.slot,
@@ -275,7 +285,7 @@ export default class Deploy extends DeployCommand {
     } else {
       this.logDeployResult(
         CREATE_COLOR,
-        `A new squid ${formatSquidFullname({
+        `A new squid ${printSquidFullname({
           org: deployment.organization.code,
           name: deployment.squid.name,
           slot: deployment.squid.slot,
@@ -289,19 +299,18 @@ export default class Deploy extends DeployCommand {
   }
 
   private async promptUpdateSquid(target: Squid) {
+    this.log(
+      `A squid "${printSquidFullname({
+        org: target.organization.code,
+        name: target.name,
+        slot: target.slot,
+      })}" will be updated.`,
+    );
     const { confirm } = await inquirer.prompt([
       {
         name: 'confirm',
         type: 'confirm',
-        message: [
-          chalk.reset(
-            `A squid "${formatSquidFullname({
-              org: target.organization.code,
-              name: target.name,
-              slot: target.slot,
-            })}" will be updated. ${chalk.bold('Are you sure?')}`,
-          ),
-        ].join('\n'),
+        message: 'Are you sure you wish to proceed?',
       },
     ]);
 
@@ -317,16 +326,16 @@ export default class Deploy extends DeployCommand {
     });
     if (!oldSquid) return true;
 
+    this.log(
+      `A squid tag "${tag}" has already been assigned to ${printSquidFullname({ name: oldSquid.name, slot: oldSquid.slot })}.`,
+    );
+    this.log(`The tag will be assigned to the newly created squid.`);
+
     const { confirm } = await inquirer.prompt([
       {
         name: 'confirm',
         type: 'confirm',
-        message: [
-          chalk.reset(
-            `A squid tag "${tag}" has already been assigned to ${formatSquidFullname({ name: oldSquid.name, slot: oldSquid.slot })}.`,
-          ),
-          chalk.reset(`The tag will be assigned to the newly created squid. ${chalk.bold('Are you sure?')}`),
-        ].join('\n'),
+        message: 'Are you sure you wish to proceed?',
       },
     ]);
 
