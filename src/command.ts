@@ -6,7 +6,6 @@ import { isNil, uniqBy } from 'lodash';
 
 import { ApiError, getOrganization, getSquid, listOrganizations, listUserSquids, SquidRequest } from './api';
 import { getTTY } from './tty';
-import { parseSquidFullname } from './utils';
 
 export const SUCCESS_CHECK_MARK = chalk.green('✓');
 

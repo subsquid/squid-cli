@@ -5,7 +5,7 @@ import inquirer from 'inquirer';
 import { addSquidTag } from '../../api';
 import { SqdFlags } from '../../command';
 import { DeployCommand } from '../../deploy-command';
-import { formatSquidFullname } from '../../utils';
+import { formatSquidFullname, printSquidFullname } from '../../utils';
 import { UPDATE_COLOR } from '../deploy';
 
 export default class Add extends DeployCommand {
@@ -70,7 +70,7 @@ export default class Add extends DeployCommand {
 
     if (squid.tags.find((t) => t.name === tagName)) {
       return this.log(
-        `Tag "${tagName}" is already assigned to the squid ${formatSquidFullname({ org, name, tag, slot })}`,
+        `Tag "${tagName}" is already assigned to the squid ${printSquidFullname({ org, name, tag, slot })}`,
       );
     }
 
@@ -82,7 +82,7 @@ export default class Add extends DeployCommand {
           type: 'confirm',
           message: [
             chalk.reset(
-              `A squid tag "${tagName}" has already been assigned to the previous squid deployment ${formatSquidFullname({ org, name, slot: oldSquid.slot })}.`,
+              `A squid tag "${tagName}" has already been assigned to the previous squid deployment ${printSquidFullname({ org, name, slot: oldSquid.slot })}.`,
             ),
             chalk.reset(`The tag URL will be assigned to the newly created deployment. ${chalk.bold(`Are you sure?`)}`),
           ].join('\n'),
@@ -101,7 +101,7 @@ export default class Add extends DeployCommand {
 
     this.logDeployResult(
       UPDATE_COLOR,
-      `The squid ${formatSquidFullname({
+      `The squid ${printSquidFullname({
         org: deployment.organization.code,
         name: deployment.squid.name,
         slot: deployment.squid.slot,

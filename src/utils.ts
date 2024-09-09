@@ -36,6 +36,10 @@ export function formatSquidFullname({ org, name, slot, tag }: ParsedSquidFullnam
   return res;
 }
 
+export function printSquidFullname(args: ParsedSquidFullname) {
+  return chalk.bold(formatSquidFullname(args));
+}
+
 export const SQUID_FULLNAME_REGEXP = /^(([a-z0-9\-]+)\/)?([a-z0-9\-]+)([:@])([a-z0-9\-]+)$/;
 
 export function parseSquidFullname(fullname: string): ParsedSquidFullname {

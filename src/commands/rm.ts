@@ -4,7 +4,7 @@ import inquirer from 'inquirer';
 import { deleteSquid } from '../api';
 import { SqdFlags, SquidReferenceArg } from '../command';
 import { DeployCommand } from '../deploy-command';
-import { formatSquidFullname } from '../utils';
+import { formatSquidFullname, printSquidFullname } from '../utils';
 
 import { DELETE_COLOR } from './deploy';
 
@@ -74,7 +74,7 @@ export default class Rm extends DeployCommand {
         {
           name: 'confirm',
           type: 'confirm',
-          message: `Your squid ${formatSquidFullname({ org, name, slot: squid.slot })} will be completely removed. This action can not be undone. Are you sure?`,
+          message: `Your squid ${printSquidFullname({ org, name, slot: squid.slot })} will be completely removed. This action can not be undone. Are you sure?`,
         },
       ]);
       if (!confirm) return;
@@ -86,7 +86,7 @@ export default class Rm extends DeployCommand {
 
     this.logDeployResult(
       DELETE_COLOR,
-      `A squid deployment ${formatSquidFullname({
+      `A squid deployment ${printSquidFullname({
         org: deployment.organization.code,
         name: deployment.squid.name,
         slot: deployment.squid.slot,

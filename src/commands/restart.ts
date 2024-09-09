@@ -4,7 +4,7 @@ import { isNil, omitBy } from 'lodash';
 import { restartSquid } from '../api';
 import { SqdFlags } from '../command';
 import { DeployCommand } from '../deploy-command';
-import { formatSquidFullname } from '../utils';
+import { formatSquidFullname, printSquidFullname } from '../utils';
 
 import { UPDATE_COLOR } from './deploy';
 
@@ -66,7 +66,7 @@ export default class Restart extends DeployCommand {
 
     this.logDeployResult(
       UPDATE_COLOR,
-      `The squid ${formatSquidFullname({
+      `The squid ${printSquidFullname({
         org: deployment.organization.code,
         name: deployment.squid.name,
         slot: deployment.squid.slot,
