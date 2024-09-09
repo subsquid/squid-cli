@@ -3,7 +3,7 @@ import { Args } from '@oclif/core';
 import { removeSquidTag } from '../../api';
 import { SqdFlags } from '../../command';
 import { DeployCommand } from '../../deploy-command';
-import { formatSquidFullname } from '../../utils';
+import { formatSquidFullname, printSquidFullname } from '../../utils';
 import { UPDATE_COLOR } from '../deploy';
 
 export default class Remove extends DeployCommand {
@@ -74,7 +74,7 @@ export default class Remove extends DeployCommand {
     const squid = await this.findOrThrowSquid({ organization, reference });
 
     if (!squid.tags.some((t) => t.name === tagName)) {
-      return this.log(`Tag "${tagName}" is not assigned to the squid ${formatSquidFullname({ org, name, tag, slot })}`);
+      return this.log(`Tag "${tagName}" is not assigned to the squid ${printSquidFullname({ org, name, tag, slot })}`);
     }
 
     const deployment = await removeSquidTag({
@@ -87,7 +87,7 @@ export default class Remove extends DeployCommand {
 
     this.logDeployResult(
       UPDATE_COLOR,
-      `The squid ${formatSquidFullname({
+      `The squid ${printSquidFullname({
         org: deployment.organization.code,
         name: deployment.squid.name,
         slot: deployment.squid.slot,
