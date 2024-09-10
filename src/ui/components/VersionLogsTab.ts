@@ -39,7 +39,7 @@ export class VersionLogTab implements VersionTab {
       try {
         const { logs } = await squidHistoryLogs({
           organization: squid.organization,
-          reference: squid.reference,
+          squid,
           query: {
             limit: 100,
             from: addMinutes(new Date(), -30),
@@ -61,7 +61,7 @@ export class VersionLogTab implements VersionTab {
 
       streamSquidLogs({
         organization: squid.organization,
-        reference: squid.reference,
+        squid,
         onLog: (line) => {
           logsBox.add(line);
         },

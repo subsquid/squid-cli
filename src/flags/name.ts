@@ -1,7 +1,7 @@
 import { Flags } from '@oclif/core';
 
 export const name = Flags.custom<string>({
-  helpGroup: 'COMMON',
+  helpGroup: 'SQUID',
   char: 'n',
   name: 'name',
   description: 'Squid name',
@@ -10,4 +10,13 @@ export const name = Flags.custom<string>({
   parse: async (input) => {
     return input.toLowerCase();
   },
+  relationships: [
+    {
+      type: 'some',
+      flags: [
+        { name: 'slot', when: async (flags) => !flags['tag'] },
+        { name: 'tag', when: async (flags) => !flags['slot'] },
+      ],
+    },
+  ],
 });

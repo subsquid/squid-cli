@@ -1,5 +1,8 @@
 import { ConfigNotFound, getConfig } from '@subsquid/commands';
 import chalk from 'chalk';
+import { PickDeep } from 'type-fest';
+
+import { Squid } from './api';
 
 export async function getSquidCommands() {
   try {
@@ -23,32 +26,37 @@ export async function doUntil(fn: () => Promise<boolean>, { pause }: { pause: nu
   }
 }
 
-export type ParsedSquidFullname = { org?: string; name: string } & (
+export type ParsedSquidReference = { org?: string; name: string } & (
   | { slot: string; tag?: never }
   | { slot?: never; tag: string }
+  | { slot: string; tag: string }
 );
 
-export function formatSquidFullname({ org, name, slot, tag }: ParsedSquidFullname) {
-  let res = org ? `${org}/` : '';
-  res += name;
-  res += slot ? `@${slot}` : `:${tag}`;
+export function formatSquidReference(
+  reference: ParsedSquidReference | string,
+  { colored }: { colored?: boolean } = {},
+) {
+  const { org, name, slot, tag } = typeof reference === 'string' ? parseSquidReference(reference) : reference;
 
-  return res;
-}
+  const prefix = org ? `${org}/` : ``;
+  const suffix = slot ? `@${slot}` : `:${tag}`;
 
-export function printSquidFullname(args: ParsedSquidFullname) {
-  return chalk.bold(formatSquidFullname(args));
+  return colored ? chalk`{bold {green ${prefix}}{green ${name}}{blue ${suffix}}}` : `${prefix}${name}${suffix}`;
 }
 
 export const SQUID_FULLNAME_REGEXP = /^(([a-z0-9\-]+)\/)?([a-z0-9\-]+)([:@])([a-z0-9\-]+)$/;
 
-export function parseSquidFullname(fullname: string): ParsedSquidFullname {
-  const parsed = SQUID_FULLNAME_REGEXP.exec(fullname);
+export function parseSquidReference(reference: string): ParsedSquidReference {
+  const parsed = SQUID_FULLNAME_REGEXP.exec(reference);
   if (!parsed) {
-    throw new Error(`Invalid squid full name: "${fullname}"`);
+    throw new Error(`Invalid squid full name: "${reference}"`);
   }
 
   const [, , org, name, type, tagOrSlot] = parsed;
 
   return { org, name, ...(type === ':' ? { tag: tagOrSlot } : { slot: tagOrSlot }) };
+}
+
+export function printSquid(squid: PickDeep<Squid, 'name' | 'slot' | 'organization.code'>) {
+  return formatSquidReference({ org: squid.organization.code, name: squid.name, slot: squid.slot }, { colored: true });
 }

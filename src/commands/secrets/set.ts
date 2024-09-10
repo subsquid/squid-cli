@@ -33,11 +33,11 @@ export default class Set extends CliCommand {
 
   async run(): Promise<void> {
     const {
-      flags: { org },
+      flags: { org, interactive },
       args: { name, value },
     } = await this.parse(Set);
 
-    const organization = await this.promptOrganization(org);
+    const organization = await this.promptOrganization(org, { interactive });
 
     let secretValue = value;
     if (!secretValue) {

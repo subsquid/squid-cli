@@ -3,7 +3,7 @@ import { Args } from '@oclif/core';
 import { removeSquidTag } from '../../api';
 import { SqdFlags } from '../../command';
 import { DeployCommand } from '../../deploy-command';
-import { formatSquidFullname, printSquidFullname } from '../../utils';
+import { formatSquidReference, printSquid } from '../../utils';
 import { UPDATE_COLOR } from '../deploy';
 
 export default class Remove extends DeployCommand {
@@ -62,36 +62,28 @@ export default class Remove extends DeployCommand {
   async run(): Promise<void> {
     const {
       args: { tag: tagName },
-      flags: { fullname, ...flags },
+      flags: { fullname, interactive, ...flags },
     } = await this.parse(Remove);
 
     this.validateSquidNameFlags({ fullname, ...flags });
 
     const { org, name, tag, slot } = fullname ? fullname : (flags as any);
-    const reference = formatSquidFullname({ name, slot, tag });
 
-    const organization = await this.promptSquidOrganization({ code: org, name });
-    const squid = await this.findOrThrowSquid({ organization, reference });
+    const organization = await this.promptSquidOrganization(org, name, { interactive });
+    const squid = await this.findOrThrowSquid({ organization, squid: { name, tag, slot } });
 
     if (!squid.tags.some((t) => t.name === tagName)) {
-      return this.log(`Tag "${tagName}" is not assigned to the squid ${printSquidFullname({ org, name, tag, slot })}`);
+      return this.log(`Tag "${tagName}" is not assigned to the squid ${printSquid(squid)}`);
     }
 
     const deployment = await removeSquidTag({
       organization,
-      reference,
+      squid,
       tag: tagName,
     });
     await this.pollDeploy({ organization, deploy: deployment });
     if (!deployment || !deployment.squid) return;
 
-    this.logDeployResult(
-      UPDATE_COLOR,
-      `The squid ${printSquidFullname({
-        org: deployment.organization.code,
-        name: deployment.squid.name,
-        slot: deployment.squid.slot,
-      })} has been successfully updated`,
-    );
+    this.logDeployResult(UPDATE_COLOR, `The squid ${printSquid(squid)} has been successfully updated`);
   }
 }
