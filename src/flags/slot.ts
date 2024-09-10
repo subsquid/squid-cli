@@ -1,7 +1,7 @@
 import { Flags } from '@oclif/core';
 
 export const slot = Flags.custom<string>({
-  helpGroup: 'COMMON',
+  helpGroup: 'SQUID',
   char: 's',
   name: 'slot',
   description: 'Squid slot',
@@ -10,4 +10,6 @@ export const slot = Flags.custom<string>({
     return input.toLowerCase();
   },
   required: false,
+  dependsOn: ['name'],
+  exclusive: ['tag'],
 });

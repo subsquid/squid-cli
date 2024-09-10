@@ -2,9 +2,9 @@ import { ux as CliUx } from '@oclif/core';
 import chalk, { ForegroundColor } from 'chalk';
 import inquirer from 'inquirer';
 
-import { Deployment, DeployRequest, getDeploy, Organization, Squid, streamSquidLogs } from './api';
+import { Deployment, DeployRequest, getDeploy, Organization, Squid, SquidRequest, streamSquidLogs } from './api';
 import { CliCommand, SUCCESS_CHECK_MARK } from './command';
-import { doUntil, formatSquidFullname } from './utils';
+import { doUntil, formatSquidReference, printSquid } from './utils';
 
 export abstract class DeployCommand extends CliCommand {
   deploy: Deployment | undefined;
@@ -21,7 +21,7 @@ export abstract class DeployCommand extends CliCommand {
           {
             name: 'confirm',
             type: 'confirm',
-            message: `Squid "${formatSquidFullname(squid)}" is being deploying. 
+            message: `Squid "${formatSquidReference(squid)}" is being deploying. 
 You can not run deploys on the same squid in parallel.
 Do you want to attach to the running deploy process?`,
           },
@@ -38,6 +38,36 @@ Do you want to attach to the running deploy process?`,
 
         return true;
     }
+  }
+
+  async promptAddTag(
+    { organization, name, tag }: { organization: Pick<Organization, 'code'>; name: string; tag: string },
+    { using = 'using "--force" flag', interactive }: { using?: string; interactive?: boolean } = {},
+  ) {
+    const oldSquid = await this.findSquid({
+      organization,
+      squid: { name, tag },
+    });
+    if (!oldSquid) return true;
+
+    const warning = `A tag "${tag}" has already been assigned to ${printSquid(oldSquid)}.`;
+
+    if (!interactive) {
+      this.error([warning, `Please do it explicitly ${using}`].join('\n'));
+    }
+
+    this.warn(warning);
+
+    const { confirm } = await inquirer.prompt([
+      {
+        name: 'confirm',
+        type: 'confirm',
+        message: 'Are you sure?',
+        prefix: `The tag will be assigned to the newly created squid.`,
+      },
+    ]);
+
+    return !!confirm;
   }
 
   async pollDeploy({
@@ -98,7 +128,8 @@ Do you want to attach to the running deploy process?`,
             CliUx.ux.action.start('◷ Syncing the squid addons');
 
             return false;
-          case 'CONFIGURING_INGRESS':
+          case 'ADDING_INGRESS':
+          case 'REMOVING_INGRESS':
             CliUx.ux.action.start('◷ Configuring ingress');
 
             return false;
@@ -120,12 +151,12 @@ Do you want to attach to the running deploy process?`,
     return this.deploy;
   }
 
-  async streamLogs(organization: Organization, squid: Pick<Squid, 'reference'>) {
+  async streamLogs({ organization, squid }: SquidRequest) {
     CliUx.ux.action.start(`Streaming logs from the squid`);
 
     await streamSquidLogs({
       organization,
-      reference: squid.reference,
+      squid,
       onLog: (l) => this.log(l),
     });
   }
@@ -170,7 +201,7 @@ Do you want to attach to the running deploy process?`,
       );
 
       if (this.deploy?.squid) {
-        errors.push(`${chalk.dim('Squid:')} ${formatSquidFullname(this.deploy.squid)}`);
+        errors.push(`${chalk.dim('Squid:')} ${formatSquidReference(this.deploy.squid)}`);
       }
     }
 
@@ -191,6 +222,7 @@ Do you want to attach to the running deploy process?`,
         chalk[color](`=================================================`),
         message,
         chalk[color](`=================================================`),
+        '',
       ].join('\n'),
     );
   }

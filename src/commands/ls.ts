@@ -1,9 +1,8 @@
 import { ux as CliUx, Flags } from '@oclif/core';
-import chalk from 'chalk';
-import { isNil, omitBy } from 'lodash';
 
 import { listSquids } from '../api';
 import { CliCommand, SqdFlags } from '../command';
+import { printSquid } from '../utils';
 
 export default class Ls extends CliCommand {
   static description = 'List squids deployed to the Cloud';
@@ -11,47 +10,52 @@ export default class Ls extends CliCommand {
   static flags = {
     org: SqdFlags.org({
       required: false,
-      relationships: [
-        {
-          type: 'all',
-          flags: ['name'],
-        },
-      ],
     }),
     name: SqdFlags.name({
       required: false,
+      relationships: [],
+    }),
+    tag: SqdFlags.tag({
+      required: false,
+      dependsOn: [],
+    }),
+    slot: SqdFlags.slot({
+      required: false,
+      dependsOn: [],
     }),
     fullname: SqdFlags.fullname({
       required: false,
     }),
     truncate: Flags.boolean({
-      char: 't',
       description: 'Truncate data in columns: false by default',
       required: false,
       default: false,
+      allowNo: true,
     }),
   };
 
   async run(): Promise<void> {
     const {
-      flags: { truncate, fullname, ...flags },
+      flags: { truncate, fullname, interactive, ...flags },
     } = await this.parse(Ls);
-    const noTruncate = !truncate;
 
-    const { org, name } = fullname ? fullname : omitBy(flags, isNil);
+    const { org, name, slot, tag } = fullname ? fullname : (flags as any);
 
     const organization = name
-      ? await this.promptSquidOrganization({ code: org, name })
-      : await this.promptOrganization(org);
+      ? await this.promptSquidOrganization(org, name, { interactive })
+      : await this.promptOrganization(org, { interactive });
 
-    const squids = await listSquids({ organization, name });
-    if (squids) {
+    let squids = await listSquids({ organization, name });
+    if (tag || slot) {
+      squids = squids.filter((s) => s.slot === slot || s.tags.some((t) => t.name === tag));
+    }
+    if (squids.length) {
       CliUx.ux.table(
         squids,
         {
           name: {
             header: 'Squid',
-            get: (s) => `${s.name}${chalk.dim(`@${s.slot}`)}`,
+            get: (s) => `${printSquid(s)}`,
           },
           tags: {
             header: 'Tags',
@@ -70,7 +74,7 @@ export default class Ls extends CliCommand {
             get: (s) => (s.deployedAt ? new Date(s.deployedAt).toUTCString() : `-`),
           },
         },
-        { 'no-truncate': noTruncate },
+        { 'no-truncate': !truncate },
       );
     }
   }

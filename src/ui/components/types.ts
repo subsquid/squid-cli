@@ -1,5 +1,5 @@
 import { Squid as ApiSquid } from '../../api';
-import { formatSquidFullname } from '../../utils';
+import { formatSquidReference } from '../../utils';
 
 export interface Squid extends ApiSquid {}
 export class Squid {
@@ -8,7 +8,7 @@ export class Squid {
   constructor(squid: ApiSquid) {
     Object.assign(this, squid);
 
-    this.displayName = formatSquidFullname({ name: this.name, slot: this.slot });
+    this.displayName = formatSquidReference({ name: this.name, slot: this.slot });
 
     if (this.tags.length) {
       this.displayName += ` (${this.tags.map((a) => a.name).join(', ')})`;
