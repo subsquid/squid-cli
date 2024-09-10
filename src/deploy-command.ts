@@ -10,9 +10,18 @@ export abstract class DeployCommand extends CliCommand {
   deploy: Deployment | undefined;
   logsPrinted = 0;
 
-  async promptAttachToDeploy(squid: Squid) {
+  async promptAttachToDeploy(squid: Squid, { interactive }: { interactive?: boolean } = {}) {
     if (!squid.lastDeploy) return false;
     if (squid.status !== 'DEPLOYING') return false;
+
+    const warning = `Squid "${formatSquidReference(squid)}" is being deploying. 
+You can not run deploys on the same squid in parallel`;
+
+    if (!interactive) {
+      this.error(warning);
+    }
+
+    this.warn(warning);
 
     switch (squid.lastDeploy.type) {
       // we should react only for running deploy
@@ -21,9 +30,7 @@ export abstract class DeployCommand extends CliCommand {
           {
             name: 'confirm',
             type: 'confirm',
-            message: `Squid "${formatSquidReference(squid)}" is being deploying. 
-You can not run deploys on the same squid in parallel.
-Do you want to attach to the running deploy process?`,
+            message: `Do you want to attach to the running deploy process?`,
           },
         ]);
         if (!confirm) return false;
