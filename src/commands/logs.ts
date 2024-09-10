@@ -3,9 +3,9 @@ import { isNil, omitBy } from 'lodash';
 import ms from 'ms';
 
 import { debugLog, squidHistoryLogs, SquidRequest, streamSquidLogs } from '../api';
-import { CliCommand, SqdFlags, SquidReferenceArg } from '../command';
+import { CliCommand, SqdFlags } from '../command';
 import { pretty } from '../logs';
-import { formatSquidFullname } from '../utils';
+import { formatSquidReference } from '../utils';
 
 type LogResult = {
   hasLogs: boolean;
@@ -27,33 +27,15 @@ export default class Logs extends CliCommand {
   static flags = {
     org: SqdFlags.org({
       required: false,
-      relationships: [
-        {
-          type: 'all',
-          flags: ['name'],
-        },
-      ],
     }),
     name: SqdFlags.name({
       required: false,
-      relationships: [
-        {
-          type: 'some',
-          flags: [
-            { name: 'slot', when: async (flags) => !flags['tag'] },
-            { name: 'tag', when: async (flags) => !flags['slot'] },
-          ],
-        },
-      ],
     }),
     slot: SqdFlags.slot({
       required: false,
-      dependsOn: ['name'],
     }),
     tag: SqdFlags.tag({
       required: false,
-      dependsOn: ['name'],
-      exclusive: ['slot'],
     }),
     fullname: SqdFlags.fullname({
       required: false,
@@ -98,16 +80,15 @@ export default class Logs extends CliCommand {
 
   async run(): Promise<void> {
     const {
-      flags: { follow, pageSize, container, level, since, search, fullname, ...flags },
+      flags: { follow, pageSize, container, level, since, search, fullname, interactive, ...flags },
     } = await this.parse(Logs);
 
     this.validateSquidNameFlags({ fullname, ...flags });
 
-    const { org, name, tag, slot } = fullname ? fullname : omitBy(flags, isNil);
-    const reference = formatSquidFullname({ name, slot, tag });
+    const { org, name, tag, slot } = fullname ? fullname : (flags as any);
 
-    const organization = await this.promptSquidOrganization({ code: org, name });
-    const squid = await this.findOrThrowSquid({ organization, reference });
+    const organization = await this.promptSquidOrganization(org, name, { interactive });
+    const squid = await this.findOrThrowSquid({ organization, squid: { name, slot, tag } });
     if (!squid) return;
 
     const fromDate = parseDate(since);
@@ -115,7 +96,7 @@ export default class Logs extends CliCommand {
     if (follow) {
       await this.fetchLogs({
         organization,
-        reference,
+        squid,
         reverse: true,
         query: {
           limit: 30,
@@ -127,7 +108,7 @@ export default class Logs extends CliCommand {
       });
       await streamSquidLogs({
         organization,
-        reference,
+        squid,
         onLog: (l) => this.log(l),
         query: { container, level, search },
       });
@@ -138,7 +119,7 @@ export default class Logs extends CliCommand {
     do {
       const { hasLogs, nextPage }: LogResult = await this.fetchLogs({
         organization,
-        reference,
+        squid,
         query: {
           limit: pageSize,
           from: fromDate,
@@ -164,7 +145,7 @@ export default class Logs extends CliCommand {
 
   async fetchLogs({
     organization,
-    reference,
+    squid,
     query,
     reverse,
   }: SquidRequest & {
@@ -180,7 +161,7 @@ export default class Logs extends CliCommand {
     };
   }): Promise<LogResult> {
     // eslint-disable-next-line prefer-const
-    let { logs, nextPage } = await squidHistoryLogs({ organization, reference, query });
+    let { logs, nextPage } = await squidHistoryLogs({ organization, squid, query });
 
     if (reverse) {
       logs = logs.reverse();

@@ -1,9 +1,9 @@
 import { Flags } from '@oclif/core';
 
-import { ParsedSquidFullname, parseSquidFullname, SQUID_FULLNAME_REGEXP } from '../utils';
+import { ParsedSquidReference, parseSquidReference, SQUID_FULLNAME_REGEXP } from '../utils';
 
-export const fullname = Flags.custom<ParsedSquidFullname>({
-  helpGroup: 'COMMON',
+export const fullname = Flags.custom<ParsedSquidReference>({
+  helpGroup: 'SQUID',
   name: 'fullname',
   aliases: ['ref'],
   description: `Reference of a squid`,
@@ -16,6 +16,6 @@ export const fullname = Flags.custom<ParsedSquidFullname>({
       throw new Error(`Expected a squid reference name but received: ${input}`);
     }
 
-    return parseSquidFullname(input);
+    return parseSquidReference(input);
   },
 });

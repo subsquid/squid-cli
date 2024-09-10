@@ -18,10 +18,10 @@ export default class Explorer extends CliCommand {
 
   async run(): Promise<void> {
     const {
-      flags: { org },
+      flags: { org, interactive },
     } = await this.parse(Explorer);
 
-    const organization = await this.promptOrganization(org);
+    const organization = await this.promptOrganization(org, { interactive });
     const screen = blessed.screen({
       smartCSR: true,
       fastCSR: true,

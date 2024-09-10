@@ -22,11 +22,11 @@ export default class Rm extends CliCommand {
 
   async run(): Promise<void> {
     const {
-      flags: { org },
+      flags: { org, interactive },
       args: { name },
     } = await this.parse(Rm);
 
-    const organization = await this.promptOrganization(org);
+    const organization = await this.promptOrganization(org, { interactive });
     await removeSecret({ organization, name });
 
     this.log(`Secret '${name}' removed`);

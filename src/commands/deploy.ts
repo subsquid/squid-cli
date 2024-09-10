@@ -9,7 +9,7 @@ import diff from 'cli-diff';
 import { globSync } from 'glob';
 import ignore from 'ignore';
 import inquirer from 'inquirer';
-import { defaults, get, isNil, keys, pick, pickBy } from 'lodash';
+import { defaults, get, isNil, keys } from 'lodash';
 import prettyBytes from 'pretty-bytes';
 import targz from 'targz';
 
@@ -17,7 +17,7 @@ import { deploySquid, OrganizationRequest, Squid, uploadFile } from '../api';
 import { SqdFlags, SUCCESS_CHECK_MARK } from '../command';
 import { DeployCommand } from '../deploy-command';
 import { loadManifestFile } from '../manifest';
-import { formatSquidFullname, ParsedSquidFullname, parseSquidFullname, printSquidFullname } from '../utils';
+import { printSquid } from '../utils';
 
 const compressAsync = promisify(targz.compress);
 
@@ -60,21 +60,23 @@ function example(command: string, description: string) {
 export default class Deploy extends DeployCommand {
   static description = 'Deploy new or update an existing squid in the Cloud';
   static examples = [
-    example('sqd deploy', 'Create a new squid with name provided in the manifest file'),
+    example('sqd deploy ./', 'Create a new squid with name provided in the manifest file'),
     example(
-      'sqd deploy my-squid-override',
+      'sqd deploy ./ -n my-squid-override',
       'Create a new squid deployment and override it\'s name to "my-squid-override"',
     ),
-    example('sqd deploy my-squid#asmzf5', 'Update the "my-squid" squid with hash "asmzf5"'),
+    example('sqd deploy ./ -n my-squid -s asmzf5', 'Update the "my-squid" squid with slot "asmzf5"'),
     example(
-      'sqd deploy -d ./path-to-the-squid -m squid.prod.yaml',
+      'sqd deploy ./path-to-the-squid -m squid.prod.yaml',
       'Use a manifest file located in ./path-to-the-squid/squid.prod.yaml',
     ),
     example(
-      'sqd deploy -d /Users/dev/path-to-the-squid -m /Users/dev/path-to-the-squid/squid.prod.yaml',
+      'sqd deploy /Users/dev/path-to-the-squid -m /Users/dev/path-to-the-squid/squid.prod.yaml',
       'Full paths are also fine',
     ),
   ];
+
+  static help = 'If squid flags are not specified, the they will be retrieved from the manifest or prompted.';
 
   static args = {
     // squid_name_or_reference: Args.string({
@@ -88,7 +90,7 @@ export default class Deploy extends DeployCommand {
     //   ].join('\n'),
     //   required: false,
     // }),
-    source: Args.string({
+    source: Args.directory({
       description: [
         `Squid source. Could be:`,
         `  - a relative or absolute path to a local folder (e.g. ".")`,
@@ -106,41 +108,31 @@ export default class Deploy extends DeployCommand {
     }),
     name: SqdFlags.name({
       required: false,
+      relationships: [],
     }),
     tag: SqdFlags.tag({
       required: false,
+      dependsOn: [],
     }),
     slot: SqdFlags.slot({
       required: false,
+      dependsOn: [],
     }),
     fullname: SqdFlags.fullname({
       required: false,
     }),
-    manifest: Flags.string({
+    manifest: Flags.file({
       char: 'm',
       description: 'Relative local path to a squid manifest file in squid working directory',
       required: false,
       default: 'squid.yaml',
       helpValue: '<manifest_path>',
     }),
-    // dir: Flags.string({
-    //   char: 'd',
-    //   description: SQUID_WORKDIR_DESC.join('\n'),
-    //   required: false,
-    //   default: '.',
-    //   helpValue: '<source>',
-    // }),
-    // tag: Flags.string({
-    //   char: 't',
-    //   description: [
-    //     'Assign the tag to the squid deployment. ',
-    //     'The previous deployment API URL assigned with the same tag will be transitioned to the new deployment',
-    //     'Tag must contain only alphanumeric characters, dashes, and underscores',
-    //   ].join('\n'),
-    //   required: false,
-    //   helpValue: '<tag>',
-    // }),
     force: Flags.boolean({
+      required: false,
+      default: false,
+    }),
+    override: Flags.boolean({
       required: false,
       default: false,
     }),
@@ -150,14 +142,14 @@ export default class Deploy extends DeployCommand {
       required: false,
       default: false,
     }),
-    'no-stream-logs': Flags.boolean({
-      description: 'Do not attach and stream squid logs after the deploy',
+    'stream-logs': Flags.boolean({
+      description: 'Attach and stream squid logs after the deploy',
       required: false,
-      default: false,
+      default: true,
+      allowNo: true,
     }),
-    'apply-tag': Flags.boolean({
+    'add-tag': Flags.string({
       required: false,
-      default: false,
     }),
   };
 
@@ -165,12 +157,14 @@ export default class Deploy extends DeployCommand {
     const {
       args: { source },
       flags: {
+        interactive,
         manifest: manifestPath,
         'hard-reset': hardReset,
-        'no-stream-logs': noStreamLogs,
-        'apply-tag': applyTag,
+        'stream-logs': streamLogs,
+        'add-tag': addTag,
         force,
         fullname,
+        override,
         ...flags
       },
     } = await this.parse(Deploy);
@@ -190,21 +184,23 @@ export default class Deploy extends DeployCommand {
 
     const overrides = fullname ? fullname : flags;
 
-    // some hack to add slot name in case if version is used
+    // some hack to normalize slot name in case if version is used
     {
       manifest.slot = manifest.slotName();
       delete manifest['version'];
     }
 
-    const override = await this.promptOverrideConflict(manifest, overrides);
-    if (!override) return;
+    if (!override) {
+      const confirm = await this.promptOverrideConflict(manifest, overrides, { interactive });
+      if (!confirm) return;
+    }
 
     // eslint-disable-next-line prefer-const
     let { name, slot, org, tag } = defaults(overrides, manifest);
 
-    const organization = await this.promptOrganization(org);
+    const organization = await this.promptOrganization(org, { interactive });
 
-    name = await this.promptSquidName(name);
+    name = await this.promptSquidName(name, { interactive });
 
     this.log(chalk.dim(`Squid directory: ${squidDir}`));
     this.log(chalk.dim(`Build directory: ${buildDir}`));
@@ -214,8 +210,7 @@ export default class Deploy extends DeployCommand {
     this.log(chalk.cyan(`Squid name: ${name}`));
     if (slot) {
       this.log(chalk.cyan(`Squid slot: ${slot}`));
-    }
-    if (tag) {
+    } else if (tag) {
       this.log(chalk.cyan(`Squid tag: ${tag}`));
     }
     this.log(chalk.cyan(`-----------------------------`));
@@ -224,7 +219,7 @@ export default class Deploy extends DeployCommand {
     if (slot || tag) {
       target = await this.findSquid({
         organization,
-        reference: formatSquidFullname(slot ? { name, slot } : { name, tag: tag! }),
+        squid: { name, slot, tag: tag! },
       });
     }
 
@@ -247,9 +242,10 @@ export default class Deploy extends DeployCommand {
     /**
      * Squid exists we should check if tag belongs to another squid
      */
-    if (target && slot && tag && !applyTag) {
-      const apply = await this.promptApplyTag(target, tag);
-      if (!apply) return;
+    const hasTag = !!target?.tags.find((t) => t.name === addTag) || tag === addTag;
+    if (addTag && !force && !hasTag) {
+      const add = await this.promptAddTag({ organization, name, tag: addTag });
+      if (!add) return;
     }
 
     const archiveName = `${manifest.name}.tar.gz`;
@@ -274,75 +270,48 @@ export default class Deploy extends DeployCommand {
     if (!deployment || !deployment.squid) return;
 
     if (target) {
-      this.logDeployResult(
-        UPDATE_COLOR,
-        `The squid ${printSquidFullname({
-          org: deployment.organization.code,
-          name: deployment.squid.name,
-          slot: deployment.squid.slot,
-        })} has been successfully updated`,
-      );
+      this.logDeployResult(UPDATE_COLOR, `The squid ${printSquid(target)} has been successfully updated`);
     } else {
       this.logDeployResult(
         CREATE_COLOR,
-        `A new squid ${printSquidFullname({
-          org: deployment.organization.code,
-          name: deployment.squid.name,
-          slot: deployment.squid.slot,
-        })} has been successfully created`,
+        `A new squid ${printSquid({ ...deployment.squid, organization: deployment.organization })} has been successfully created`,
       );
     }
 
-    if (!noStreamLogs) {
-      await this.streamLogs(organization, deployment.squid);
+    if (streamLogs) {
+      await this.streamLogs({ organization: deployment.organization, squid: deployment.squid });
     }
   }
 
-  private async promptUpdateSquid(target: Squid) {
-    this.log(
-      `A squid "${printSquidFullname({
-        org: target.organization.code,
-        name: target.name,
-        slot: target.slot,
-      })}" will be updated.`,
-    );
+  private async promptUpdateSquid(
+    target: Squid,
+    { using = 'using "--force" flag', interactive }: { using?: string; interactive?: boolean } = {},
+  ) {
+    const warning = `A squid ${printSquid(target)} already exists.`;
+
+    if (!interactive) {
+      this.error([warning, `Please do it explicitly ${using}`].join('\n'));
+    }
+
+    this.warn(warning);
+
     const { confirm } = await inquirer.prompt([
       {
         name: 'confirm',
         type: 'confirm',
-        message: 'Are you sure you wish to proceed?',
+        message: 'Are you sure?',
+        prefix: `A squid ${printSquid(target)} will be updated.`,
       },
     ]);
 
     return !!confirm;
   }
 
-  private async promptApplyTag(target: Squid, tag: string) {
-    if (!!target.tags.find((t) => t.name === tag)) return true;
-
-    const oldSquid = await this.findSquid({
-      organization: target.organization,
-      reference: formatSquidFullname({ name: target.name, tag }),
-    });
-    if (!oldSquid) return true;
-
-    this.log(
-      `A squid tag "${tag}" has already been assigned to ${printSquidFullname({ name: oldSquid.name, slot: oldSquid.slot })}.`,
-    );
-    this.log(`The tag will be assigned to the newly created squid.`);
-
-    const { confirm } = await inquirer.prompt([
-      {
-        name: 'confirm',
-        type: 'confirm',
-        message: 'Are you sure you wish to proceed?',
-      },
-    ]);
-
-    return !!confirm;
-  }
-
-  private async promptOverrideConflict(manifest: Manifest, override: Record<string, any>) {
+  private async promptOverrideConflict(
+    manifest: Manifest,
+    override: Record<string, any>,
+    { using = 'using "--override" flag', interactive }: { using?: string; interactive?: boolean } = {},
+  ) {
     const conflictKeys = keys(override).filter((k) => {
       const m = get(manifest, k);
       const o = get(override, k);
@@ -351,18 +320,24 @@ export default class Deploy extends DeployCommand {
 
     if (!conflictKeys.length) return true;
 
-    this.log(
-      [
-        chalk.bold('Conflict detected!'),
+    const warning = [
+      'Conflict detected!',
+      `A manifest values do not match with specified ones.`,
+      ``,
+      diff(
+        { content: conflictKeys.map((k) => `${k}: ${get(manifest, k)}`).join('\n') + '\n' },
+        { content: conflictKeys.map((k) => `${k}: ${get(override, k)}`).join('\n') + '\n' },
+      ),
+      ``,
+    ].join('\n');
 
-        `A manifest values do not match with specified ones.`,
-        `If it is intended and you'd like to override them, just skip this message and confirm, the manifest name will be overridden automatically in the Cloud during the deploy.`,
-        ``,
-        diff(
-          { content: conflictKeys.map((k) => `${k}: ${get(manifest, k)}`).join('\n') + '\n' },
-          { content: conflictKeys.map((k) => `${k}: ${get(override, k)}`).join('\n') + '\n' },
-        ),
-      ].join('\n'),
+    if (!interactive) {
+      this.error([warning, `Please do it explicitly ${using}`].join('\n'));
+    }
+
+    this.warn(warning);
+    this.log(
+      `If it is intended and you'd like to override them, just skip this message and confirm, the manifest name will be overridden automatically in the Cloud during the deploy.`,
     );
 
     const { confirm } = await inquirer.prompt([
@@ -376,17 +351,24 @@ export default class Deploy extends DeployCommand {
     return !!confirm;
   }
 
-  private async promptSquidName(name?: string) {
+  private async promptSquidName(
+    name?: string | null | undefined,
+    { using = 'using "--name" flag', interactive }: { using?: string; interactive?: boolean } = {},
+  ) {
     if (name) return name;
 
+    const warning = `The squid name is not defined either in the manifest or via CLI command.`;
+
+    if (!interactive) {
+      this.error([warning, `Please specify it explicitly ${using}`].join('\n'));
+    }
+
+    this.warn(warning);
     const { input } = await inquirer.prompt([
       {
         name: 'input',
         type: 'input',
-        message: [
-          chalk.reset(`The squid name is not defined either in the manifest or via CLI command.`),
-          chalk.reset(`Please enter the name of the squid:`),
-        ].join('\n'),
+        message: `Please enter the name of the squid:`,
       },
     ]);
 

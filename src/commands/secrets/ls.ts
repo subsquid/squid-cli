@@ -16,11 +16,11 @@ export default class Ls extends CliCommand {
 
   async run(): Promise<void> {
     const {
-      flags: { org },
+      flags: { org, interactive },
       args: {},
     } = await this.parse(Ls);
 
-    const organization = await this.promptOrganization(org);
+    const organization = await this.promptOrganization(org, { interactive });
     const response = await listSecrets({ organization });
 
     if (!Object.keys(response.secrets).length) {

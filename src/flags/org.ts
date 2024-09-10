@@ -1,7 +1,7 @@
 import { Flags } from '@oclif/core';
 
 export const org = Flags.custom<string>({
-  helpGroup: 'COMMON',
+  helpGroup: 'ORG',
   char: 'o',
   name: 'org',
   description: 'Organization code',
