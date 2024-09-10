@@ -227,7 +227,7 @@ export default class Deploy extends DeployCommand {
      * Squid exists we should check running deploys
      */
     if (target) {
-      const attached = await this.promptAttachToDeploy(target);
+      const attached = await this.promptAttachToDeploy(target, { interactive });
       if (attached) return;
     }
 
@@ -235,7 +235,7 @@ export default class Deploy extends DeployCommand {
      * Squid exists we should ask for update
      */
     if (target && !force) {
-      const update = await this.promptUpdateSquid(target);
+      const update = await this.promptUpdateSquid(target, { interactive });
       if (!update) return;
     }
 
@@ -244,7 +244,7 @@ export default class Deploy extends DeployCommand {
      */
     const hasTag = !!target?.tags.find((t) => t.name === addTag) || tag === addTag;
     if (addTag && !force && !hasTag) {
-      const add = await this.promptAddTag({ organization, name, tag: addTag });
+      const add = await this.promptAddTag({ organization, name, tag: addTag }, { interactive });
       if (!add) return;
     }
 
