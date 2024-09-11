@@ -46,7 +46,10 @@ export default class Rm extends DeployCommand {
     const organization = await this.promptSquidOrganization(org, name, { interactive });
     const squid = await this.findOrThrowSquid({ organization, squid: { name, slot, tag } });
 
-    if (!force) {
+    const attached = await this.promptAttachToDeploy(squid, { interactive });
+    if (attached) return;
+
+    if (!force && interactive) {
       const { confirm } = await inquirer.prompt([
         {
           name: 'confirm',

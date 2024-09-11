@@ -6,14 +6,14 @@ export const fullname = Flags.custom<ParsedSquidReference>({
   helpGroup: 'SQUID',
   name: 'fullname',
   aliases: ['ref'],
-  description: `Reference of a squid`,
+  description: `Fully qualified reference of the squid. It can include the organization, name, slot, or tag`,
   helpValue: '[<org>/]<name>(@<slot>|:<tag>)',
   required: false,
   exclusive: ['org', 'name', 'slot', 'tag'],
   parse: async (input) => {
     input = input.toLowerCase();
     if (!SQUID_FULLNAME_REGEXP.test(input)) {
-      throw new Error(`Expected a squid reference name but received: ${input}`);
+      throw new Error(`Expected full name of the squid but received: ${input}`);
     }
 
     return parseSquidReference(input);

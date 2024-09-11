@@ -19,40 +19,15 @@ export default class Remove extends DeployCommand {
   static flags = {
     org: SqdFlags.org({
       required: false,
-      relationships: [
-        {
-          type: 'all',
-          flags: ['name'],
-        },
-        {
-          type: 'some',
-          flags: [
-            { name: 'slot', when: async (flags) => !flags['tag'] },
-            { name: 'tag', when: async (flags) => !flags['slot'] },
-          ],
-        },
-      ],
     }),
     name: SqdFlags.name({
       required: false,
-      relationships: [
-        {
-          type: 'some',
-          flags: [
-            { name: 'slot', when: async (flags) => !flags['tag'] },
-            { name: 'tag', when: async (flags) => !flags['slot'] },
-          ],
-        },
-      ],
     }),
     slot: SqdFlags.slot({
       required: false,
-      dependsOn: ['name'],
     }),
     tag: SqdFlags.tag({
       required: false,
-      dependsOn: ['name'],
-      exclusive: ['slot'],
     }),
     fullname: SqdFlags.fullname({
       required: false,
@@ -75,6 +50,9 @@ export default class Remove extends DeployCommand {
     if (!squid.tags.some((t) => t.name === tagName)) {
       return this.log(`Tag "${tagName}" is not assigned to the squid ${printSquid(squid)}`);
     }
+
+    const attached = await this.promptAttachToDeploy(squid, { interactive });
+    if (attached) return;
 
     const deployment = await removeSquidTag({
       organization,
