@@ -41,6 +41,9 @@ export default class Restart extends DeployCommand {
     const organization = await this.promptSquidOrganization(org, name, { interactive });
     const squid = await this.findOrThrowSquid({ organization, squid: { name, tag, slot } });
 
+    const attached = await this.promptAttachToDeploy(squid, { interactive });
+    if (attached) return;
+
     const deployment = await restartSquid({ organization, squid });
     await this.pollDeploy({ organization, deploy: deployment });
     if (!deployment || !deployment.squid) return;

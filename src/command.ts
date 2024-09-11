@@ -13,6 +13,7 @@ export const SUCCESS_CHECK_MARK = chalk.green('✓');
 export abstract class CliCommand extends Command {
   static baseFlags = {
     interactive: Flags.boolean({
+      description: 'Enable or disable interactive mode',
       required: false,
       default: true,
       allowNo: true,
