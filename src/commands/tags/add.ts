@@ -21,38 +21,21 @@ export default class Add extends DeployCommand {
   static flags = {
     org: SqdFlags.org({
       required: false,
-      relationships: [
-        {
-          type: 'all',
-          flags: ['name'],
-        },
-      ],
     }),
     name: SqdFlags.name({
       required: false,
-      relationships: [
-        {
-          type: 'some',
-          flags: [
-            { name: 'slot', when: async (flags) => !flags['tag'] },
-            { name: 'tag', when: async (flags) => !flags['slot'] },
-          ],
-        },
-      ],
     }),
     slot: SqdFlags.slot({
       required: false,
-      dependsOn: ['name'],
     }),
     tag: SqdFlags.tag({
       required: false,
-      dependsOn: ['name'],
-      exclusive: ['slot'],
     }),
     fullname: SqdFlags.fullname({
       required: false,
     }),
-    force: Flags.boolean({
+    'allow-tag-reassign': Flags.boolean({
+      description: 'Allow reassigning an existing tag',
       required: false,
       default: false,
     }),
@@ -61,7 +44,7 @@ export default class Add extends DeployCommand {
   async run(): Promise<void> {
     const {
       args: { tag: tagName },
-      flags: { fullname, interactive, force, ...flags },
+      flags: { fullname, interactive, ...flags },
     } = await this.parse(Add);
 
     this.validateSquidNameFlags({ fullname, ...flags });
@@ -75,7 +58,7 @@ export default class Add extends DeployCommand {
       return this.log(`Tag "${tagName}" is already assigned to the squid ${printSquid(squid)}`);
     }
 
-    if (!force) {
+    if (!flags['allow-tag-reassign']) {
       const confirm = await this.promptAddTag(
         {
           organization,
@@ -86,6 +69,9 @@ export default class Add extends DeployCommand {
       );
       if (!confirm) return;
     }
+
+    const attached = await this.promptAttachToDeploy(squid, { interactive });
+    if (attached) return;
 
     const deployment = await addSquidTag({
       organization,

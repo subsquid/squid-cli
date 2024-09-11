@@ -14,7 +14,7 @@ export abstract class DeployCommand extends CliCommand {
     if (!squid.lastDeploy) return false;
     if (squid.status !== 'DEPLOYING') return false;
 
-    const warning = `Squid "${formatSquidReference(squid)}" is being deploying. 
+    const warning = `Squid ${printSquid(squid)} is being deploying. 
 You can not run deploys on the same squid in parallel`;
 
     if (!interactive) {

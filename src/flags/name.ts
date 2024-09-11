@@ -4,7 +4,7 @@ export const name = Flags.custom<string>({
   helpGroup: 'SQUID',
   char: 'n',
   name: 'name',
-  description: 'Squid name',
+  description: 'Name of the squid',
   helpValue: '<name>',
   required: false,
   parse: async (input) => {

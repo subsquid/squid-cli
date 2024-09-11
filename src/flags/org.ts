@@ -4,7 +4,7 @@ export const org = Flags.custom<string>({
   helpGroup: 'ORG',
   char: 'o',
   name: 'org',
-  description: 'Organization code',
+  description: 'Code of the organization',
   helpValue: '<code>',
   required: false,
   parse: async (input) => {

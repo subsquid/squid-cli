@@ -9,7 +9,7 @@ import diff from 'cli-diff';
 import { globSync } from 'glob';
 import ignore from 'ignore';
 import inquirer from 'inquirer';
-import { defaults, get, isNil, keys } from 'lodash';
+import { defaults, get, isNil, keys, pick } from 'lodash';
 import prettyBytes from 'pretty-bytes';
 import targz from 'targz';
 
@@ -60,12 +60,12 @@ function example(command: string, description: string) {
 export default class Deploy extends DeployCommand {
   static description = 'Deploy new or update an existing squid in the Cloud';
   static examples = [
-    example('sqd deploy ./', 'Create a new squid with name provided in the manifest file'),
+    example('sqd deploy .', 'Create a new squid with name provided in the manifest file'),
     example(
-      'sqd deploy ./ -n my-squid-override',
+      'sqd deploy . -n my-squid-override',
       'Create a new squid deployment and override it\'s name to "my-squid-override"',
     ),
-    example('sqd deploy ./ -n my-squid -s asmzf5', 'Update the "my-squid" squid with slot "asmzf5"'),
+    example('sqd deploy . -n my-squid -s asmzf5', 'Update the "my-squid" squid with slot "asmzf5"'),
     example(
       'sqd deploy ./path-to-the-squid -m squid.prod.yaml',
       'Use a manifest file located in ./path-to-the-squid/squid.prod.yaml',
@@ -79,17 +79,6 @@ export default class Deploy extends DeployCommand {
   static help = 'If squid flags are not specified, the they will be retrieved from the manifest or prompted.';
 
   static args = {
-    // squid_name_or_reference: Args.string({
-    //   description: [
-    //     `Reference to squid for the update.`,
-    //     `If argument not specified, the squid name will be retrieved from the manifest or prompted and a new squid will be created.`,
-    //     ``,
-    //     `Alternatively, you can overwrite the name of the squid from the manifest by explicitly providing a new name instead of a reference.`,
-    //     ``,
-    //     `See Examples section for more information`,
-    //   ].join('\n'),
-    //   required: false,
-    // }),
     source: Args.directory({
       description: [
         `Squid source. Could be:`,
@@ -123,33 +112,41 @@ export default class Deploy extends DeployCommand {
     }),
     manifest: Flags.file({
       char: 'm',
-      description: 'Relative local path to a squid manifest file in squid working directory',
+      description: 'Specify the relative local path to a squid manifest file in the squid working directory',
       required: false,
       default: 'squid.yaml',
       helpValue: '<manifest_path>',
     }),
-    force: Flags.boolean({
-      required: false,
-      default: false,
-    }),
-    override: Flags.boolean({
-      required: false,
-      default: false,
-    }),
     'hard-reset': Flags.boolean({
       description:
-        'Do a hard reset before deploying. Drops and re-creates all the squid resources including the database. Will cause a short API downtime',
+        'Perform a hard reset before deploying. This will drop and re-create all squid resources, including the database, causing a short API downtime',
       required: false,
       default: false,
     }),
     'stream-logs': Flags.boolean({
-      description: 'Attach and stream squid logs after the deploy',
+      description: 'Attach and stream squid logs after the deployment',
       required: false,
       default: true,
       allowNo: true,
     }),
     'add-tag': Flags.string({
+      description: 'Add a tag to the deployed squid',
       required: false,
+    }),
+    'allow-update': Flags.boolean({
+      description: 'Allow updating an existing squid',
+      required: false,
+      default: false,
+    }),
+    'allow-tag-reassign': Flags.boolean({
+      description: 'Allow reassigning an existing tag',
+      required: false,
+      default: false,
+    }),
+    'allow-manifest-override': Flags.boolean({
+      description: 'Allow overriding the manifest during deployment',
+      required: false,
+      default: false,
     }),
   };
 
@@ -162,9 +159,7 @@ export default class Deploy extends DeployCommand {
         'hard-reset': hardReset,
         'stream-logs': streamLogs,
         'add-tag': addTag,
-        force,
         fullname,
-        override,
         ...flags
       },
     } = await this.parse(Deploy);
@@ -182,7 +177,7 @@ export default class Deploy extends DeployCommand {
 
     const { buildDir, squidDir, manifest } = res;
 
-    const overrides = fullname ? fullname : flags;
+    const overrides = fullname ? fullname : pick(flags, 'slot', 'name', 'tag', 'org');
 
     // some hack to normalize slot name in case if version is used
     {
@@ -190,7 +185,7 @@ export default class Deploy extends DeployCommand {
       delete manifest['version'];
     }
 
-    if (!override) {
+    if (!flags['allow-manifest-override']) {
       const confirm = await this.promptOverrideConflict(manifest, overrides, { interactive });
       if (!confirm) return;
     }
@@ -224,17 +219,9 @@ export default class Deploy extends DeployCommand {
     }
 
     /**
-     * Squid exists we should check running deploys
-     */
-    if (target) {
-      const attached = await this.promptAttachToDeploy(target, { interactive });
-      if (attached) return;
-    }
-
-    /**
      * Squid exists we should ask for update
      */
-    if (target && !force) {
+    if (target && !flags['allow-update']) {
       const update = await this.promptUpdateSquid(target, { interactive });
       if (!update) return;
     }
@@ -243,9 +230,17 @@ export default class Deploy extends DeployCommand {
      * Squid exists we should check if tag belongs to another squid
      */
     const hasTag = !!target?.tags.find((t) => t.name === addTag) || tag === addTag;
-    if (addTag && !force && !hasTag) {
+    if (addTag && !flags['allow-tag-reassign'] && !hasTag) {
       const add = await this.promptAddTag({ organization, name, tag: addTag }, { interactive });
       if (!add) return;
+    }
+
+    /**
+     * Squid exists we should check running deploys
+     */
+    if (target) {
+      const attached = await this.promptAttachToDeploy(target, { interactive });
+      if (attached) return;
     }
 
     const archiveName = `${manifest.name}.tar.gz`;
