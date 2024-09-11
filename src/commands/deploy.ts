@@ -280,7 +280,15 @@ export default class Deploy extends DeployCommand {
 
   private async promptUpdateSquid(
     target: Squid,
-    { using = 'using "--force" flag', interactive }: { using?: string; interactive?: boolean } = {},
+    {
+      using = 'using "--force" flag',
+      interactive,
+      hardReset,
+    }: {
+      using?: string;
+      interactive?: boolean;
+      hardReset?: boolean;
+    } = {},
   ) {
     const warning = `A squid ${printSquid(target)} already exists.`;
 
@@ -295,7 +303,7 @@ export default class Deploy extends DeployCommand {
         name: 'confirm',
         type: 'confirm',
         message: 'Are you sure?',
-        prefix: `A squid ${printSquid(target)} will be updated.`,
+        prefix: `A squid ${printSquid(target)} will be ${hardReset ? `recreated` : `updated`}.`,
       },
     ]);
 
