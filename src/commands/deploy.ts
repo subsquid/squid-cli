@@ -256,7 +256,7 @@ export default class Deploy extends DeployCommand {
           hardReset,
           overrideName: name,
           overrideSlot: slot,
-          tag,
+          tag: addTag,
         },
       },
     });
