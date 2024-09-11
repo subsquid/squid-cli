@@ -57,7 +57,7 @@ You can not run deploys on the same squid in parallel`;
     });
     if (!oldSquid) return true;
 
-    const warning = `A tag "${tag}" has already been assigned to ${printSquid(oldSquid)}.`;
+    const warning = `The tag "${tag}" has already been assigned to ${printSquid(oldSquid)}.`;
 
     if (!interactive) {
       this.error([warning, `Please do it explicitly ${using}`].join('\n'));
@@ -70,7 +70,7 @@ You can not run deploys on the same squid in parallel`;
         name: 'confirm',
         type: 'confirm',
         message: 'Are you sure?',
-        prefix: `The tag will be assigned to the newly created squid.`,
+        prefix: `The tag will be reassigned.`,
       },
     ]);
 
