@@ -33,15 +33,15 @@ export abstract class CliCommand extends Command {
   }
 
   // Haven't find a way to do it with native settings
-  validateSquidNameFlags(flags: { fullname?: any; name?: any }) {
-    if (flags.fullname || flags.name) return;
+  validateSquidNameFlags(flags: { reference?: any; name?: any }) {
+    if (flags.reference || flags.name) return;
 
     throw new FailedFlagValidationError({
       failed: [
         {
           name: 'squid name',
           validationFn: 'validateSquidName',
-          reason: 'One of the following must be provided: --fullname, --name',
+          reason: 'One of the following must be provided: --reference, --name',
           status: 'failed',
         },
       ],

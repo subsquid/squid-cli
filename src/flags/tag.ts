@@ -1,4 +1,5 @@
 import { Flags } from '@oclif/core';
+import { JoiSquidTag } from '@subsquid/manifest';
 
 export const tag = Flags.custom<string>({
   helpGroup: 'SQUID',
@@ -8,7 +9,7 @@ export const tag = Flags.custom<string>({
   helpValue: '<tag>',
   required: false,
   parse: async (input) => {
-    return input.toLowerCase();
+    return await JoiSquidTag.validateAsync(input);
   },
   dependsOn: ['name'],
   exclusive: ['slot'],

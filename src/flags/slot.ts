@@ -1,4 +1,5 @@
 import { Flags } from '@oclif/core';
+import { JoiSquidSlot } from '@subsquid/manifest';
 
 export const slot = Flags.custom<string>({
   helpGroup: 'SQUID',
@@ -7,7 +8,7 @@ export const slot = Flags.custom<string>({
   description: 'Slot of the squid',
   helpValue: '<slot>',
   parse: async (input) => {
-    return input.toLowerCase();
+    return await JoiSquidSlot.validateAsync(input);
   },
   required: false,
   dependsOn: ['name'],

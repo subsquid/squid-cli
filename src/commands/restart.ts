@@ -24,19 +24,19 @@ export default class Restart extends DeployCommand {
     tag: SqdFlags.tag({
       required: false,
     }),
-    fullname: SqdFlags.fullname({
+    reference: SqdFlags.reference({
       required: false,
     }),
   };
 
   async run(): Promise<void> {
     const {
-      flags: { fullname, interactive, ...flags },
+      flags: { reference, interactive, ...flags },
     } = await this.parse(Restart);
 
-    this.validateSquidNameFlags({ fullname, ...flags });
+    this.validateSquidNameFlags({ reference, ...flags });
 
-    const { org, name, tag, slot } = fullname ? fullname : (flags as any);
+    const { org, name, tag, slot } = reference ? reference : (flags as any);
 
     const organization = await this.promptSquidOrganization(org, name, { interactive });
     const squid = await this.findOrThrowSquid({ organization, squid: { name, tag, slot } });

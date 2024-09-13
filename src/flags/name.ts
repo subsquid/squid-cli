@@ -1,4 +1,5 @@
 import { Flags } from '@oclif/core';
+import { JoiSquidName } from '@subsquid/manifest';
 
 export const name = Flags.custom<string>({
   helpGroup: 'SQUID',
@@ -8,7 +9,7 @@ export const name = Flags.custom<string>({
   helpValue: '<name>',
   required: false,
   parse: async (input) => {
-    return input.toLowerCase();
+    return await JoiSquidName.validateAsync(input);
   },
   relationships: [
     {
