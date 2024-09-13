@@ -49,7 +49,7 @@ You can not run deploys on the same squid in parallel`;
 
   async promptAddTag(
     { organization, name, tag }: { organization: Pick<Organization, 'code'>; name: string; tag: string },
-    { using = 'using "--force" flag', interactive }: { using?: string; interactive?: boolean } = {},
+    { using = 'using "--allow-tag-reassign" flag', interactive }: { using?: string; interactive?: boolean } = {},
   ) {
     const oldSquid = await this.findSquid({
       organization,

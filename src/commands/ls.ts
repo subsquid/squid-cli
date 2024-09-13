@@ -23,7 +23,7 @@ export default class Ls extends CliCommand {
       required: false,
       dependsOn: [],
     }),
-    fullname: SqdFlags.fullname({
+    reference: SqdFlags.reference({
       required: false,
     }),
     truncate: Flags.boolean({
@@ -36,10 +36,10 @@ export default class Ls extends CliCommand {
 
   async run(): Promise<void> {
     const {
-      flags: { truncate, fullname, interactive, ...flags },
+      flags: { truncate, reference, interactive, ...flags },
     } = await this.parse(Ls);
 
-    const { org, name, slot, tag } = fullname ? fullname : (flags as any);
+    const { org, name, slot, tag } = reference ? reference : (flags as any);
 
     const organization = name
       ? await this.promptSquidOrganization(org, name, { interactive })

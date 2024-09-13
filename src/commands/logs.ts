@@ -37,7 +37,7 @@ export default class Logs extends CliCommand {
     tag: SqdFlags.tag({
       required: false,
     }),
-    fullname: SqdFlags.fullname({
+    reference: SqdFlags.reference({
       required: false,
     }),
     container: Flags.string({
@@ -80,12 +80,12 @@ export default class Logs extends CliCommand {
 
   async run(): Promise<void> {
     const {
-      flags: { follow, pageSize, container, level, since, search, fullname, interactive, ...flags },
+      flags: { follow, pageSize, container, level, since, search, reference, interactive, ...flags },
     } = await this.parse(Logs);
 
-    this.validateSquidNameFlags({ fullname, ...flags });
+    this.validateSquidNameFlags({ reference, ...flags });
 
-    const { org, name, tag, slot } = fullname ? fullname : (flags as any);
+    const { org, name, tag, slot } = reference ? reference : (flags as any);
 
     const organization = await this.promptSquidOrganization(org, name, { interactive });
     const squid = await this.findOrThrowSquid({ organization, squid: { name, slot, tag } });

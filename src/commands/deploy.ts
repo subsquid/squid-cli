@@ -107,7 +107,7 @@ export default class Deploy extends DeployCommand {
       required: false,
       dependsOn: [],
     }),
-    fullname: SqdFlags.fullname({
+    reference: SqdFlags.reference({
       required: false,
     }),
     manifest: Flags.file({
@@ -159,7 +159,7 @@ export default class Deploy extends DeployCommand {
         'hard-reset': hardReset,
         'stream-logs': streamLogs,
         'add-tag': addTag,
-        fullname,
+        reference,
         ...flags
       },
     } = await this.parse(Deploy);
@@ -177,7 +177,7 @@ export default class Deploy extends DeployCommand {
 
     const { buildDir, squidDir, manifest } = res;
 
-    const overrides = fullname ? fullname : pick(flags, 'slot', 'name', 'tag', 'org');
+    const overrides = reference ? reference : pick(flags, 'slot', 'name', 'tag', 'org');
 
     // some hack to normalize slot name in case if version is used
     {
@@ -222,7 +222,7 @@ export default class Deploy extends DeployCommand {
      * Squid exists we should ask for update
      */
     if (target && !flags['allow-update']) {
-      const update = await this.promptUpdateSquid(target, { interactive });
+      const update = await this.promptUpdateSquid(target, { interactive, hardReset });
       if (!update) return;
     }
 
@@ -255,7 +255,7 @@ export default class Deploy extends DeployCommand {
         options: {
           hardReset,
           overrideName: name,
-          overrideSlot: slot,
+          overrideSlot: target?.slot || slot,
           tag: addTag,
         },
       },
@@ -281,7 +281,7 @@ export default class Deploy extends DeployCommand {
   private async promptUpdateSquid(
     target: Squid,
     {
-      using = 'using "--force" flag',
+      using = 'using "--allow-update" flag',
       interactive,
       hardReset,
     }: {
@@ -313,7 +313,7 @@ export default class Deploy extends DeployCommand {
   private async promptOverrideConflict(
     manifest: Manifest,
     override: Record<string, any>,
-    { using = 'using "--override" flag', interactive }: { using?: string; interactive?: boolean } = {},
+    { using = 'using "--allow--manifest-override" flag', interactive }: { using?: string; interactive?: boolean } = {},
   ) {
     const conflictKeys = keys(override).filter((k) => {
       const m = get(manifest, k);
@@ -375,7 +375,7 @@ export default class Deploy extends DeployCommand {
       },
     ]);
 
-    return input.name as string;
+    return input as string;
   }
 
   private async pack({ buildDir, squidDir, archiveName }: { buildDir: string; squidDir: string; archiveName: string }) {
