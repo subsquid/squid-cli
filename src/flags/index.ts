@@ -1,4 +1,4 @@
-export { fullname } from './fullname';
+export { reference } from './fullname';
 export { name } from './name';
 export { org } from './org';
 export { slot } from './slot';

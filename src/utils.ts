@@ -1,8 +1,18 @@
 import { ConfigNotFound, getConfig } from '@subsquid/commands';
+import {
+  JoiSquidName,
+  JoiSquidSlot,
+  JoiSquidTag,
+  SQUID_NAME_PATTERN,
+  SQUID_SLOT_PATTERN,
+  SQUID_TAG_PATTERN,
+} from '@subsquid/manifest';
 import chalk from 'chalk';
+import Joi from 'joi';
 import { PickDeep } from 'type-fest';
 
 import { Squid } from './api';
+import { org } from './flags';
 
 export async function getSquidCommands() {
   try {
@@ -44,17 +54,25 @@ export function formatSquidReference(
   return colored ? chalk`{bold {green ${prefix}}{green ${name}}{blue ${suffix}}}` : `${prefix}${name}${suffix}`;
 }
 
-export const SQUID_FULLNAME_REGEXP = /^(([a-z0-9\-]+)\/)?([a-z0-9\-]+)([:@])([a-z0-9\-]+)$/;
+export const SQUID_FULLNAME_REGEXP = /^((.+)\/)?(.+)([@:])(.+)$/;
+
+export const JoiSquidReference = Joi.object({
+  org: JoiSquidName,
+  name: JoiSquidName.required(),
+  slot: JoiSquidSlot,
+  tag: JoiSquidTag,
+}).xor('slot', 'tag');
 
 export function parseSquidReference(reference: string): ParsedSquidReference {
   const parsed = SQUID_FULLNAME_REGEXP.exec(reference);
   if (!parsed) {
-    throw new Error(`Invalid squid full name: "${reference}"`);
+    throw new Error(`The squid reference "${reference}" is invalid.`);
   }
 
   const [, , org, name, type, tagOrSlot] = parsed;
 
-  return { org, name, ...(type === ':' ? { tag: tagOrSlot } : { slot: tagOrSlot }) };
+  // the last case should never happen, used only for flag validation
+  return { org, name, ...(type === ':' ? { tag: tagOrSlot } : type === '@' ? { slot: tagOrSlot } : ({} as any)) };
 }
 
 export function printSquid(squid: PickDeep<Squid, 'name' | 'slot' | 'organization.code'>) {
