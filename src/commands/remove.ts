@@ -1,15 +1,18 @@
 import { Flags } from '@oclif/core';
+import chalk from 'chalk';
 import inquirer from 'inquirer';
 
 import { deleteSquid } from '../api';
 import { SqdFlags } from '../command';
 import { DeployCommand } from '../deploy-command';
-import { formatSquidReference, printSquid } from '../utils';
+import { ParsedSquidReference, printSquid } from '../utils';
 
 import { DELETE_COLOR } from './deploy';
 
-export default class Rm extends DeployCommand {
+export default class Remove extends DeployCommand {
   static description = 'Remove a squid deployed to the Cloud';
+
+  static aliases = ['rm'];
 
   static flags = {
     org: SqdFlags.org({
@@ -37,11 +40,11 @@ export default class Rm extends DeployCommand {
   async run(): Promise<void> {
     const {
       flags: { interactive, force, reference, ...flags },
-    } = await this.parse(Rm);
+    } = await this.parse(Remove);
 
     this.validateSquidNameFlags({ reference, ...flags });
 
-    const { org, name, tag, slot } = reference ? reference : (flags as any);
+    const { org, name, tag, slot } = reference || (flags as ParsedSquidReference);
 
     const organization = await this.promptSquidOrganization(org, name, { interactive });
     const squid = await this.findOrThrowSquid({ organization, squid: { name, slot, tag } });
@@ -54,7 +57,8 @@ export default class Rm extends DeployCommand {
         {
           name: 'confirm',
           type: 'confirm',
-          message: `Your squid ${printSquid(squid)} will be completely removed. This action can not be undone. Are you sure?`,
+          message: `Are you sure?`,
+          prefix: `The squid ${printSquid(squid)} will be completely removed. This action can not be undone.`,
         },
       ]);
       if (!confirm) return;
@@ -64,6 +68,6 @@ export default class Rm extends DeployCommand {
     await this.pollDeploy({ organization, deploy: deployment });
     if (!deployment || !deployment.squid) return;
 
-    this.logDeployResult(DELETE_COLOR, `A squid deployment ${printSquid(squid)} was successfully deleted`);
+    this.logDeployResult(DELETE_COLOR, `The squid ${printSquid(squid)} was successfully deleted`);
   }
 }

@@ -31,7 +31,7 @@ export function loadManifestFile(localPath: string, manifestPath: string): { squ
   if (!fs.statSync(squidDir).isDirectory()) {
     throw new Error(
       [
-        `The squid directory is not a directory`,
+        `The provided path is not a directory`,
         ``,
         `Squid directory    ${squidDir}`,
         ``,

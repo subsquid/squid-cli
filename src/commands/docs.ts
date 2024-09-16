@@ -7,6 +7,6 @@ export default class Docs extends Command {
   async run(): Promise<void> {
     await this.parse(Docs);
 
-    void open('https://docs.subsquid.io');
+    void open('https://docs.sqd.dev/');
   }
 }

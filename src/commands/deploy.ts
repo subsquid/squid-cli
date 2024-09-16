@@ -290,7 +290,7 @@ export default class Deploy extends DeployCommand {
       hardReset?: boolean;
     } = {},
   ) {
-    const warning = `A squid ${printSquid(target)} already exists.`;
+    const warning = `The squid ${printSquid(target)} already exists.`;
 
     if (!interactive) {
       this.error([warning, `Please do it explicitly ${using}`].join('\n'));
@@ -303,7 +303,7 @@ export default class Deploy extends DeployCommand {
         name: 'confirm',
         type: 'confirm',
         message: 'Are you sure?',
-        prefix: `A squid ${printSquid(target)} will be ${hardReset ? `recreated` : `updated`}.`,
+        prefix: `The squid ${printSquid(target)} will be updated.`,
       },
     ]);
 

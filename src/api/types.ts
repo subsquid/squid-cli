@@ -52,13 +52,7 @@ export type LogsResponse = {
 export type OrganizationRequest = { organization: PickDeep<Organization, 'code'> };
 
 export type SquidRequest = OrganizationRequest & {
-  squid:
-    | ({ name: string } & (
-        | { tag?: never; slot: string }
-        | { tag: string; slot?: never }
-        | { tag: string; slot: string }
-      ))
-    | string;
+  squid: ({ name: string } & { tag?: string; slot?: string }) | string;
 };
 
 export type DeployRequest = OrganizationRequest & { deploy: PickDeep<Deployment, 'id'> };
