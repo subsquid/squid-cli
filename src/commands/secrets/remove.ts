@@ -4,6 +4,8 @@ import { removeSecret } from '../../api';
 import { CliCommand } from '../../command';
 
 export default class Rm extends CliCommand {
+  static aliases = ['secrets rm'];
+
   static description = 'Delete an organization secret in the Cloud';
   static args = {
     name: Args.string({

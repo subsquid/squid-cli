@@ -4,7 +4,9 @@ import { listSquids } from '../api';
 import { CliCommand, SqdFlags } from '../command';
 import { printSquid } from '../utils';
 
-export default class Ls extends CliCommand {
+export default class List extends CliCommand {
+  static aliases = ['ls'];
+
   static description = 'List squids deployed to the Cloud';
 
   static flags = {
@@ -37,7 +39,7 @@ export default class Ls extends CliCommand {
   async run(): Promise<void> {
     const {
       flags: { truncate, reference, interactive, ...flags },
-    } = await this.parse(Ls);
+    } = await this.parse(List);
 
     const { org, name, slot, tag } = reference ? reference : (flags as any);
 

@@ -128,7 +128,7 @@ You can not run deploys on the same squid in parallel`;
             return false;
           case 'DEPLOYING':
           case 'SQUID_SYNCING':
-            CliUx.ux.action.start('◷ Deploying the squid');
+            CliUx.ux.action.start('◷ Syncing the squid');
 
             return false;
           case 'ADDONS_SYNCING':
