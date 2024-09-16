@@ -4,6 +4,8 @@ import { listSecrets } from '../../api';
 import { CliCommand } from '../../command';
 
 export default class Ls extends CliCommand {
+  static aliases = ['secrets ls'];
+
   static description = 'List organization secrets in the Cloud';
 
   static flags = {

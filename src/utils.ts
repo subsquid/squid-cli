@@ -39,14 +39,16 @@ export async function doUntil(fn: () => Promise<boolean>, { pause }: { pause: nu
 export type ParsedSquidReference = { org?: string; name: string } & (
   | { slot: string; tag?: never }
   | { slot?: never; tag: string }
-  | { slot: string; tag: string }
 );
 
 export function formatSquidReference(
-  reference: ParsedSquidReference | string,
+  reference: { org?: string; name: string; slot?: string; tag?: string } | string,
   { colored }: { colored?: boolean } = {},
 ) {
   const { org, name, slot, tag } = typeof reference === 'string' ? parseSquidReference(reference) : reference;
+  if (!tag && !slot) {
+    throw new Error('At least one of slot or tag has to be defined');
+  }
 
   const prefix = org ? `${org}/` : ``;
   const suffix = slot ? `@${slot}` : `:${tag}`;

@@ -13,7 +13,7 @@ export const SUCCESS_CHECK_MARK = chalk.green('✓');
 export abstract class CliCommand extends Command {
   static baseFlags = {
     interactive: Flags.boolean({
-      description: 'Enable or disable interactive mode',
+      description: 'Disable interactive mode',
       required: false,
       default: true,
       allowNo: true,
@@ -139,7 +139,7 @@ export abstract class CliCommand extends Command {
   }
 
   async promptSquidOrganization(
-    code: string,
+    code: string | null | undefined,
     name: string,
     {
       using,
