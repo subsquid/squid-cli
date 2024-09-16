@@ -9,7 +9,7 @@ import diff from 'cli-diff';
 import { globSync } from 'glob';
 import ignore from 'ignore';
 import inquirer from 'inquirer';
-import { defaults, get, isNil, keys, pick } from 'lodash';
+import { entries, get, pick } from 'lodash';
 import prettyBytes from 'pretty-bytes';
 import targz from 'targz';
 
@@ -35,9 +35,9 @@ export const DELETE_COLOR = 'red';
 export function resolveManifest(
   localPath: string,
   manifestPath: string,
-): { error: string } | { buildDir: string; squidDir: string; manifest: Manifest } {
+): { error: string } | { buildDir: string; squidDir: string; manifest: Manifest; manifestRaw: string } {
   try {
-    const { squidDir, manifest } = loadManifestFile(localPath, manifestPath);
+    const { squidDir, manifest, manifestRaw } = loadManifestFile(localPath, manifestPath);
 
     const buildDir = path.join(squidDir, 'builds');
     fs.mkdirSync(buildDir, { recursive: true, mode: 0o777 });
@@ -46,6 +46,7 @@ export function resolveManifest(
       squidDir,
       buildDir,
       manifest,
+      manifestRaw,
     };
   } catch (e: any) {
     return { error: e.message };
@@ -187,27 +188,33 @@ export default class Deploy extends DeployCommand {
     const res = resolveManifest(source, manifestPath);
     if ('error' in res) return this.showError(res.error, 'MANIFEST_VALIDATION_FAILED');
 
-    const { buildDir, squidDir, manifest } = res;
+    const { buildDir, squidDir } = res;
 
     const overrides = reference || (pick(flags, 'slot', 'name', 'tag', 'org') as Partial<ParsedSquidReference>);
 
-    // some hack to normalize slot name in case if version is used
-    {
-      manifest.slot = manifest.slotName();
-      delete manifest['version'];
+    let manifest = res.manifest;
+    // FIXME: it is not possible to override org atm
+    if (entries(overrides).some(([k, v]) => k !== 'org' && get(manifest, k) !== v)) {
+      // we need to do it to keep formatting the same
+      const manifestRaw = Manifest.replace(res.manifestRaw, {});
+      const newManifestRaw = Manifest.replace(manifestRaw, overrides);
+
+      if (!flags['allow-manifest-override']) {
+        const confirm = await this.promptOverrideConflict(manifestRaw, newManifestRaw, { interactive });
+        if (!confirm) return;
+      }
+
+      const newRes = Manifest.parse(newManifestRaw);
+      if (newRes.error) return this.showError(newRes.error.message, 'MANIFEST_VALIDATION_FAILED');
+
+      manifest = newRes.value;
     }
 
-    if (!flags['allow-manifest-override']) {
-      const confirm = await this.promptOverrideConflict(manifest, overrides, { interactive });
-      if (!confirm) return;
-    }
+    const organization = await this.promptOrganization(overrides.org, { interactive });
 
-    // eslint-disable-next-line prefer-const
-    let { name, slot, org, tag } = defaults(overrides, manifest);
-
-    const organization = await this.promptOrganization(org, { interactive });
-
-    name = await this.promptSquidName(name, { interactive });
+    const name = await this.promptSquidName(manifest.squidName(), { interactive });
+    const slot = manifest.slotName();
+    const tag = manifest.tag;
 
     this.log(chalk.dim(`Squid directory: ${squidDir}`));
     this.log(chalk.dim(`Build directory: ${buildDir}`));
@@ -223,10 +230,15 @@ export default class Deploy extends DeployCommand {
     this.log(chalk.cyan(`-----------------------------`));
 
     let target: Squid | null = null;
-    if (slot || tag) {
+    if (slot) {
       target = await this.findSquid({
         organization,
-        squid: { name, slot, tag: tag! },
+        squid: { name, slot },
+      });
+    } else if (tag) {
+      target = await this.findOrThrowSquid({
+        organization,
+        squid: { name, tag },
       });
     }
 
@@ -324,26 +336,15 @@ export default class Deploy extends DeployCommand {
   }
 
   private async promptOverrideConflict(
-    manifest: Manifest,
-    override: Record<string, any>,
+    dest: string,
+    src: string,
     { using = 'using "--allow--manifest-override" flag', interactive }: { using?: string; interactive?: boolean } = {},
   ) {
-    const conflictKeys = keys(override).filter((k) => {
-      const m = get(manifest, k);
-      const o = get(override, k);
-      return !isNil(m) && m !== o;
-    });
-
-    if (!conflictKeys.length) return true;
-
     const warning = [
       'Conflict detected!',
       `A manifest values do not match with specified ones.`,
       ``,
-      diff(
-        { content: conflictKeys.map((k) => `${k}: ${get(manifest, k)}`).join('\n') + '\n' },
-        { content: conflictKeys.map((k) => `${k}: ${get(override, k)}`).join('\n') + '\n' },
-      ),
+      diff({ content: dest }, { content: src }),
       ``,
     ].join('\n');
 
