@@ -238,6 +238,23 @@ export default class Deploy extends DeployCommand {
       if (attached) return;
     }
 
+    /**
+     * Squid exists we should ask for update
+     */
+    if (target && !flags['allow-update']) {
+      const update = await this.promptUpdateSquid(target, { interactive });
+      if (!update) return;
+    }
+
+    /**
+     * Squid exists we should check if tag belongs to another squid
+     */
+    const hasTag = !!target?.tags.find((t) => t.name === addTag) || tag === addTag;
+    if (addTag && !flags['allow-tag-reassign'] && !hasTag) {
+      const add = await this.promptAddTag({ organization, name, tag: addTag }, { interactive });
+      if (!add) return;
+    }
+
     const archiveName = `${slot || tag ? formatSquidReference({ name, slot, tag }) : name}.tar.gz`;
     const artifactPath = await this.pack({ buildDir, squidDir, archiveName });
     const artifactUrl = await this.upload({ organization, artifactPath });
