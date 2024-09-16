@@ -25,7 +25,10 @@ export function parseManifestEnv(env: Record<string, any>) {
   return mapValues(env, (value) => (typeof value === 'string' ? parser.parse(value) : value));
 }
 
-export function loadManifestFile(localPath: string, manifestPath: string): { squidDir: string; manifest: Manifest } {
+export function loadManifestFile(
+  localPath: string,
+  manifestPath: string,
+): { squidDir: string; manifest: Manifest; manifestRaw: string } {
   const squidDir = path.resolve(localPath);
 
   if (!fs.statSync(squidDir).isDirectory()) {
@@ -83,14 +86,15 @@ export function loadManifestFile(localPath: string, manifestPath: string): { squ
     );
   }
 
-  let manifest;
+  let manifest: Manifest;
+  let manifestRaw: string;
   try {
-    const raw = fs.readFileSync(manifestFullPath).toString();
-    const { value, error } = Manifest.parse(raw, { validation: { allowUnknown: true } });
+    manifestRaw = fs.readFileSync(manifestFullPath).toString();
+    const { value, error } = Manifest.parse(manifestRaw, { validation: { allowUnknown: true } });
     if (error) {
       throw error;
     }
-    manifest = value as Manifest;
+    manifest = value;
   } catch (e: any) {
     throw new Error(
       `The manifest file on ${manifestFullPath} can not be parsed: ${e instanceof Error ? e.message : e}`,
@@ -98,6 +102,7 @@ export function loadManifestFile(localPath: string, manifestPath: string): { squ
   }
   return {
     squidDir,
-    manifest: manifest,
+    manifest,
+    manifestRaw,
   };
 }
