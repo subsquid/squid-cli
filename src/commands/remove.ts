@@ -52,6 +52,20 @@ export default class Remove extends DeployCommand {
     const attached = await this.promptAttachToDeploy(squid, { interactive });
     if (attached) return;
 
+    const hasOtherTags = !tag || !!squid.tags.some((t) => t.name !== tag);
+    if (hasOtherTags) {
+      const warning = [
+        `The squid ${printSquid(squid)} has one or more tags assigned to it:`,
+        ...squid.tags.map((t) => chalk.dim(` - ${t.name}`)),
+      ];
+
+      if (!interactive && !force) {
+        this.error([...warning, 'Please do it explicitly using --force flag'].join('\n'));
+      } else {
+        this.warn(warning.join('\n'));
+      }
+    }
+
     if (!force && interactive) {
       const { confirm } = await inquirer.prompt([
         {
