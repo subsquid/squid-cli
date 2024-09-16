@@ -52,7 +52,7 @@ export default class Remove extends DeployCommand {
     const attached = await this.promptAttachToDeploy(squid, { interactive });
     if (attached) return;
 
-    const hasOtherTags = !tag || !!squid.tags.some((t) => t.name !== tag);
+    const hasOtherTags = !tag || squid.tags.some((t) => t.name !== tag);
     if (hasOtherTags) {
       const warning = [
         `The squid ${printSquid(squid)} has one or more tags assigned to it:`,
