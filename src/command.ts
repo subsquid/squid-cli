@@ -1,25 +1,27 @@
-import { Args, Command } from '@oclif/core';
+import { Command, Flags } from '@oclif/core';
+import { FailedFlagValidationError } from '@oclif/core/lib/parser/errors';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { isNil, uniqBy } from 'lodash';
 
-import { ApiError, getOrganization, listOrganizations, listSquids, listUserSquids, OrganizationRequest } from './api';
+import { ApiError, getOrganization, getSquid, listOrganizations, listUserSquids, SquidRequest } from './api';
 import { getTTY } from './tty';
-import { formatSquidName } from './utils';
+import { formatSquidReference, printSquid } from './utils';
 
-export const RELEASE_DEPRECATE = [
-  chalk.yellow('*******************************************************'),
-  chalk.yellow('*                                                     *'),
-  chalk.yellow('* WARNING! This command has been deprecated           *'),
-  chalk.yellow('* Please check the migration guide                    *'),
-  chalk.yellow('* https://docs.subsquid.io/deploy-squid/migration/    *'),
-  chalk.yellow('*                                                     *'),
-  chalk.yellow('*******************************************************'),
-].join('\n');
+export const SUCCESS_CHECK_MARK = chalk.green('✓');
 
 export abstract class CliCommand extends Command {
+  static baseFlags = {
+    interactive: Flags.boolean({
+      description: 'Disable interactive mode',
+      required: false,
+      default: true,
+      allowNo: true,
+    }),
+  };
+
   logSuccess(message: string) {
-    this.log(chalk.green(`✓ `) + message);
+    this.log(SUCCESS_CHECK_MARK + message);
   }
 
   logQuestion(message: string) {
@@ -28,6 +30,23 @@ export abstract class CliCommand extends Command {
 
   logDimmed(message: string) {
     this.log(chalk.dim(message));
+  }
+
+  // Haven't find a way to do it with native settings
+  validateSquidNameFlags(flags: { reference?: any; name?: any }) {
+    if (flags.reference || flags.name) return;
+
+    throw new FailedFlagValidationError({
+      failed: [
+        {
+          name: 'squid name',
+          validationFn: 'validateSquidName',
+          reason: 'One of the following must be provided: --reference, --name',
+          status: 'failed',
+        },
+      ],
+      parse: {},
+    });
   }
 
   async catch(error: any) {
@@ -83,59 +102,53 @@ export abstract class CliCommand extends Command {
     throw error;
   }
 
-  async findSquid({
-    organization,
-    name,
-    tag,
-    slot,
-    tagOrSlot,
-  }: OrganizationRequest & { name: string } & (
-      | { tag: string; slot?: undefined; tagOrSlot?: undefined }
-      | { tag?: undefined; slot: string; tagOrSlot?: undefined }
-      | { tag?: undefined; slot?: undefined; tagOrSlot: string }
-    )) {
-    const squids = await listSquids({ organization, name });
+  async findSquid(req: SquidRequest) {
+    try {
+      return await getSquid(req);
+    } catch (e) {
+      if (e instanceof ApiError && e.request.status === 404) {
+        return null;
+      }
 
-    if (slot) {
-      return squids.find((s) => s.slot === slot);
-    }
-
-    if (tag) {
-      return squids.find((s) => s.tags.some((t) => t.name === tag));
-    }
-
-    if (tagOrSlot) {
-      return squids.find((s) => s.slot === tagOrSlot || s.tags.some((t) => t.name === tagOrSlot));
+      throw e;
     }
   }
 
-  async findOrThrowSquid(opts: Parameters<typeof this.findSquid>[0]) {
-    const squid = await this.findSquid(opts);
-    if (!squid) {
+  async findOrThrowSquid({ organization, squid }: SquidRequest) {
+    const res = await this.findSquid({ organization, squid });
+    if (!res) {
       throw new Error(
-        `The squid ${formatSquidName(opts.tagOrSlot != null ? { name: opts.name, slot: opts.tagOrSlot } : opts)} is not found`,
+        `The squid ${formatSquidReference(typeof squid === 'string' ? squid : squid, { colored: true })} is not found`,
       );
     }
 
-    return squid;
+    return res;
   }
 
-  async promptOrganization(code: string | null | undefined, using: string) {
+  async promptOrganization(
+    code: string | null | undefined,
+    { using, interactive }: { using?: string; interactive?: boolean } = {},
+  ) {
     if (code) {
       return await getOrganization({ organization: { code } });
     }
 
     const organizations = await listOrganizations();
-    if (organizations.length === 0) {
-      return this.error(`You have no organizations. Please create organization first.`);
-    } else if (organizations.length === 1) {
-      return organizations[0];
-    }
 
-    return await this.getOrganizationPromt(organizations, using);
+    return await this.getOrganizationPrompt(organizations, { using, interactive });
   }
 
-  async promptSquidOrganization(code: string | null | undefined, name: string, using: string) {
+  async promptSquidOrganization(
+    code: string | null | undefined,
+    name: string,
+    {
+      using,
+      interactive,
+    }: {
+      using?: string;
+      interactive?: boolean;
+    } = {},
+  ) {
     if (code) {
       return await getOrganization({ organization: { code } });
     }
@@ -146,25 +159,37 @@ export abstract class CliCommand extends Command {
     organizations = uniqBy(organizations, (o) => o.code);
 
     if (organizations.length === 0) {
-      return this.error(`Squid "${name}" was not found.`);
+      return this.error(`You have no organizations with squid "${name}".`);
+    }
+
+    return await this.getOrganizationPrompt(organizations, { using, interactive });
+  }
+
+  private async getOrganizationPrompt<T extends { code: string; name: string }>(
+    organizations: T[],
+    {
+      using = 'using "--org" flag',
+      interactive,
+    }: {
+      using?: string;
+      interactive?: boolean;
+    },
+  ): Promise<T> {
+    if (organizations.length === 0) {
+      return this.error(`You have no organizations. Please create organization first.`);
     } else if (organizations.length === 1) {
       return organizations[0];
     }
 
-    return await this.getOrganizationPromt(organizations, using);
-  }
-
-  private async getOrganizationPromt<T extends { code: string; name: string }>(
-    organizations: T[],
-    using: string,
-  ): Promise<T> {
     const { stdin, stdout } = getTTY();
-    if (!stdin || !stdout) {
-      this.log(chalk.dim(`You have ${organizations.length} organizations:`));
-      for (const organization of organizations) {
-        this.log(`${chalk.dim(' - ')}${chalk.dim(organization.code)}`);
-      }
-      return this.error(`Please specify one of them explicitly ${using}`);
+    if (!stdin || !stdout || !interactive) {
+      return this.error(
+        [
+          `You have ${organizations.length} organizations:`,
+          ...organizations.map((o) => `${chalk.dim(' - ')}${chalk.dim(o.code)}`),
+          `Please specify one of them explicitly ${using}`,
+        ].join('\n'),
+      );
     }
 
     const prompt = inquirer.createPromptModule({ input: stdin, output: stdout });
@@ -190,14 +215,4 @@ export abstract class CliCommand extends Command {
   }
 }
 
-export const SquidNameArg = Args.string({
-  description: '<name#id> or <name@tag>',
-  required: true,
-  parse: async (input) => {
-    input = input.toLowerCase();
-    if (!/^[a-z0-9\-]+[#@][a-z0-9\-]+$/.test(input)) {
-      throw new Error(`Expected a squid name but received: ${input}`);
-    }
-    return input;
-  },
-});
+export * as SqdFlags from './flags';

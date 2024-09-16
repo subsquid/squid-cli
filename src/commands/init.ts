@@ -2,17 +2,16 @@ import { promises as asyncFs } from 'fs';
 import path from 'path';
 
 import { Args, Flags, ux as CliUx } from '@oclif/core';
+import { Manifest } from '@subsquid/manifest';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { simpleGit } from 'simple-git';
-import { adjectives, animals, colors, uniqueNamesGenerator } from 'unique-names-generator';
 
-import { CliCommand } from '../command';
+import { CliCommand, SUCCESS_CHECK_MARK } from '../command';
 import { readManifest, saveManifest } from '../manifest';
 
 const SQUID_NAME_DESC = [
   `The squid name. It must contain only alphanumeric or dash ("-") symbols and must not start with "-".`,
-  `Squid names are ${chalk.yellow('globally unique')}.`,
 ];
 
 const TEMPLATE_ALIASES: Record<string, { url: string; description: string }> = {
@@ -143,18 +142,6 @@ export default class Init extends CliCommand {
       ? TEMPLATE_ALIASES[resolvedTemplate].url
       : resolvedTemplate;
 
-    try {
-      const uniqueNameSuggestion = uniqueNamesGenerator({
-        dictionaries: [adjectives, colors, animals],
-        separator: '-',
-        length: 2,
-      });
-      return this.error(
-        `There is already a squid with name "${name}" deployed to the Cloud. Squid names are globally unique. ` +
-          `Please pick a new memorable name, e.g. "${uniqueNameSuggestion}".`,
-      );
-    } catch (e) {}
-
     CliUx.ux.action.start(`◷ Downloading the template: ${githubRepository}... `);
     try {
       // TODO: support branches?
@@ -162,7 +149,7 @@ export default class Init extends CliCommand {
     } catch (e: any) {
       return this.error(e);
     }
-    CliUx.ux.action.stop(`✔`);
+    CliUx.ux.action.stop(SUCCESS_CHECK_MARK);
 
     /** Clean up template **/
     await asyncFs.rm(path.resolve(localDir, '.git'), { recursive: true });
@@ -174,10 +161,7 @@ export default class Init extends CliCommand {
 
     const manifestPath = path.resolve(localDir, 'squid.yaml');
     try {
-      const manifest = readManifest(manifestPath);
-
-      /** Override name in squid manifest **/
-      manifest.name = name;
+      const manifest = Manifest.replace(readManifest(manifestPath), { name });
 
       saveManifest(manifestPath, manifest);
     } catch (e: any) {

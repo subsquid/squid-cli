@@ -7,6 +7,8 @@ import { Gateway, getEvmGateways, getSubstrateGateways } from '../../api/gateway
 import { CliCommand } from '../../command';
 
 export default class Ls extends CliCommand {
+  static aliases = ['gateways ls'];
+
   static description = 'List available gateways';
 
   static flags = {

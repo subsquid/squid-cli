@@ -1,10 +1,11 @@
-import { Args, ux as CliUx, Flags } from '@oclif/core';
+import { Flags, ux as CliUx } from '@oclif/core';
+import { isNil, omitBy } from 'lodash';
 import ms from 'ms';
 
-import { debugLog, SquidRequest, streamSquidLogs, squidHistoryLogs } from '../api';
-import { CliCommand, SquidNameArg } from '../command';
+import { debugLog, squidHistoryLogs, SquidRequest, streamSquidLogs } from '../api';
+import { CliCommand, SqdFlags } from '../command';
 import { pretty } from '../logs';
-import { parseSquidName } from '../utils';
+import { formatSquidReference } from '../utils';
 
 type LogResult = {
   hasLogs: boolean;
@@ -21,14 +22,24 @@ function parseDate(str: string): Date {
 }
 
 export default class Logs extends CliCommand {
-  static aliases = ['squid:logs'];
-
   static description = 'Fetch logs from a squid deployed to the Cloud';
-  static args = {
-    squidName: SquidNameArg,
-  };
 
   static flags = {
+    org: SqdFlags.org({
+      required: false,
+    }),
+    name: SqdFlags.name({
+      required: false,
+    }),
+    slot: SqdFlags.slot({
+      required: false,
+    }),
+    tag: SqdFlags.tag({
+      required: false,
+    }),
+    reference: SqdFlags.reference({
+      required: false,
+    }),
     container: Flags.string({
       char: 'c',
       summary: `Container name`,
@@ -55,7 +66,6 @@ export default class Logs extends CliCommand {
       default: '1d',
     }),
     search: Flags.string({
-      char: 's',
       summary: 'Filter by content',
       required: false,
     }),
@@ -66,22 +76,19 @@ export default class Logs extends CliCommand {
       default: false,
       exclusive: ['fromDate', 'pageSize'],
     }),
-    org: Flags.string({
-      char: 'o',
-      description: 'Organization',
-      required: false,
-    }),
   };
 
   async run(): Promise<void> {
     const {
-      args: { squidName },
-      flags: { follow, pageSize, container, level, since, org, search },
+      flags: { follow, pageSize, container, level, since, search, reference, interactive, ...flags },
     } = await this.parse(Logs);
-    const filter = parseSquidName(squidName);
 
-    const organization = await this.promptSquidOrganization(org, filter.name, 'using "-o" flag');
-    const squid = await this.findOrThrowSquid({ organization, ...filter });
+    this.validateSquidNameFlags({ reference, ...flags });
+
+    const { org, name, tag, slot } = reference ? reference : (flags as any);
+
+    const organization = await this.promptSquidOrganization(org, name, { interactive });
+    const squid = await this.findOrThrowSquid({ organization, squid: { name, slot, tag } });
     if (!squid) return;
 
     const fromDate = parseDate(since);
@@ -155,6 +162,7 @@ export default class Logs extends CliCommand {
   }): Promise<LogResult> {
     // eslint-disable-next-line prefer-const
     let { logs, nextPage } = await squidHistoryLogs({ organization, squid, query });
+
     if (reverse) {
       logs = logs.reverse();
     }

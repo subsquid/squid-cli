@@ -1,7 +1,7 @@
 import { addMinutes } from 'date-fns';
-import blessed, { Element, List, Log } from 'reblessed';
+import blessed, { Element } from 'reblessed';
 
-import { streamSquidLogs, squidHistoryLogs } from '../../api';
+import { squidHistoryLogs, streamSquidLogs } from '../../api';
 import { pretty } from '../../logs';
 import { mainColor, scrollBarTheme } from '../theme';
 
@@ -39,13 +39,14 @@ export class VersionLogTab implements VersionTab {
       try {
         const { logs } = await squidHistoryLogs({
           organization: squid.organization,
-          squid: squid,
+          squid,
           query: {
             limit: 100,
             from: addMinutes(new Date(), -30),
           },
           abortController,
         });
+
         pretty(logs.reverse()).forEach((line) => {
           logsBox.add(line);
         });
