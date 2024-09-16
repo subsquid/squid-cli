@@ -17,7 +17,7 @@ import { deploySquid, OrganizationRequest, Squid, uploadFile } from '../api';
 import { SqdFlags, SUCCESS_CHECK_MARK } from '../command';
 import { DeployCommand } from '../deploy-command';
 import { loadManifestFile } from '../manifest';
-import { printSquid } from '../utils';
+import { formatSquidReference, ParsedSquidReference, printSquid } from '../utils';
 
 const compressAsync = promisify(targz.compress);
 
@@ -170,6 +170,18 @@ export default class Deploy extends DeployCommand {
       return this.error('Not implemented yet');
     }
 
+    if (interactive && hardReset) {
+      const { confirm } = await inquirer.prompt([
+        {
+          name: 'confirm',
+          type: 'confirm',
+          message: `Are you sure?`,
+          prefix: `Your squid will be reset, which may potentially result in data loss.`,
+        },
+      ]);
+      if (!confirm) return;
+    }
+
     this.log(`🦑 Releasing the squid from local folder`);
 
     const res = resolveManifest(source, manifestPath);
@@ -177,7 +189,7 @@ export default class Deploy extends DeployCommand {
 
     const { buildDir, squidDir, manifest } = res;
 
-    const overrides = reference ? reference : pick(flags, 'slot', 'name', 'tag', 'org');
+    const overrides = reference || (pick(flags, 'slot', 'name', 'tag', 'org') as Partial<ParsedSquidReference>);
 
     // some hack to normalize slot name in case if version is used
     {
@@ -219,10 +231,18 @@ export default class Deploy extends DeployCommand {
     }
 
     /**
+     * Squid exists we should check running deploys
+     */
+    if (target) {
+      const attached = await this.promptAttachToDeploy(target, { interactive });
+      if (attached) return;
+    }
+
+    /**
      * Squid exists we should ask for update
      */
     if (target && !flags['allow-update']) {
-      const update = await this.promptUpdateSquid(target, { interactive, hardReset });
+      const update = await this.promptUpdateSquid(target, { interactive });
       if (!update) return;
     }
 
@@ -235,15 +255,7 @@ export default class Deploy extends DeployCommand {
       if (!add) return;
     }
 
-    /**
-     * Squid exists we should check running deploys
-     */
-    if (target) {
-      const attached = await this.promptAttachToDeploy(target, { interactive });
-      if (attached) return;
-    }
-
-    const archiveName = `${manifest.name}.tar.gz`;
+    const archiveName = `${formatSquidReference({ name, slot, tag })}.tar.gz`;
     const artifactPath = await this.pack({ buildDir, squidDir, archiveName });
     const artifactUrl = await this.upload({ organization, artifactPath });
 
@@ -279,31 +291,32 @@ export default class Deploy extends DeployCommand {
   }
 
   private async promptUpdateSquid(
-    target: Squid,
+    squid: Squid,
     {
       using = 'using "--allow-update" flag',
       interactive,
-      hardReset,
     }: {
       using?: string;
       interactive?: boolean;
-      hardReset?: boolean;
     } = {},
   ) {
-    const warning = `The squid ${printSquid(target)} already exists.`;
+    const warning = [
+      `The squid ${printSquid(squid)} already exists${squid.tags.length > 0 ? ` and has one or more tags assigned to it:` : ``}`,
+      ...squid.tags.map((t) => chalk.dim(` - ${t.name}`)),
+    ];
 
-    if (!interactive) {
-      this.error([warning, `Please do it explicitly ${using}`].join('\n'));
+    if (interactive) {
+      this.warn(warning.join('\n'));
+    } else {
+      this.error([...warning, `Please do it explicitly ${using}`].join('\n'));
     }
-
-    this.warn(warning);
 
     const { confirm } = await inquirer.prompt([
       {
         name: 'confirm',
         type: 'confirm',
         message: 'Are you sure?',
-        prefix: `The squid ${printSquid(target)} will be updated.`,
+        prefix: `The squid ${printSquid(squid)} will be updated.`,
       },
     ]);
 
@@ -334,11 +347,12 @@ export default class Deploy extends DeployCommand {
       ``,
     ].join('\n');
 
-    if (!interactive) {
+    if (interactive) {
+      this.warn(warning);
+    } else {
       this.error([warning, `Please do it explicitly ${using}`].join('\n'));
     }
 
-    this.warn(warning);
     this.log(
       `If it is intended and you'd like to override them, just skip this message and confirm, the manifest name will be overridden automatically in the Cloud during the deploy.`,
     );
@@ -362,11 +376,12 @@ export default class Deploy extends DeployCommand {
 
     const warning = `The squid name is not defined either in the manifest or via CLI command.`;
 
-    if (!interactive) {
+    if (interactive) {
+      this.warn(warning);
+    } else {
       this.error([warning, `Please specify it explicitly ${using}`].join('\n'));
     }
 
-    this.warn(warning);
     const { input } = await inquirer.prompt([
       {
         name: 'input',
