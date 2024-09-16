@@ -254,7 +254,7 @@ export default class Deploy extends DeployCommand {
      * Squid exists we should ask for update
      */
     if (target && !flags['allow-update']) {
-      const update = await this.promptUpdateSquid(target, { interactive });
+      const update = await this.promptUpdateSquid(target, { interactive, tag });
       if (!update) return;
     }
 
@@ -307,15 +307,20 @@ export default class Deploy extends DeployCommand {
     {
       using = 'using "--allow-update" flag',
       interactive,
+      tag,
     }: {
       using?: string;
       interactive?: boolean;
+      tag?: string;
     } = {},
   ) {
+    const hasOtherTags = !tag || squid.tags.some((t) => t.name !== tag);
     const warning = [
-      `The squid ${printSquid(squid)} already exists${squid.tags.length > 0 ? ` and has one or more tags assigned to it:` : ``}`,
-      ...squid.tags.map((t) => chalk.dim(` - ${t.name}`)),
+      `The squid ${printSquid(squid)} already exists${hasOtherTags ? ` and has one or more tags assigned to it:` : ``}`,
     ];
+    if (hasOtherTags) {
+      warning.push(...squid.tags.map((t) => chalk.dim(` - ${t.name}`)));
+    }
 
     if (interactive) {
       this.warn(warning.join('\n'));
