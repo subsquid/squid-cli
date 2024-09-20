@@ -314,7 +314,7 @@ export default class Deploy extends DeployCommand {
       tag?: string;
     } = {},
   ) {
-    const hasOtherTags = !tag || squid.tags.some((t) => t.name !== tag);
+    const hasOtherTags = (!tag && squid.tags.length > 0) || squid.tags.some((t) => t.name !== tag);
     const warning = [
       `The squid ${printSquid(squid)} already exists${hasOtherTags ? ` and has one or more tags assigned to it:` : ``}`,
     ];
