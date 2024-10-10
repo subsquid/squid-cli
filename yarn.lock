@@ -1411,7 +1411,7 @@ __metadata:
     "@oclif/plugin-autocomplete": "npm:3.2.2"
     "@oclif/plugin-warn-if-update-available": "npm:^3.1.13"
     "@subsquid/commands": "npm:^2.3.1"
-    "@subsquid/manifest": "npm:^2.0.0-beta.4"
+    "@subsquid/manifest": "npm:^2.0.0-beta.6"
     "@subsquid/manifest-expr": "npm:^0.0.1"
     "@types/async-retry": "npm:^1.4.8"
     "@types/blessed": "npm:^0.1.25"
@@ -1513,15 +1513,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subsquid/manifest@npm:^2.0.0-beta.4":
-  version: 2.0.0-beta.4
-  resolution: "@subsquid/manifest@npm:2.0.0-beta.4"
+"@subsquid/manifest@npm:^2.0.0-beta.6":
+  version: 2.0.0-beta.6
+  resolution: "@subsquid/manifest@npm:2.0.0-beta.6"
   dependencies:
     "@subsquid/manifest-expr": "npm:^0.0.1"
     joi: "npm:17.13.3"
     js-yaml: "npm:^4.1.0"
     lodash: "npm:^4.17.21"
-  checksum: 10c0/6073eb4db6c496b3b10588ff14fe7329b1621a35992b2bbd8a7beb302c8b6a30775f595ee89db30646078b6dc5867c469fe359789d0eb00c253e785874eca63b
+  checksum: 10c0/4bd21a04f1a5c176e2d7229fbacac7aa2e45d2737339ab04cd10315ed102156cd64fc353cb502967f311a09d82aef9f1fc89df85603c9f3f9302c78022e57bfe
   languageName: node
   linkType: hard
 
