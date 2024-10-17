@@ -3,17 +3,28 @@ import path from 'path';
 import axios, { Method } from 'axios';
 import axiosRetry, { IAxiosRetryConfig, isNetworkOrIdempotentRequestError } from 'axios-retry';
 import chalk from 'chalk';
-import { pickBy } from 'lodash';
+import { isEmpty, pickBy } from 'lodash';
 import ms from 'ms';
+import qs from 'qs';
 
 import { getConfig } from '../config';
 
 const API_DEBUG = process.env.API_DEBUG === 'true';
-
+const delayFactor = 10;
 const DEFAULT_RETRY: IAxiosRetryConfig = {
   retries: 10,
-  retryDelay: axiosRetry.exponentialDelay,
+  retryDelay: (retryCount, error) => axiosRetry.exponentialDelay(retryCount, error, delayFactor),
   retryCondition: isNetworkOrIdempotentRequestError,
+  onRetry: (retryCount, error) => {
+    if (!error.response) {
+      if (retryCount === 1) {
+        console.log(chalk.dim(`There appears to be trouble with your network connection. Retrying...`));
+      } else if (retryCount > 6) {
+        const next = ms(Math.round(axiosRetry.exponentialDelay(retryCount, error, delayFactor)));
+        console.log(chalk.dim(`There appears to be trouble with your network connection. Retrying in ${next}...`));
+      }
+    }
+  },
 };
 
 axiosRetry(axios, DEFAULT_RETRY);
@@ -48,6 +59,7 @@ export function debugLog(...args: any[]) {
 }
 
 export async function api<T = any>({
+  version = 'v1',
   method,
   path,
   data,
@@ -58,6 +70,7 @@ export async function api<T = any>({
   abortController,
   retry,
 }: {
+  version?: 'v1';
   method: Method;
   path: string;
   query?: Record<string, string | string[] | boolean | number | undefined>;
@@ -72,7 +85,7 @@ export async function api<T = any>({
 
   const started = Date.now();
   // add the API_URL to the path if it's not a full url
-  const url = !path.startsWith('https') ? `${config.apiUrl}${path}` : path;
+  const url = !path.startsWith('https') ? `${config.apiUrl}/${version}${path}` : path;
 
   const finalHeaders = {
     authorization: url.startsWith(config.apiUrl) ? `token ${config.credentials}` : null,
@@ -101,7 +114,7 @@ export async function api<T = any>({
     console.log(
       chalk.dim(new Date().toISOString()),
       chalk.cyan`[${method.toUpperCase()}]`,
-      response.config.url,
+      `${response.config.url}${!isEmpty(query) ? `?${qs.stringify(query)}` : ``}`,
       chalk.cyan(response.status),
       ms(Date.now() - started),
       chalk.dim(JSON.stringify({ headers: response.headers })),

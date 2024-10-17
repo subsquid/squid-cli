@@ -4,6 +4,8 @@ import { listSecrets } from '../../api';
 import { CliCommand } from '../../command';
 
 export default class Ls extends CliCommand {
+  static aliases = ['secrets ls'];
+
   static description = 'List organization secrets in the Cloud';
 
   static flags = {
@@ -16,12 +18,12 @@ export default class Ls extends CliCommand {
 
   async run(): Promise<void> {
     const {
-      flags: { org },
+      flags: { org, interactive },
       args: {},
     } = await this.parse(Ls);
 
-    const orgCode = await this.promptOrganization(org, 'using "-o" flag');
-    const response = await listSecrets({ orgCode });
+    const organization = await this.promptOrganization(org, { interactive });
+    const response = await listSecrets({ organization });
 
     if (!Object.keys(response.secrets).length) {
       return this.log('There are no secrets');

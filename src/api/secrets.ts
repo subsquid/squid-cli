@@ -1,18 +1,21 @@
 import { api } from './api';
-import { HttpResponse, SecretsListResponse } from './types';
+import { HttpResponse, OrganizationRequest, SecretsListResponse } from './types';
 
-export async function listSecrets({ orgCode }: { orgCode: string }): Promise<SecretsListResponse> {
+export async function listSecrets({ organization }: OrganizationRequest): Promise<SecretsListResponse> {
   const { body } = await api<HttpResponse<SecretsListResponse>>({
     method: 'get',
-    path: `/orgs/${orgCode}/secrets`,
+    path: `/orgs/${organization.code}/secrets`,
   });
   return body.payload;
 }
 
-export async function removeSecret({ name, orgCode }: { name: string; orgCode: string }): Promise<SecretsListResponse> {
+export async function removeSecret({
+  organization,
+  name,
+}: OrganizationRequest & { name: string }): Promise<SecretsListResponse> {
   const { body } = await api<HttpResponse<SecretsListResponse>>({
     method: 'put',
-    path: `/orgs/${orgCode}/secrets`,
+    path: `/orgs/${organization.code}/secrets`,
     data: {
       secrets: [{ action: 'DELETE', name }],
     },
@@ -22,17 +25,16 @@ export async function removeSecret({ name, orgCode }: { name: string; orgCode: s
 }
 
 export async function setSecret({
+  organization,
   name,
   value,
-  orgCode,
-}: {
+}: OrganizationRequest & {
   name: string;
   value: string;
-  orgCode: string;
 }): Promise<SecretsListResponse> {
   const { body } = await api<HttpResponse<SecretsListResponse>>({
     method: 'put',
-    path: `/orgs/${orgCode}/secrets`,
+    path: `/orgs/${organization.code}/secrets`,
     data: {
       secrets: [{ action: 'UPDATE', name, value }],
     },

@@ -2,7 +2,7 @@ import blessed, { Element, Widgets } from 'reblessed';
 
 import { mainColor } from '../theme';
 
-import { SquidVersion } from './types';
+import { Squid } from './types';
 
 interface VersionTabConstructor {
   new (): VersionTab;
@@ -11,7 +11,7 @@ interface VersionTabConstructor {
 export type Cancellable = void | (() => void) | undefined;
 
 export interface VersionTab {
-  append(holder: Element, squid: SquidVersion): Promise<Cancellable>;
+  append(holder: Element, squid: Squid): Promise<Cancellable>;
 }
 
 export type Tab = {
@@ -22,7 +22,7 @@ export type Tab = {
 
 export class Tabs extends Element {
   menu: any;
-  squid: SquidVersion | undefined;
+  squid: Squid | undefined;
   selectedTab = 0;
   wrapper: Element | undefined;
   cancel: Cancellable | undefined;
@@ -93,7 +93,7 @@ export class Tabs extends Element {
     // this.menu.selectTab(this.selectedTab);
   }
 
-  setVersion(squid: SquidVersion) {
+  setVersion(squid: Squid) {
     // if (squid === this.squid) return;
     this.screen.debug('set version');
     this.squid = squid;

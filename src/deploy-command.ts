@@ -1,57 +1,44 @@
 import { ux as CliUx } from '@oclif/core';
-import chalk from 'chalk';
+import chalk, { ForegroundColor } from 'chalk';
 import inquirer from 'inquirer';
 
-import {
-  ApiError,
-  DeployResponse,
-  DeployStatus,
-  getDeploy,
-  getSquid,
-  SquidResponse,
-  streamSquidLogs,
-  VersionResponse,
-} from './api';
-import { CliCommand } from './command';
-import { doUntil } from './utils';
+import { Deployment, DeployRequest, getDeploy, Organization, Squid, SquidRequest, streamSquidLogs } from './api';
+import { CliCommand, SUCCESS_CHECK_MARK } from './command';
+import { doUntil, formatSquidReference, printSquid } from './utils';
 
 export abstract class DeployCommand extends CliCommand {
-  deploy: DeployResponse | undefined;
+  deploy: Deployment | undefined;
   logsPrinted = 0;
 
-  async findSquid({ orgCode, squidName }: { orgCode: string; squidName: string }) {
-    try {
-      return await getSquid({ orgCode, squidName });
-    } catch (e: unknown) {
-      if (e instanceof ApiError && e.request.status === 404) {
-        return null;
-      }
+  async promptAttachToDeploy(squid: Squid, { interactive }: { interactive?: boolean } = {}) {
+    if (!squid.lastDeploy) return false;
+    if (squid.status !== 'DEPLOYING') return false;
 
-      throw e;
+    const warning = `Squid ${printSquid(squid)} is being deploying. 
+You can not run deploys on the same squid in parallel`;
+
+    if (!interactive) {
+      this.error(warning);
     }
-  }
 
-  async attachToParallelDeploy(squid: SquidResponse, version: VersionResponse) {
-    if (!version || !version.runningDeploy) return false;
+    this.warn(warning);
 
-    switch (version.runningDeploy.type) {
+    switch (squid.lastDeploy.type) {
       // we should react only for running deploy
       case 'DEPLOY':
         const { confirm } = await inquirer.prompt([
           {
             name: 'confirm',
             type: 'confirm',
-            message: `Squid "${squid.name}@${version.name}" is being deploying. 
-You can not run deploys on the same squid in parallel.
-Do you want to attach to the running deploy process?`,
+            message: `Do you want to attach to the running deploy process?`,
           },
         ]);
         if (!confirm) return false;
 
         if (squid.organization) {
           await this.pollDeploy({
-            orgCode: squid.organization.code,
-            deployId: version.runningDeploy.id,
+            organization: squid.organization,
+            deploy: squid.lastDeploy,
             streamLogs: true,
           });
         }
@@ -60,42 +47,66 @@ Do you want to attach to the running deploy process?`,
     }
   }
 
+  async promptAddTag(
+    { organization, name, tag }: { organization: Pick<Organization, 'code'>; name: string; tag: string },
+    { using = 'using "--allow-tag-reassign" flag', interactive }: { using?: string; interactive?: boolean } = {},
+  ) {
+    const oldSquid = await this.findSquid({
+      organization,
+      squid: { name, tag },
+    });
+    if (!oldSquid) return true;
+
+    const warning = `The tag "${tag}" has already been assigned to ${printSquid(oldSquid)}.`;
+
+    if (!interactive) {
+      this.error([warning, `Please do it explicitly ${using}`].join('\n'));
+    }
+
+    this.warn(warning);
+
+    const { confirm } = await inquirer.prompt([
+      {
+        name: 'confirm',
+        type: 'confirm',
+        message: 'Are you sure?',
+        prefix: `The tag will be reassigned.`,
+      },
+    ]);
+
+    return !!confirm;
+  }
+
   async pollDeploy({
-    orgCode,
-    deployId,
-    streamLogs,
-  }: {
-    orgCode: string;
-    deployId: string;
-    streamLogs: boolean;
-  }): Promise<void> {
+    deploy,
+    organization,
+  }: DeployRequest & { streamLogs?: boolean }): Promise<Deployment | undefined> {
     let lastStatus: string;
     let validatedPrinted = false;
 
     await doUntil(
       async () => {
-        this.deploy = await getDeploy({ orgCode, id: deployId });
+        this.deploy = await getDeploy({ deploy, organization });
 
         if (!this.deploy) return true;
-        if (this.deploy.status !== lastStatus) {
-          lastStatus = this.deploy.status;
-          CliUx.ux.action.stop('✔️');
-        }
 
         this.printDebug();
 
+        if (this.isFailed()) return this.showError(`An error occurred while deploying the squid`);
+        if (this.deploy.status === lastStatus) return false;
+        lastStatus = this.deploy.status;
+        CliUx.ux.action.stop(SUCCESS_CHECK_MARK);
+
         switch (this.deploy.status) {
-          case DeployStatus.UNPACKING:
+          case 'UNPACKING':
             CliUx.ux.action.start('◷ Preparing the squid');
-            if (this.isFailed()) return this.showError(`❌ An error occurred while unpacking the squid`);
 
             return false;
-          case DeployStatus.RESETTING:
+          case 'RESETTING':
             CliUx.ux.action.start('◷ Resetting the squid');
-            if (this.isFailed()) return this.showError(`❌ An error occurred while resetting the squid`);
 
             return false;
-          case DeployStatus.IMAGE_BUILDING:
+          case 'IMAGE_BUILDING':
             CliUx.ux.action.start('◷ Building the squid');
 
             if (!validatedPrinted) {
@@ -106,34 +117,31 @@ Do you want to attach to the running deploy process?`,
               validatedPrinted = true;
             }
 
-            if (this.isFailed()) return this.showError(`❌ An error occurred while building the squid`);
+            return false;
+          case 'SQUID_DELETING':
+            CliUx.ux.action.start('◷ Deleting the squid');
 
             return false;
-          case DeployStatus.IMAGE_PUSHING:
-            CliUx.ux.action.start('◷ Pushing the image');
-            if (this.isFailed()) return this.showError(`❌ An error occurred while publishing the squid`);
+          case 'ADDONS_DELETING':
+            CliUx.ux.action.start('◷ Deleting the squid addons');
 
             return false;
-          case DeployStatus.DEPLOYING:
-            CliUx.ux.action.start('◷ Deploying the squid');
-            if (this.isFailed()) return this.showError(`❌ An error occurred while deploying the squid`);
+          case 'DEPLOYING':
+          case 'SQUID_SYNCING':
+            CliUx.ux.action.start('◷ Syncing the squid');
 
             return false;
-          case DeployStatus.OK:
-            this.log(
-              `The squid is up and running. The GraphQL API will be shortly available at ${this.deploy.deploymentUrl}`,
-            );
+          case 'ADDONS_SYNCING':
+            CliUx.ux.action.start('◷ Syncing the squid addons');
 
-            const { squidName, versionName, orgCode } = this.deploy;
-            if (streamLogs && squidName && versionName && orgCode) {
-              CliUx.ux.action.start(`Streaming logs from the squid`);
-              await streamSquidLogs({
-                orgCode,
-                squidName,
-                versionName,
-                onLog: (l) => this.log(l),
-              });
-            }
+            return false;
+          case 'ADDING_INGRESS':
+          case 'REMOVING_INGRESS':
+            CliUx.ux.action.start('◷ Configuring ingress');
+
+            return false;
+          case 'OK':
+            this.log(`Done! ${SUCCESS_CHECK_MARK}`);
 
             return true;
           default:
@@ -146,7 +154,20 @@ Do you want to attach to the running deploy process?`,
       },
       { pause: 3000 },
     );
+
+    return this.deploy;
   }
+
+  async streamLogs({ organization, squid }: SquidRequest) {
+    CliUx.ux.action.start(`Streaming logs from the squid`);
+
+    await streamSquidLogs({
+      organization,
+      squid,
+      onLog: (l) => this.log(l),
+    });
+  }
+
   printDebug = () => {
     if (!this.deploy) return;
 
@@ -184,9 +205,11 @@ Do you want to attach to the running deploy process?`,
         `------`,
         'Please report to Discord https://discord.gg/KRvRcBdhEE or SquidDevs https://t.me/HydraDevs',
         `${chalk.dim('Deploy:')} ${this.deploy?.id}`,
-        this.deploy?.squidName ? `${chalk.dim('Squid:')} ${this.deploy?.squidName}` : null,
-        this.deploy?.versionName ? `${chalk.dim('Version:')} ${this.deploy?.versionName}` : null,
       );
+
+      if (this.deploy?.squid) {
+        errors.push(`${chalk.dim('Squid:')} ${formatSquidReference(this.deploy.squid)}`);
+      }
     }
 
     // FIXME: maybe we should send an error report ourselves here with more details?
@@ -197,5 +220,17 @@ Do you want to attach to the running deploy process?`,
     if (!this.deploy) return true;
 
     return this.deploy.failed !== 'NO';
+  }
+
+  logDeployResult(color: typeof ForegroundColor, message: string) {
+    this.log(
+      [
+        '',
+        chalk[color](`=================================================`),
+        message,
+        chalk[color](`=================================================`),
+        '',
+      ].join('\n'),
+    );
   }
 }

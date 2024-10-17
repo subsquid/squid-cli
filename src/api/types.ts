@@ -1,130 +1,26 @@
+import { PickDeep } from 'type-fest';
+
+import { components } from './schema';
+
 export type HttpResponse<T> = {
   payload: T;
 };
 
-export enum DeployStatus {
-  CREATED = 'CREATED',
-  RESETTING = 'RESETTING',
-  UNPACKING = 'UNPACKING',
-  IMAGE_BUILDING = 'IMAGE_BUILDING',
-  IMAGE_PUSHING = 'IMAGE_PUSHING',
-  DEPLOYING = 'DEPLOYING',
-  OK = 'OK',
-}
+export type Organization = components['schemas']['OrganizationResponse'];
 
-export type DeployResponse = {
-  id: string;
-  status: DeployStatus;
-  squidName?: string;
-  versionName?: string;
-  orgCode?: string;
-  deploymentUrl?: string;
-  failed: 'NO' | 'UNEXPECTED' | 'PERMISSIONS' | 'REQUIREMENTS' | 'SOURCE_FILES_BUILD_FAILED';
-  logs: { severity: 'debug' | 'warn' | 'info' | 'error'; message: string }[];
-  createdAt: string;
-};
+export type Deployment = components['schemas']['DeploymentResponse'];
 
-export type UploadUrlResponse = {
-  uploadUrl: string;
-  uploadFields: Record<string, string>;
-  maxUploadBytes: number;
-  fileUrl: string;
-};
+export type UploadUrl = components['schemas']['UploadUrlResponse'];
 
-export type DeploymentStatus = 'CREATED' | 'DEPLOYING' | 'DEPLOY_ERROR' | 'DEPLOYED';
-export type SecretsStatus = 'UP_TO_DATE' | 'NONE' | 'OUTDATED';
+export type SquidProcessor = components['schemas']['SquidProcessorResponse'];
 
-export type SquidProcessor = {
-  name: string;
-  status: 'SYNCING' | 'UNKNOWN' | 'STARTING' | 'SYNCED';
-  syncState: {
-    currentBlock: number;
-    totalBlocks: number;
-  };
-};
+export type SquidApi = components['schemas']['SquidApiResponse'];
 
-export interface SquidApi {
-  url: string;
-  status: 'AVAILABLE' | 'NOT_AVAILABLE';
-}
+export type SquidAddonsNeon = components['schemas']['SquidAddonsNeonResponse'];
 
-export interface AddonNeon {
-  connections: {
-    uri: string;
-    params: {
-      host: string;
-      database: string;
-      user: string;
-      password: string;
-    };
-  }[];
-}
+export type SquidAddonsPostgres = components['schemas']['SquidAddonsPostgresResponse'];
 
-export interface AddonPostgres extends AddonNeon {
-  disk: {
-    usageStatus: 'LOW' | 'NORMAL' | 'WARNING' | 'CRITICAL' | 'UNKNOWN';
-    totalBytes?: number;
-    usedBytes?: number;
-  };
-}
-
-export type VersionResponse = {
-  id: number;
-  name: string;
-  artifactUrl: string;
-  deploymentUrl: string;
-  description: string;
-  status: DeploymentStatus;
-  secretStatus: SecretsStatus;
-  deploy: {
-    status: 'HIBERNATED' | 'DEPLOYED' | 'DEPLOYING';
-  };
-  api?: SquidApi;
-  processors: SquidProcessor[];
-
-  runningDeploy?: {
-    id: string;
-    type: 'DELETE' | 'DEPLOY' | 'RESTART' | 'HIBERNATE';
-  };
-
-  addons: {
-    postgres?: AddonPostgres;
-    neon?: AddonNeon;
-    hasura?: {
-      profile: string;
-      replicas: number;
-    };
-  };
-
-  aliases: { name: string }[];
-  deployedAt: Date;
-  createdAt: Date;
-};
-
-export type SquidResponse = {
-  id: number;
-  name: string;
-  description: string;
-  logoUrl: string;
-  sourceCodeUrl: string;
-  websiteUrl: string;
-  versions: VersionResponse[];
-  aliasProd: string;
-  isPublic: boolean;
-  deploy?: DeployResponse;
-  createdAt: Date;
-  organization?: SquidOrganizationResponse;
-};
-
-export type SquidOrganizationResponse = {
-  id: string;
-  code: string;
-  name: string;
-};
-
-export type SquidNameIsAvailableResponse = {
-  available: boolean;
-};
+export type Squid = components['schemas']['SquidResponse'];
 
 export type SecretsListResponse = {
   secrets: Record<string, string>;
@@ -153,10 +49,10 @@ export type LogsResponse = {
   nextPage: string | null;
 };
 
-export type SquidVersionResponse = {
-  id: number;
-  name: string;
-  version: {
-    deploymentUrl: string;
-  };
+export type OrganizationRequest = { organization: PickDeep<Organization, 'code'> };
+
+export type SquidRequest = OrganizationRequest & {
+  squid: ({ name: string } & { tag?: string; slot?: string }) | string;
 };
+
+export type DeployRequest = OrganizationRequest & { deploy: PickDeep<Deployment, 'id'> };

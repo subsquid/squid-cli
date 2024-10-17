@@ -1,15 +1,20 @@
-import { Flags } from '@oclif/core';
-import { isNil, omitBy } from 'lodash';
+import { Args } from '@oclif/core';
 
-import { restartSquid } from '../api';
-import { SqdFlags } from '../command';
-import { DeployCommand } from '../deploy-command';
-import { formatSquidReference as formatSquidReference, printSquid } from '../utils';
+import { removeSquidTag } from '../../api';
+import { SqdFlags } from '../../command';
+import { DeployCommand } from '../../deploy-command';
+import { formatSquidReference, printSquid } from '../../utils';
+import { UPDATE_COLOR } from '../deploy';
 
-import { UPDATE_COLOR } from './deploy';
+export default class Remove extends DeployCommand {
+  static description = 'Remove a tag from a squid';
 
-export default class Restart extends DeployCommand {
-  static description = 'Restart a squid deployed to the Cloud';
+  static args = {
+    tag: Args.string({
+      description: `New tag to assign`,
+      required: true,
+    }),
+  };
 
   static flags = {
     org: SqdFlags.org({
@@ -31,8 +36,9 @@ export default class Restart extends DeployCommand {
 
   async run(): Promise<void> {
     const {
+      args: { tag: tagName },
       flags: { reference, interactive, ...flags },
-    } = await this.parse(Restart);
+    } = await this.parse(Remove);
 
     this.validateSquidNameFlags({ reference, ...flags });
 
@@ -41,13 +47,21 @@ export default class Restart extends DeployCommand {
     const organization = await this.promptSquidOrganization(org, name, { interactive });
     const squid = await this.findOrThrowSquid({ organization, squid: { name, tag, slot } });
 
+    if (!squid.tags.some((t) => t.name === tagName)) {
+      return this.log(`Tag "${tagName}" is not assigned to the squid ${printSquid(squid)}`);
+    }
+
     const attached = await this.promptAttachToDeploy(squid, { interactive });
     if (attached) return;
 
-    const deployment = await restartSquid({ organization, squid });
+    const deployment = await removeSquidTag({
+      organization,
+      squid,
+      tag: tagName,
+    });
     await this.pollDeploy({ organization, deploy: deployment });
     if (!deployment || !deployment.squid) return;
 
-    this.logDeployResult(UPDATE_COLOR, `The squid ${printSquid(squid)} has been successfully restarted`);
+    this.logDeployResult(UPDATE_COLOR, `The squid ${printSquid(squid)} has been successfully updated`);
   }
 }

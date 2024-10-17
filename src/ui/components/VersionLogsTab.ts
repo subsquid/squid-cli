@@ -1,16 +1,16 @@
 import { addMinutes } from 'date-fns';
-import blessed, { Element, List, Log } from 'reblessed';
+import blessed, { Element } from 'reblessed';
 
-import { streamSquidLogs, versionHistoryLogs } from '../../api';
+import { squidHistoryLogs, streamSquidLogs } from '../../api';
 import { pretty } from '../../logs';
 import { mainColor, scrollBarTheme } from '../theme';
 
 import { Loader } from './Loader';
 import { VersionTab } from './Tabs';
-import { SquidVersion } from './types';
+import { Squid } from './types';
 
 export class VersionLogTab implements VersionTab {
-  async append(parent: Element, squid: SquidVersion) {
+  async append(parent: Element, squid: Squid) {
     const logsBox = blessed.log({
       top: 0,
       left: 0,
@@ -37,16 +37,16 @@ export class VersionLogTab implements VersionTab {
 
     process.nextTick(async () => {
       try {
-        const { logs } = await versionHistoryLogs({
-          orgCode: squid.squid.organization!.code,
-          squidName: squid.squid.name,
-          versionName: squid.version.name,
+        const { logs } = await squidHistoryLogs({
+          organization: squid.organization,
+          squid,
           query: {
             limit: 100,
             from: addMinutes(new Date(), -30),
           },
           abortController,
         });
+
         pretty(logs.reverse()).forEach((line) => {
           logsBox.add(line);
         });
@@ -60,9 +60,8 @@ export class VersionLogTab implements VersionTab {
       logsBox.screen.render();
 
       streamSquidLogs({
-        orgCode: squid.squid.organization!.code,
-        squidName: squid.squid.name,
-        versionName: squid.version.name,
+        organization: squid.organization,
+        squid,
         onLog: (line) => {
           logsBox.add(line);
         },

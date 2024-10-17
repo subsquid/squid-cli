@@ -4,13 +4,13 @@ import blessed, { Element } from 'reblessed';
 import { chalkMainColor, scrollBarTheme } from '../theme';
 
 import { VersionTab } from './Tabs';
-import { SquidVersion } from './types';
+import { Squid } from './types';
 
 export class VersionDbAccessTab implements VersionTab {
-  async append(parent: Element, squid: SquidVersion) {
+  async append(parent: Element, squid: Squid) {
     const lines = [];
 
-    const db = squid.version.addons.postgres || squid.version.addons.neon;
+    const db = squid.addons?.postgres || squid.addons?.neon;
 
     const connection = db?.connections?.[0];
     if (connection) {
