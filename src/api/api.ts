@@ -29,10 +29,10 @@ const DEFAULT_RETRY: IAxiosRetryConfig = {
 
 axiosRetry(axios, DEFAULT_RETRY);
 
-let version = 'unknown';
+let CLI_VERSION = 'unknown';
 try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  version = require(path.resolve(__dirname, '../../package.json')).version;
+  CLI_VERSION = require(path.resolve(__dirname, '../../package.json')).version;
 } catch (e) {}
 
 export class ApiError extends Error {
@@ -89,7 +89,7 @@ export async function api<T = any>({
 
   const finalHeaders = {
     authorization: url.startsWith(config.apiUrl) ? `token ${config.credentials}` : null,
-    'X-CLI-Version': version,
+    'X-CLI-Version': CLI_VERSION,
     ...headers,
   };
 
