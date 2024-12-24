@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
 import { resolve, dirname } from 'path';
 
-export const DEFAULT_API_URL = process.env.SUBSQUID_DEFAULT_API_URL || 'https://app.subsquid.io/api';
+export const DEFAULT_API_URL = process.env.SUBSQUID_DEFAULT_API_URL || 'https://cloud.sqd.dev/api';
 
 export type Config = {
   apiUrl: string;
@@ -38,7 +38,15 @@ function writeConfig(config: Config) {
 
 export function getConfig(): Config {
   try {
-    return JSON.parse(readFileSync(getConfigFilePath(), 'utf8'));
+    const config = JSON.parse(readFileSync(getConfigFilePath(), 'utf8'));
+
+    // Migrate old config API URL
+    if (config.apiUrl === 'https://app.subsquid.io/api') {
+      config.apiUrl = DEFAULT_API_URL;
+      writeConfig(config);
+    }
+
+    return config;
   } catch (e) {
     return defaultConfig();
   }
