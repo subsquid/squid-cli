@@ -3,6 +3,7 @@ import { json } from 'stream/consumers';
 import { ux as CliUx, Flags } from '@oclif/core';
 import { Manifest, ManifestValue } from '@subsquid/manifest';
 import chalk from 'chalk';
+import { func } from 'joi';
 import { startCase, toUpper } from 'lodash';
 import prettyBytes from 'pretty-bytes';
 
@@ -60,8 +61,14 @@ export default class View extends CliCommand {
       return this.log(JSON.stringify(squid, null, 2));
     }
 
-    this.log(`${printSquid(squid)} (${squid.tags.map((t) => t.name).join(', ')})`);
-    CliUx.ux.styledHeader('General');
+    this.log(`${chalk.bold('SQUID:')} ${printSquid(squid)} (${squid.tags.map((t) => t.name).join(', ')})`);
+    this.printSquidInfo(squid);
+    this.log();
+    this.log(`View this squid in Cloud: ${squid.links.cloudUrl}`);
+  }
+
+  printSquidInfo(squid: Squid) {
+    this.printHeader('General');
     printInfoTable([
       {
         name: 'Status',
@@ -86,7 +93,7 @@ export default class View extends CliCommand {
     ]);
     if (squid.status !== 'HIBERNATED') {
       if (squid.api) {
-        CliUx.ux.styledHeader('API');
+        this.printHeader('API');
         printInfoTable([
           {
             name: 'Status',
@@ -107,7 +114,7 @@ export default class View extends CliCommand {
         ]);
       }
       for (const processor of squid.processors || []) {
-        CliUx.ux.styledHeader(`Processor (${processor.name})`);
+        this.printHeader(`Processor (${processor.name})`);
         printInfoTable([
           {
             name: 'Status',
@@ -115,7 +122,9 @@ export default class View extends CliCommand {
           },
           {
             name: 'Progress',
-            value: `${processor.syncState.currentBlock}/${processor.syncState.totalBlocks} (${Math.round((processor.syncState.currentBlock / processor.syncState.totalBlocks) * 100)}%)`,
+            value:
+              `${formatNumber(processor.syncState.currentBlock)}/${formatNumber(processor.syncState.totalBlocks)} ` +
+              `(${Math.round((processor.syncState.currentBlock / processor.syncState.totalBlocks) * 100)}%)`,
           },
           {
             name: 'Profile',
@@ -124,7 +133,7 @@ export default class View extends CliCommand {
         ]);
       }
       if (squid.addons?.postgres) {
-        CliUx.ux.styledHeader('Addon (Postgres)');
+        this.printHeader('Addon (Postgres)');
         printInfoTable([
           {
             name: 'Usage',
@@ -132,7 +141,9 @@ export default class View extends CliCommand {
           },
           {
             name: 'Disk',
-            value: `${prettyBytes(squid.addons?.postgres?.disk.usedBytes)}/${prettyBytes(squid.addons?.postgres?.disk.totalBytes)} (${Math.round((squid.addons?.postgres?.disk.usedBytes / squid.addons?.postgres?.disk.totalBytes) * 100)}%)`,
+            value:
+              `${prettyBytes(squid.addons?.postgres?.disk.usedBytes)}/${prettyBytes(squid.addons?.postgres?.disk.totalBytes)} ` +
+              `(${Math.round((squid.addons?.postgres?.disk.usedBytes / squid.addons?.postgres?.disk.totalBytes) * 100)}%)`,
           },
           {
             name: 'URL',
@@ -145,7 +156,7 @@ export default class View extends CliCommand {
         ]);
       }
       if (squid.addons?.neon) {
-        CliUx.ux.styledHeader('Addon (Neon)');
+        this.printHeader('Addon (Neon)');
         printInfoTable([
           {
             name: 'URL',
@@ -154,7 +165,7 @@ export default class View extends CliCommand {
         ]);
       }
       if (squid.addons?.hasura) {
-        CliUx.ux.styledHeader('Addon (Hasura)');
+        this.printHeader('Addon (Hasura)');
         printInfoTable([
           {
             name: 'Status',
@@ -175,8 +186,11 @@ export default class View extends CliCommand {
         ]);
       }
     }
+  }
+
+  printHeader(value: string) {
     this.log();
-    this.log(`View this squid in Cloud: ${squid.links.cloudUrl}`);
+    this.log(`${chalk.dim('===')} ${chalk.bold(value)}`);
   }
 }
 
@@ -190,8 +204,8 @@ function printInfoTable(
     data,
     {
       name: {
-        get: (v) => chalk.bold(v.name),
-        minWidth: 12,
+        get: (v) => chalk.dim(v.name),
+        minWidth: 14,
       },
       value: {
         get: (v) => v.value ?? '-',
@@ -257,4 +271,8 @@ function formatPostgresStatus(status?: SquidDiskResponseUsageStatus): any {
     default:
       return status;
   }
+}
+
+export function formatNumber(value: number) {
+  return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(value);
 }
