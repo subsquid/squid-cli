@@ -64,7 +64,7 @@ export default class View extends CliCommand {
     this.log(`${chalk.bold('SQUID:')} ${printSquid(squid)} (${squid.tags.map((t) => t.name).join(', ')})`);
     this.printSquidInfo(squid);
     this.log();
-    this.log(`View this squid in Cloud: ${squid.links.cloudUrl}`);
+    this.log(`View this squid in Cloud: ${chalk.underline(squid.links.cloudUrl)}`);
   }
 
   printSquidInfo(squid: Squid) {
@@ -146,8 +146,8 @@ export default class View extends CliCommand {
               `(${Math.round((squid.addons?.postgres?.disk.usedBytes / squid.addons?.postgres?.disk.totalBytes) * 100)}%)`,
           },
           {
-            name: 'URL',
-            value: squid.addons?.postgres?.connections?.map((c) => chalk.underline(c.uri)).join('\n'),
+            name: 'Connection',
+            value: squid.addons?.postgres?.connections?.map((c) => c.uri).join('\n'),
           },
           {
             name: 'Profile',
@@ -159,8 +159,8 @@ export default class View extends CliCommand {
         this.printHeader('Addon (Neon)');
         printInfoTable([
           {
-            name: 'URL',
-            value: squid.addons?.neon?.connections?.map((c) => chalk.underline(c.uri)),
+            name: 'Connection',
+            value: squid.addons?.neon?.connections?.map((c) => c.uri),
           },
         ]);
       }
