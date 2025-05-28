@@ -211,7 +211,7 @@ function printInfoTable(
         get: (v) => v.value ?? '-',
       },
     },
-    { 'no-header': true },
+    { 'no-header': true, 'no-truncate': true },
   );
 }
 
