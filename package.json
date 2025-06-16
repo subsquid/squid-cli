@@ -1,7 +1,7 @@
 {
   "name": "@subsquid/cli",
   "description": "squid cli tool",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "license": "GPL-3.0-or-later",
   "repository": "git@github.com:subsquid/squid-cli.git",
   "publishConfig": {
@@ -78,7 +78,7 @@
     "@oclif/plugin-autocomplete": "3.2.2",
     "@oclif/plugin-warn-if-update-available": "^3.1.13",
     "@subsquid/commands": "^2.3.1",
-    "@subsquid/manifest": "^2.0.0-beta.19",
+    "@subsquid/manifest": "^2.0.0-beta.20",
     "@types/fast-levenshtein": "^0.0.4",
     "@types/lodash": "^4.17.7",
     "@types/targz": "^1.0.4",
