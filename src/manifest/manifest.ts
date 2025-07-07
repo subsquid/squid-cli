@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 
 import { Manifest } from '@subsquid/manifest';
-import { Expression, Parser } from '@subsquid/manifest-expr';
 import { mapValues } from 'lodash';
 
 export function readManifest(path: string) {
@@ -11,18 +10,6 @@ export function readManifest(path: string) {
 
 export function saveManifest(path: string, manifest: string) {
   fs.writeFileSync(path, manifest);
-}
-
-export function evalManifestEnv(env: Record<string, any>, context: Record<string, any>) {
-  const parsed = parseManifestEnv(env);
-
-  return mapValues(parsed, (value) => (value instanceof Expression ? value.eval(context) : value));
-}
-
-export function parseManifestEnv(env: Record<string, any>) {
-  const parser = new Parser();
-
-  return mapValues(env, (value) => (typeof value === 'string' ? parser.parse(value) : value));
 }
 
 export function loadManifestFile(
