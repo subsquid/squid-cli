@@ -203,7 +203,7 @@ You can not run deploys on the same squid in parallel`;
     if (reason === 'UNEXPECTED') {
       errors.push(
         `------`,
-        'Please report to Discord https://discord.gg/KRvRcBdhEE or SquidDevs https://t.me/HydraDevs',
+        'Please report to SquidDevs https://t.me/HydraDevs',
         `${chalk.dim('Deploy:')} ${this.deploy?.id}`,
       );
 
