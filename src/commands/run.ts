@@ -12,7 +12,7 @@ import { defaults, omit } from 'lodash';
 import treeKill from 'tree-kill';
 
 import { CliCommand } from '../command';
-import { evalManifestEnv, loadManifestFile } from '../manifest';
+import { loadManifestFile } from '../manifest';
 
 const chalkColors = [chalk.green, chalk.yellow, chalk.blue, chalk.magenta, chalk.cyan];
 
@@ -180,13 +180,14 @@ export default class Run extends CliCommand {
       }
 
       const context = { secrets: process.env };
+      const evaluatedManifest = manifest.eval(context);
 
       const processEnv = omit(process.env, ['PROCESSOR_PROMETHEUS_PORT']);
       const env = {
         FORCE_COLOR: 'true',
         FORCE_PRETTY_LOGGER: 'true',
         ...processEnv,
-        ...evalManifestEnv(manifest.deploy?.env ?? {}, context),
+        ...evaluatedManifest.deploy?.env,
       };
 
       const init = manifest.deploy?.init;
@@ -194,7 +195,7 @@ export default class Run extends CliCommand {
         const p = new SquidProcess('init', init.cmd, {
           env: {
             ...env,
-            ...evalManifestEnv(init.env ?? {}, context),
+            ...init.env,
           },
           cwd: squidDir,
         });
@@ -208,7 +209,7 @@ export default class Run extends CliCommand {
           new SquidProcess('api', api.cmd, {
             env: {
               ...env,
-              ...evalManifestEnv(api.env ?? {}, context),
+              ...api.env,
             },
             cwd: squidDir,
           }),
@@ -227,7 +228,7 @@ export default class Run extends CliCommand {
             new SquidProcess(processor.name, processor.cmd, {
               env: {
                 ...env,
-                ...evalManifestEnv(processor.env ?? {}, context),
+                ...processor.env,
               },
               cwd: squidDir,
             }),
