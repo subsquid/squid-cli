@@ -382,11 +382,14 @@ export default class Deploy extends DeployCommand {
     return !!confirm;
   }
 
-  private async promptPostgresDeletion(squid: Squid, { interactive }: { interactive?: boolean } = {}) {
+  private async promptPostgresDeletion(
+    squid: Squid,
+    { using = 'using "--allow-postgres-deletion" flag', interactive }: { using?: string; interactive?: boolean } = {},
+  ) {
     const warning = `The new manifest does not include "addons.postgres", but the squid ${printSquid(squid)} currently has a Postgres database. Deploying will permanently delete the database and all its data.`;
 
     if (!interactive) {
-      this.error(warning);
+      this.error([warning, `Please do it explicitly ${using}`].join('\n'));
     }
 
     this.warn(warning);
