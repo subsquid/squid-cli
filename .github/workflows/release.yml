@@ -19,7 +19,10 @@ on:
 #      - src/**
 #      - bin/**
 #      - yarn.lock
-
+permissions:
+  id-token: write  # Required for OIDC
+  contents: write
+  
 jobs:
   build-publish:
     name: Build & publish
@@ -31,12 +34,13 @@ jobs:
           access_token: ${{ github.token }}
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install Yarn
         run: corepack enable
@@ -48,24 +52,29 @@ jobs:
         with:
           cache: yarn
 
-      - name: Write npm credentials
-        run: |
-          echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> .npmrc
-          npm whoami
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
-
       - name: Install
         run: yarn install --immutable
 
       - name: Build
         run: yarn build
 
+      - name: Update npm
+        run: npm install -g npm@latest
+
       - name: Release
         run: npm publish --tag ${{ github.event.inputs.tag }} --access public
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Get version
+        id: package-version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.package-version.outputs.version }}
+          name: v${{ steps.package-version.outputs.version }}
+          generate_release_notes: true
+          prerelease: ${{ github.event.inputs.tag != 'latest' }}
 
 #      - name: Build packages
 #        run: |

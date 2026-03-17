@@ -3,7 +3,10 @@
   "description": "squid cli tool",
   "version": "3.3.0",
   "license": "GPL-3.0-or-later",
-  "repository": "git@github.com:subsquid/squid-cli.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/subsquid/squid-cli.git"
+  },
   "publishConfig": {
     "access": "public"
   },
