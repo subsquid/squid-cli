@@ -259,6 +259,14 @@ export default class Deploy extends DeployCommand {
     }
 
     /**
+     * Warn if the existing squid has a Postgres addon but the new manifest removes it
+     */
+    if (!hardReset && target?.addons?.postgres && !manifest.deploy?.addons?.postgres) {
+      const confirmed = await this.promptPostgresDeletion(target, { interactive });
+      if (!confirmed) return;
+    }
+
+    /**
      * Squid exists we should check if tag belongs to another squid
      */
     const hasTag = !!target?.tags.find((t) => t.name === addTag) || tag === addTag;
@@ -368,6 +376,30 @@ export default class Deploy extends DeployCommand {
         name: 'confirm',
         type: 'confirm',
         message: chalk.reset(`Manifest values will be overridden. ${chalk.bold('Are you sure?')}`),
+      },
+    ]);
+
+    return !!confirm;
+  }
+
+  private async promptPostgresDeletion(
+    squid: Squid,
+    { using = 'using "--allow-postgres-deletion" flag', interactive }: { using?: string; interactive?: boolean } = {},
+  ) {
+    const warning = `The new manifest does not include "addons.postgres", but the squid ${printSquid(squid)} currently has a Postgres database. Deploying will permanently delete the database and all its data.`;
+
+    if (!interactive) {
+      this.error([warning, `Please do it explicitly ${using}`].join('\n'));
+    }
+
+    this.warn(warning);
+
+    const { confirm } = await inquirer.prompt([
+      {
+        name: 'confirm',
+        type: 'confirm',
+        message: 'Are you sure you want to continue?',
+        prefix: `The Postgres database will be permanently deleted.`,
       },
     ]);
 
