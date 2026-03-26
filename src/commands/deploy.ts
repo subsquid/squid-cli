@@ -3,7 +3,7 @@ import path from 'node:path';
 import { promisify } from 'util';
 
 import { Args, Flags, ux as CliUx } from '@oclif/core';
-import { Manifest } from '@subsquid/manifest';
+import { Manifest, ManifestValue } from '@subsquid/manifest';
 import chalk from 'chalk';
 import diff from 'cli-diff';
 import { globSync } from 'glob';
@@ -256,6 +256,17 @@ export default class Deploy extends DeployCommand {
     if (target && !flags['allow-update']) {
       const update = await this.promptUpdateSquid(target, { interactive, tag });
       if (!update) return;
+    }
+
+    /**
+     * Prevent deploying if the Postgres version has changed (requires hard reset)
+     */
+    const versionMismatch = getPostgresVersionMismatch(target, manifest);
+    if (!hardReset && versionMismatch) {
+      this.error(
+        `The squid ${printSquid(target!)} is currently using Postgres ${versionMismatch.currentVersion}, but the new manifest specifies Postgres ${versionMismatch.newVersion}. ` +
+          `Changing the Postgres version requires a hard reset. Please use the "--hard-reset" flag to proceed.`,
+      );
     }
 
     /**
@@ -544,4 +555,21 @@ export function getIgnorePatterns(ignoreDir: string, raw: string) {
 
 function toRootPattern(pattern: string) {
   return pattern.startsWith('/') ? pattern : `/${pattern}`;
+}
+
+export function getPostgresVersionMismatch(
+  target: Squid | null,
+  manifest: Manifest,
+): { currentVersion: string; newVersion: string } | null {
+  if (!target?.addons?.postgres || !manifest.deploy?.addons?.postgres) return null;
+
+  const currentManifest = target.manifest.current as ManifestValue;
+  const currentVersion = currentManifest.deploy?.addons?.postgres?.version;
+  const newVersion = manifest.deploy.addons.postgres.version;
+
+  if (currentVersion && newVersion && currentVersion !== newVersion) {
+    return { currentVersion, newVersion };
+  }
+
+  return null;
 }
