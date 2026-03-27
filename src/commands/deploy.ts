@@ -265,7 +265,7 @@ export default class Deploy extends DeployCommand {
     if (!hardReset && versionMismatch) {
       this.error(
         `The squid ${printSquid(target!)} is currently using Postgres ${versionMismatch.currentVersion}, but the new manifest specifies Postgres ${versionMismatch.newVersion}. ` +
-          `Changing the Postgres version requires a hard reset. Please use the "--hard-reset" flag to proceed.`,
+          `Changing the Postgres version requires a hard reset. Please do it explicitly using "--hard-reset" flag.`,
       );
     }
 
