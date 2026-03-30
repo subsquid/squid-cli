@@ -1411,7 +1411,7 @@ __metadata:
     "@oclif/plugin-autocomplete": "npm:3.2.2"
     "@oclif/plugin-warn-if-update-available": "npm:^3.1.13"
     "@subsquid/commands": "npm:^2.3.1"
-    "@subsquid/manifest": "npm:^2.1.2"
+    "@subsquid/manifest": "npm:^2.1.3"
     "@types/async-retry": "npm:^1.4.8"
     "@types/blessed": "npm:^0.1.25"
     "@types/cross-spawn": "npm:^6.0.6"
@@ -1505,14 +1505,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subsquid/manifest@npm:^2.1.2":
-  version: 2.1.2
-  resolution: "@subsquid/manifest@npm:2.1.2"
+"@subsquid/manifest@npm:^2.1.3":
+  version: 2.1.3
+  resolution: "@subsquid/manifest@npm:2.1.3"
   dependencies:
     joi: "npm:17.13.3"
     js-yaml: "npm:^4.1.0"
     lodash: "npm:^4.17.21"
-  checksum: 10c0/20282d0e6278a4df28313fb4ade39c6a81a11caa49eb43a117e5cb115e731d693797a784080deab4587d4df17da94475c843550cdedf444f0543f32ac338084a
+  checksum: 10c0/ad569035cebd8c4fc6c67f7af7e827cc5a5925186fcb9205c88f28f18257779cb8f456cfbe0ae5ce1d735928cdc530b1b0974ca088a13056b4f4e6bab24f1025
   languageName: node
   linkType: hard
 
