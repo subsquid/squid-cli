@@ -78,5 +78,10 @@ describe('Deploy', () => {
       const result = getPostgresVersionMismatch(target, makeManifest('17'));
       expect(result).toBeNull();
     });
+
+    it('returns null when version is not set in new manifest', () => {
+      const result = getPostgresVersionMismatch(makeTarget('14'), makeManifest());
+      expect(result).toBeNull();
+    });
   });
 });
