@@ -1,4 +1,5 @@
 import { Args } from '@oclif/core';
+import chalk from 'chalk';
 import inquirer from 'inquirer';
 
 import { CliCommand } from '../../command';
@@ -27,10 +28,12 @@ export default class ProfileUse extends CliCommand {
     const current = getCurrentProfileName();
     const choices = Object.keys(profiles).filter((n) => n !== current);
 
-    this.log(`Current profile: ${current}`);
+    this.log(`${chalk.dim('Current profile:')} ${chalk.bold(current)}`);
 
     if (choices.length === 0) {
-      return this.log(`No other profiles available. Use "sqd auth -k <key> --profile <name>" to create one.`);
+      return this.log(
+        chalk.yellow(`No other profiles available. Use "sqd auth -k <key> --profile <name>" to create one.`),
+      );
     }
 
     let name = argName;
@@ -54,10 +57,7 @@ export default class ProfileUse extends CliCommand {
           name: 'profile',
           type: 'list',
           message: 'Switch to profile:',
-          choices: choices.map((n) => ({
-            name: n === current ? `${n} (current)` : n,
-            value: n,
-          })),
+          choices,
         },
       ]);
       stdin.destroy();
@@ -66,6 +66,6 @@ export default class ProfileUse extends CliCommand {
     }
 
     useProfile(name!);
-    this.log(`Switched to profile "${name}"`);
+    this.logSuccess(` Switched to profile ${chalk.bold(name)}`);
   }
 }

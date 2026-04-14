@@ -1,4 +1,5 @@
 import { Args } from '@oclif/core';
+import chalk from 'chalk';
 import inquirer from 'inquirer';
 
 import { CliCommand } from '../../command';
@@ -28,7 +29,9 @@ export default class ProfileRemove extends CliCommand {
     const choices = Object.keys(profiles).filter((n) => n !== current);
 
     if (choices.length === 0) {
-      return this.log(`No removable profiles. The active profile "${current}" cannot be removed.`);
+      return this.log(
+        chalk.yellow(`No removable profiles. The active profile "${current}" cannot be removed.`),
+      );
     }
 
     let name = argName;
@@ -61,6 +64,6 @@ export default class ProfileRemove extends CliCommand {
     }
 
     removeProfile(name!);
-    this.log(`Profile "${name}" has been removed`);
+    this.logSuccess(` Profile ${chalk.bold(name)} has been removed`);
   }
 }
