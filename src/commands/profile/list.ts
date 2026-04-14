@@ -1,5 +1,6 @@
 import { Flags } from '@oclif/core';
 
+import { profile as fetchProfile } from '../../api/profile';
 import { CliCommand } from '../../command';
 import { getCurrentProfileName, getProfiles } from '../../config';
 
@@ -33,10 +34,20 @@ export default class ProfileList extends CliCommand {
       const { apiUrl, credentials } = profiles[name];
       const isCurrent = name === current;
       const marker = isCurrent ? '* ' : '  ';
+
       this.log(`${marker}${name}${isCurrent ? ' (current)' : ''}`);
-      this.log(`    API URL : ${apiUrl}`);
+      this.log(`    API URL  : ${apiUrl}`);
+
+      try {
+        const { email, username } = await fetchProfile({ auth: { apiUrl, credentials } });
+        if (email) this.log(`    Email    : ${email}`);
+        if (username) this.log(`    Username : ${username}`);
+      } catch {
+        this.log(`    (unable to fetch user info)`);
+      }
+
       if (showToken) {
-        this.log(`    Token   : ${credentials}`);
+        this.log(`    Token    : ${credentials}`);
       }
     }
   }
