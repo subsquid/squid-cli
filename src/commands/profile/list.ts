@@ -1,8 +1,13 @@
 import { Flags } from '@oclif/core';
+import chalk from 'chalk';
 
 import { profile as fetchProfile } from '../../api/profile';
 import { CliCommand } from '../../command';
 import { getCurrentProfileName, getProfiles } from '../../config';
+
+function field(label: string, value: string) {
+  return `  ${chalk.dim(label.padEnd(10))}${value}`;
+}
 
 export default class ProfileList extends CliCommand {
   static description = 'List all saved profiles';
@@ -30,25 +35,29 @@ export default class ProfileList extends CliCommand {
       return;
     }
 
-    for (const name of names) {
+    for (let i = 0; i < names.length; i++) {
+      const name = names[i];
       const { apiUrl, credentials } = profiles[name];
       const isCurrent = name === current;
-      const marker = isCurrent ? '* ' : '  ';
 
-      this.log(`${marker}${name}${isCurrent ? ' (current)' : ''}`);
-      this.log(`    API URL  : ${apiUrl}`);
+      const marker = isCurrent ? chalk.green('❯ ') : '  ';
+      const heading = isCurrent ? chalk.bold(name) : name;
+      this.log(`${marker}${heading}`);
+      this.log(field('API URL', apiUrl));
 
       try {
         const { email, username } = await fetchProfile({ auth: { apiUrl, credentials } });
-        if (email) this.log(`    Email    : ${email}`);
-        if (username) this.log(`    Username : ${username}`);
+        if (email) this.log(field('Email', email));
+        if (username) this.log(field('Username', username));
       } catch {
-        this.log(`    (unable to fetch user info)`);
+        this.log(`  ${chalk.dim('(invalid credentials)')}`);
       }
 
       if (showToken) {
-        this.log(`    Token    : ${credentials}`);
+        this.log(field('Token', credentials));
       }
+
+      if (i < names.length - 1) this.log('');
     }
   }
 }
