@@ -1,13 +1,24 @@
+import { Flags } from '@oclif/core';
+
 import { CliCommand } from '../../command';
 import { getCurrentProfileName, getProfiles } from '../../config';
 
 export default class ProfileList extends CliCommand {
   static description = 'List all saved profiles';
 
-  static examples = ['sqd profile list'];
+  static examples = ['sqd profile list', 'sqd profile list --show-token'];
+
+  static flags = {
+    'show-token': Flags.boolean({
+      description: 'Show full auth tokens',
+      default: false,
+    }),
+  };
 
   async run(): Promise<void> {
-    await this.parse(ProfileList);
+    const {
+      flags: { 'show-token': showToken },
+    } = await this.parse(ProfileList);
 
     const profiles = getProfiles();
     const current = getCurrentProfileName();
@@ -22,11 +33,11 @@ export default class ProfileList extends CliCommand {
       const { apiUrl, credentials } = profiles[name];
       const isCurrent = name === current;
       const marker = isCurrent ? '* ' : '  ';
-      const masked =
-        credentials.length > 8 ? `${credentials.slice(0, 6)}...${credentials.slice(-4)}` : '****';
       this.log(`${marker}${name}${isCurrent ? ' (current)' : ''}`);
       this.log(`    API URL : ${apiUrl}`);
-      this.log(`    Token   : ${masked}`);
+      if (showToken) {
+        this.log(`    Token   : ${credentials}`);
+      }
     }
   }
 }

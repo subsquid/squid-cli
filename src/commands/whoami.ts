@@ -11,7 +11,7 @@ export default class Whoami extends CliCommand {
     await this.parse(Whoami);
 
     const { username, email } = await profile();
-    const { apiUrl, credentials } = getConfig();
+    const { apiUrl } = getConfig();
 
     this.log(`Profile: ${getCurrentProfileName()}`);
     if (email) {
@@ -21,7 +21,5 @@ export default class Whoami extends CliCommand {
       this.log(`Username: ${username}`);
     }
     this.log(`API URL: ${apiUrl}`);
-    const masked = credentials.length > 8 ? `${credentials.slice(0, 6)}...${credentials.slice(-4)}` : '****';
-    this.log(`Token: ${masked}`);
   }
 }
