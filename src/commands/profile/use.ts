@@ -27,6 +27,8 @@ export default class ProfileUse extends CliCommand {
     const current = getCurrentProfileName();
     const choices = Object.keys(profiles).filter((n) => n !== current);
 
+    this.log(`Current profile: ${current}`);
+
     if (choices.length === 0) {
       return this.log(`No other profiles available. Use "sqd auth -k <key> --profile <name>" to create one.`);
     }
