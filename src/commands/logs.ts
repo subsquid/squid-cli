@@ -81,7 +81,7 @@ export default class Logs extends CliCommand {
       summary: 'Follow',
       required: false,
       default: false,
-      exclusive: ['fromDate', 'pageSize'],
+      exclusive: ['since', 'pageSize'],
     }),
   };
 

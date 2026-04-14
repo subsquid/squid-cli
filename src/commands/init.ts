@@ -176,7 +176,9 @@ export default class Init extends CliCommand {
     /** Remove deprecated files from repositories **/
     try {
       await asyncFs.rm(path.resolve(localDir, 'Dockerfile'));
-    } catch (e) {}
+    } catch (e: any) {
+      if (e.code !== 'ENOENT') throw e;
+    }
 
     const manifestPath = path.resolve(localDir, 'squid.yaml');
     try {

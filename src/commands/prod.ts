@@ -9,7 +9,6 @@ export default class Prod extends Command {
   async run(): Promise<void> {
     await this.parse(Prod);
 
-    // TODO write description
     this.log(
       [
         chalk.yellow('*******************************************************'),

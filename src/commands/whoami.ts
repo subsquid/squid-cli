@@ -20,6 +20,6 @@ export default class Whoami extends CliCommand {
       this.log(`Username: ${username}`);
     }
     this.log(`API URL: ${apiUrl}`);
-    this.log(`Token: ${credentials}`);
+    this.log(`Token: ${'*'.repeat(Math.max(0, credentials.length - 4))}${credentials.slice(-4)}`);
   }
 }

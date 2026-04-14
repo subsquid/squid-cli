@@ -5,7 +5,7 @@ import inquirer from 'inquirer';
 import { addSquidTag } from '../../api';
 import { SqdFlags } from '../../command';
 import { DeployCommand } from '../../deploy-command';
-import { formatSquidReference, printSquid } from '../../utils';
+import { printSquid } from '../../utils';
 import { UPDATE_COLOR } from '../deploy';
 
 export default class Add extends DeployCommand {

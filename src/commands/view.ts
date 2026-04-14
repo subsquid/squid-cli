@@ -131,7 +131,7 @@ export default class View extends CliCommand {
             name: 'Progress',
             value:
               `${formatNumber(processor.syncState.currentBlock)}/${formatNumber(processor.syncState.totalBlocks)} ` +
-              `(${Math.round((processor.syncState.currentBlock / processor.syncState.totalBlocks) * 100)}%)`,
+              `(${processor.syncState.totalBlocks > 0 ? Math.round((processor.syncState.currentBlock / processor.syncState.totalBlocks) * 100) : 0}%)`,
           },
           {
             name: 'Profile',
