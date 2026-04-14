@@ -21,6 +21,7 @@ export default class Whoami extends CliCommand {
       this.log(`Username: ${username}`);
     }
     this.log(`API URL: ${apiUrl}`);
-    this.log(`Token: ${credentials}`);
+    const masked = credentials.length > 8 ? `${credentials.slice(0, 6)}...${credentials.slice(-4)}` : '****';
+    this.log(`Token: ${masked}`);
   }
 }

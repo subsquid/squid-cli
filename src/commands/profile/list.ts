@@ -22,9 +22,11 @@ export default class ProfileList extends CliCommand {
       const { apiUrl, credentials } = profiles[name];
       const isCurrent = name === current;
       const marker = isCurrent ? '* ' : '  ';
+      const masked =
+        credentials.length > 8 ? `${credentials.slice(0, 6)}...${credentials.slice(-4)}` : '****';
       this.log(`${marker}${name}${isCurrent ? ' (current)' : ''}`);
       this.log(`    API URL : ${apiUrl}`);
-      this.log(`    Token   : ${credentials}`);
+      this.log(`    Token   : ${masked}`);
     }
   }
 }
