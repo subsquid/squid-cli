@@ -3,6 +3,7 @@ import { ux as CliUx, Flags } from '@oclif/core';
 import { listSquids } from '../api';
 import { CliCommand, SqdFlags } from '../command';
 import { printSquid } from '../utils';
+
 import { formatSquidJson } from './view';
 
 export default class List extends CliCommand {

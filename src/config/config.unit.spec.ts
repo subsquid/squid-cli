@@ -1,6 +1,8 @@
 import { unlinkSync } from 'fs';
 import { homedir } from 'os';
 
+import { afterAll, describe, expect, it } from 'vitest';
+
 import { DEFAULT_API_URL, getConfig, getConfigFilePath, setConfig } from './config';
 
 describe('Config', () => {

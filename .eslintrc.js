@@ -16,7 +16,6 @@ module.exports = {
     root: true,
     env: {
         node: true,
-        jest: true,
     },
     rules: {
         'max-len': ['error', { code: 120, ignoreComments: true, ignoreStrings: true, ignoreTemplateLiterals: true }],

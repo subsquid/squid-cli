@@ -45,5 +45,11 @@ jobs:
       - name: Typescript check
         run: yarn tsc
 
+      - name: Build
+        run: yarn build
+
       - name: Unit tests
         run: yarn test:unit
+
+      - name: E2E tests
+        run: yarn test:e2e

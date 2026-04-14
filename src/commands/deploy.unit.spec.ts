@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { getIgnorePatterns, getPostgresVersionMismatch } from './deploy';
 
 describe('Deploy', () => {
