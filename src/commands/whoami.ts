@@ -5,6 +5,8 @@ import { getConfig } from '../config';
 export default class Whoami extends CliCommand {
   static description = `Show the user details for the current Cloud account`;
 
+  static examples = ['sqd whoami'];
+
   async run(): Promise<void> {
     await this.parse(Whoami);
 

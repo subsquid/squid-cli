@@ -11,6 +11,11 @@ import { UPDATE_COLOR } from '../deploy';
 export default class Add extends DeployCommand {
   static description = 'Add a tag to a squid';
 
+  static examples = [
+    'sqd tags add prod --reference my-squid@v1 --org my-org',
+    'sqd tags add prod --name my-squid --slot abc123 --allow-tag-reassign',
+  ];
+
   static args = {
     tag: Args.string({
       description: `New tag to assign`,

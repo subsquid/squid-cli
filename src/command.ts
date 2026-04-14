@@ -4,7 +4,16 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { isNil, uniqBy } from 'lodash';
 
-import { ApiError, getOrganization, getSquid, listOrganizations, listUserSquids, SquidRequest } from './api';
+import {
+  ApiError,
+  getOrganization,
+  getSquid,
+  listOrganizations,
+  listSquids,
+  listUserSquids,
+  Squid,
+  SquidRequest,
+} from './api';
 import { getTTY } from './tty';
 import { formatSquidReference, printSquid } from './utils';
 
@@ -13,7 +22,7 @@ export const SUCCESS_CHECK_MARK = chalk.green('✓');
 export abstract class CliCommand extends Command {
   static baseFlags = {
     interactive: Flags.boolean({
-      description: 'Disable interactive mode',
+      description: 'Enable interactive mode. Use --no-interactive to disable prompts for CI/scripts.',
       required: false,
       default: true,
       allowNo: true,
@@ -32,7 +41,6 @@ export abstract class CliCommand extends Command {
     this.log(chalk.dim(message));
   }
 
-  // Haven't find a way to do it with native settings
   validateSquidNameFlags(flags: { reference?: any; name?: any }) {
     if (flags.reference || flags.name) return;
 
@@ -41,7 +49,13 @@ export abstract class CliCommand extends Command {
         {
           name: 'squid name',
           validationFn: 'validateSquidName',
-          reason: 'One of the following must be provided: --reference, --name',
+          reason: [
+            'One of the following must be provided: --reference or --name',
+            '',
+            'Examples:',
+            '  sqd <command> --reference my-squid@v1',
+            '  sqd <command> --name my-squid --slot <slot>',
+          ].join('\n'),
           status: 'failed',
         },
       ],
@@ -165,6 +179,53 @@ export abstract class CliCommand extends Command {
     return await this.getOrganizationPrompt(organizations, { using, interactive });
   }
 
+  async promptSquid(organization: { code: string }, { interactive }: { interactive?: boolean } = {}): Promise<Squid> {
+    const squids = await listSquids({ organization });
+
+    if (squids.length === 0) {
+      return this.error(`No squids found in organization "${organization.code}".`);
+    }
+
+    if (squids.length === 1) {
+      return squids[0];
+    }
+
+    const { stdin, stdout } = getTTY();
+    if (!stdin || !stdout || !interactive) {
+      return this.error(
+        [
+          `Organization "${organization.code}" has ${squids.length} squids:`,
+          ...squids.map((s) => `  - ${formatSquidReference({ name: s.name, slot: s.slot })}`),
+          ``,
+          `Please specify the squid using "--reference" or "--name" flag.`,
+          `Example: sqd <command> --reference ${squids[0].name}@${squids[0].slot}`,
+        ].join('\n'),
+      );
+    }
+
+    const prompt = inquirer.createPromptModule({ input: stdin, output: stdout });
+    const { squid } = await prompt([
+      {
+        name: 'squid',
+        type: 'list',
+        message: 'Please choose a squid:',
+        choices: squids.map((s) => {
+          const ref = formatSquidReference({ name: s.name, slot: s.slot });
+          const tags = s.tags.length ? ` (${s.tags.map((t) => t.name).join(', ')})` : '';
+          return {
+            name: `${ref}${tags}`,
+            value: s,
+          };
+        }),
+      },
+    ]);
+
+    stdin.destroy();
+    stdout.destroy();
+
+    return squid;
+  }
+
   private async getOrganizationPrompt<T extends { code: string; name: string }>(
     organizations: T[],
     {
@@ -186,8 +247,10 @@ export abstract class CliCommand extends Command {
       return this.error(
         [
           `You have ${organizations.length} organizations:`,
-          ...organizations.map((o) => `${chalk.dim(' - ')}${chalk.dim(o.code)}`),
-          `Please specify one of them explicitly ${using}`,
+          ...organizations.map((o) => `  - ${o.code}`),
+          ``,
+          `Please specify one of them explicitly ${using}.`,
+          `Example: sqd <command> --org ${organizations[0].code}`,
         ].join('\n'),
       );
     }

@@ -7,6 +7,8 @@ import { DEFAULT_API_URL, setConfig } from '../config';
 export default class Auth extends CliCommand {
   static description = `Log in to the Cloud`;
 
+  static examples = ['sqd auth -k sqd_xyz123...'];
+
   static flags = {
     key: Flags.string({
       char: 'k',

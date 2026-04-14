@@ -80,6 +80,13 @@ const SQUID_TEMPLATE_DESC = [
 export default class Init extends CliCommand {
   static description = 'Setup a new squid project from a template or github repo';
 
+  static examples = [
+    'sqd init my-squid --template evm',
+    'sqd init my-squid -t substrate',
+    'sqd init my-squid -t https://github.com/user/repo -d ./target-dir',
+    'sqd init my-squid -t evm -r',
+  ];
+
   static args = {
     name: Args.string({ description: SQUID_NAME_DESC.join('\n'), required: true }),
   };
@@ -105,7 +112,7 @@ export default class Init extends CliCommand {
   async run() {
     const {
       args: { name },
-      flags: { template, dir, remove },
+      flags: { template, dir, remove, interactive },
     } = await this.parse(Init);
 
     const localDir = path.resolve(dir || name);
@@ -122,6 +129,18 @@ export default class Init extends CliCommand {
 
     let resolvedTemplate = template || '';
     if (!template) {
+      if (!interactive) {
+        const templateNames = Object.keys(TEMPLATE_ALIASES).join(', ');
+        return this.error(
+          [
+            `No template specified.`,
+            `Available templates: ${templateNames}`,
+            ``,
+            `Example: sqd init ${name} --template evm`,
+          ].join('\n'),
+        );
+      }
+
       const { alias } = await inquirer.prompt({
         name: 'alias',
         message: `Please select one of the templates for your "${name}" squid:`,

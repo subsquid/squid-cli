@@ -8,6 +8,8 @@ export default class Ls extends CliCommand {
 
   static description = 'List organization secrets in the Cloud';
 
+  static examples = ['sqd secrets list --org my-org'];
+
   static flags = {
     org: Flags.string({
       char: 'o',

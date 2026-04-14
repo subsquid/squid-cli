@@ -12,6 +12,11 @@ export default class Set extends CliCommand {
     `NOTE: The changes take affect only after a squid is restarted or updated.`,
   ].join('\n');
 
+  static examples = [
+    'sqd secrets set DB_PASSWORD my-secret-value --org my-org',
+    'echo "my-secret" | sqd secrets set DB_PASSWORD --org my-org',
+  ];
+
   static args = {
     name: Args.string({
       description: 'The secret name',

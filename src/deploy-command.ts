@@ -14,11 +14,10 @@ export abstract class DeployCommand extends CliCommand {
     if (!squid.lastDeploy) return false;
     if (squid.status !== 'DEPLOYING') return false;
 
-    const warning = `Squid ${printSquid(squid)} is being deploying. 
-You can not run deploys on the same squid in parallel`;
+    const warning = `Squid ${printSquid(squid)} is being deployed. You can not run deploys on the same squid in parallel.`;
 
     if (!interactive) {
-      this.error(warning);
+      this.error([warning, `Wait for the current deploy to finish and retry.`].join('\n'));
     }
 
     this.warn(warning);
@@ -60,7 +59,9 @@ You can not run deploys on the same squid in parallel`;
     const warning = `The tag "${tag}" has already been assigned to ${printSquid(oldSquid)}.`;
 
     if (!interactive) {
-      this.error([warning, `Please do it explicitly ${using}`].join('\n'));
+      this.error(
+        [warning, `Please do it explicitly ${using}.`, `Example: sqd deploy . --allow-tag-reassign`].join('\n'),
+      );
     }
 
     this.warn(warning);

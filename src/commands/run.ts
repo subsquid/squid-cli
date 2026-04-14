@@ -124,6 +124,13 @@ function isSkipped({ include, exclude }: { include?: string[]; exclude?: string[
 export default class Run extends CliCommand {
   static description = 'Run a squid project locally';
 
+  static examples = [
+    'sqd run .',
+    'sqd run . -m squid.prod.yaml',
+    'sqd run . --exclude api',
+    'sqd run . --include processor --retries -1',
+  ];
+
   static flags = {
     manifest: Flags.string({
       char: 'm',

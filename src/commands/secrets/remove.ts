@@ -7,6 +7,9 @@ export default class Rm extends CliCommand {
   static aliases = ['secrets rm'];
 
   static description = 'Delete an organization secret in the Cloud';
+
+  static examples = ['sqd secrets remove DB_PASSWORD --org my-org'];
+
   static args = {
     name: Args.string({
       description: 'The secret name',
