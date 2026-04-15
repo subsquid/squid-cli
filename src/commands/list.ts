@@ -66,6 +66,10 @@ export default class List extends CliCommand {
       return this.log(JSON.stringify(squids.map(formatSquidJson), null, 2));
     }
 
+    if (!squids.length) {
+      return this.log('No squids found');
+    }
+
     if (squids.length) {
       CliUx.ux.table(
         squids,

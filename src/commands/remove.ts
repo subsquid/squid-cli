@@ -5,7 +5,7 @@ import inquirer from 'inquirer';
 import { deleteSquid } from '../api';
 import { SqdFlags } from '../command';
 import { DeployCommand } from '../deploy-command';
-import { ParsedSquidReference, printSquid } from '../utils';
+import { formatSquidReference, ParsedSquidReference, printSquid } from '../utils';
 
 import { DELETE_COLOR } from './deploy';
 
@@ -96,7 +96,7 @@ export default class Remove extends DeployCommand {
     if (!deployment || !deployment.squid) return;
 
     this.logDeployResult(DELETE_COLOR, `The squid ${printSquid(squid)} was successfully deleted`);
-    this.log(`squid: ${squid.name}@${squid.slot}`);
+    this.log(`squid: ${formatSquidReference({ name: squid.name, slot: squid.slot })}`);
     this.log(`deploy_id: ${deployment.id}`);
     this.log(`duration: ${Math.round(deployment.totalElapsedTimeMs / 1000)}s`);
   }

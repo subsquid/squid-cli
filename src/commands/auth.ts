@@ -12,7 +12,7 @@ export default class Auth extends CliCommand {
   static flags = {
     key: Flags.string({
       char: 'k',
-      description: 'Cloud auth key. Log in to https://app.subsquid.io to create or update your key.',
+      description: 'Cloud auth key. Log in to https://cloud.sqd.dev to create or update your key.',
       required: true,
     }),
     profile: Flags.string({

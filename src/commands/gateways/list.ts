@@ -103,7 +103,7 @@ export default class Ls extends CliCommand {
       },
     });
 
-    gateways.map(({ chainName, chainId, chainSS58Prefix, providers }) => {
+    gateways.forEach(({ chainName, chainId, chainSS58Prefix, providers }) => {
       const row = [chainName, chalk.dim(chainId || chainSS58Prefix || '-'), providers[0].dataSourceUrl];
       table.push(row);
     });

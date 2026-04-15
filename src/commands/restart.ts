@@ -4,7 +4,7 @@ import { isNil, omitBy } from 'lodash';
 import { restartSquid } from '../api';
 import { SqdFlags } from '../command';
 import { DeployCommand } from '../deploy-command';
-import { formatSquidReference as formatSquidReference, printSquid } from '../utils';
+import { printSquid } from '../utils';
 
 import { UPDATE_COLOR } from './deploy';
 

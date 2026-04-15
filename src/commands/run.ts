@@ -182,7 +182,7 @@ export default class Run extends CliCommand {
           path: path.isAbsolute(envFile) ? envFile : path.join(squidDir, envFile),
         });
         if (error) {
-          return this.error(error);
+          return this.error(error.message);
         }
       }
 

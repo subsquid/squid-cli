@@ -54,7 +54,6 @@ export function resolveManifest(
 }
 
 function example(command: string, description: string) {
-  // return [chalk.dim(`// ${description}`), command].join('\r\n');
   return `${command} ${chalk.dim(`// ${description}`)}`;
 }
 
@@ -77,7 +76,7 @@ export default class Deploy extends DeployCommand {
     ),
   ];
 
-  static help = 'If squid flags are not specified, the they will be retrieved from the manifest or prompted.';
+  static help = 'If squid flags are not specified, they will be retrieved from the manifest or prompted.';
 
   static args = {
     source: Args.directory({
@@ -171,12 +170,6 @@ export default class Deploy extends DeployCommand {
       },
     } = await this.parse(Deploy);
 
-    const isUrl = source.startsWith('http://') || source.startsWith('https://');
-    if (isUrl) {
-      this.log(`🦑 Releasing the squid from remote`);
-      return this.error('Not implemented yet');
-    }
-
     if (interactive && hardReset) {
       const { confirm } = await inquirer.prompt([
         {
@@ -199,7 +192,6 @@ export default class Deploy extends DeployCommand {
     const overrides = reference || (pick(flags, 'slot', 'name', 'tag', 'org') as Partial<ParsedSquidReference>);
 
     let manifest = res.manifest;
-    // FIXME: it is not possible to override org atm
     if (entries(overrides).some(([k, v]) => k !== 'org' && get(manifest, k) !== v)) {
       // we need to do it to keep formatting the same
       const manifestRaw = Manifest.replace(res.manifestRaw, {});

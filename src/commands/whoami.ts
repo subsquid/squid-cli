@@ -19,8 +19,12 @@ export default class Whoami extends CliCommand {
     const { username, email } = await profile();
     const { apiUrl } = getConfig();
 
-    if (email) this.log(field('Email', email));
-    if (username) this.log(field('Username', username));
-    this.log(field('API URL', apiUrl));
+    if (email) {
+      this.log(`Email: ${email}`);
+    }
+    if (username) {
+      this.log(`Username: ${username}`);
+    }
+    this.log(`API URL: ${apiUrl}`);
   }
 }
