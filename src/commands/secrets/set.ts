@@ -1,9 +1,7 @@
-import { Args, Flags } from '@oclif/core';
+import { Args } from '@oclif/core';
 
 import { setSecret } from '../../api';
-import { CliCommand } from '../../command';
-
-// TODO move to new API using put method
+import { CliCommand, SqdFlags } from '../../command';
 
 export default class Set extends CliCommand {
   static description = [
@@ -12,6 +10,11 @@ export default class Set extends CliCommand {
     `NOTE: The changes take affect only after a squid is restarted or updated.`,
   ].join('\n');
 
+  static examples = [
+    'sqd secrets set DB_PASSWORD my-secret-value --org my-org',
+    'echo "my-secret" | sqd secrets set DB_PASSWORD --org my-org',
+  ];
+
   static args = {
     name: Args.string({
       description: 'The secret name',
@@ -19,14 +22,12 @@ export default class Set extends CliCommand {
     }),
     value: Args.string({
       description: 'The secret value',
-      required: true,
+      required: false,
     }),
   };
 
   static flags = {
-    org: Flags.string({
-      char: 'o',
-      description: 'Organization',
+    org: SqdFlags.org({
       required: false,
     }),
   };

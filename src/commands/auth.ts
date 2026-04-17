@@ -7,10 +7,12 @@ import { DEFAULT_API_URL, setConfig } from '../config';
 export default class Auth extends CliCommand {
   static description = `Log in to the Cloud`;
 
+  static examples = ['sqd auth -k sqd_xyz123...'];
+
   static flags = {
     key: Flags.string({
       char: 'k',
-      description: 'Cloud auth key. Log in to https://app.subsquid.io to create or update your key.',
+      description: 'Cloud auth key. Log in to https://cloud.sqd.dev to create or update your key.',
       required: true,
     }),
     host: Flags.string({

@@ -1,17 +1,17 @@
-import { ux as CliUx, Flags } from '@oclif/core';
+import { ux as CliUx } from '@oclif/core';
 
 import { listSecrets } from '../../api';
-import { CliCommand } from '../../command';
+import { CliCommand, SqdFlags } from '../../command';
 
 export default class Ls extends CliCommand {
   static aliases = ['secrets ls'];
 
   static description = 'List organization secrets in the Cloud';
 
+  static examples = ['sqd secrets list --org my-org'];
+
   static flags = {
-    org: Flags.string({
-      char: 'o',
-      description: 'Organization',
+    org: SqdFlags.org({
       required: false,
     }),
   };
@@ -29,10 +29,7 @@ export default class Ls extends CliCommand {
       return this.log('There are no secrets');
     }
 
-    const values: { name: string; value: string }[] = [];
-    for (const secret in response.secrets) {
-      values.push({ name: secret, value: response.secrets[secret] });
-    }
+    const values = Object.entries(response.secrets).map(([name, value]) => ({ name, value }));
     CliUx.ux.table(
       values,
       {

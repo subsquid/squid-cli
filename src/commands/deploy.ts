@@ -54,7 +54,6 @@ export function resolveManifest(
 }
 
 function example(command: string, description: string) {
-  // return [chalk.dim(`// ${description}`), command].join('\r\n');
   return `${command} ${chalk.dim(`// ${description}`)}`;
 }
 
@@ -77,7 +76,7 @@ export default class Deploy extends DeployCommand {
     ),
   ];
 
-  static help = 'If squid flags are not specified, the they will be retrieved from the manifest or prompted.';
+  static help = 'If squid flags are not specified, they will be retrieved from the manifest or prompted.';
 
   static args = {
     source: Args.directory({
@@ -149,6 +148,11 @@ export default class Deploy extends DeployCommand {
       required: false,
       default: false,
     }),
+    'allow-postgres-deletion': Flags.boolean({
+      description: 'Allow deleting an existing Postgres addon when deploying a manifest without one',
+      required: false,
+      default: false,
+    }),
   };
 
   async run(): Promise<void> {
@@ -160,16 +164,11 @@ export default class Deploy extends DeployCommand {
         'hard-reset': hardReset,
         'stream-logs': streamLogs,
         'add-tag': addTag,
+        'allow-postgres-deletion': allowPostgresDeletion,
         reference,
         ...flags
       },
     } = await this.parse(Deploy);
-
-    const isUrl = source.startsWith('http://') || source.startsWith('https://');
-    if (isUrl) {
-      this.log(`🦑 Releasing the squid from remote`);
-      return this.error('Not implemented yet');
-    }
 
     if (interactive && hardReset) {
       const { confirm } = await inquirer.prompt([
@@ -193,7 +192,6 @@ export default class Deploy extends DeployCommand {
     const overrides = reference || (pick(flags, 'slot', 'name', 'tag', 'org') as Partial<ParsedSquidReference>);
 
     let manifest = res.manifest;
-    // FIXME: it is not possible to override org atm
     if (entries(overrides).some(([k, v]) => k !== 'org' && get(manifest, k) !== v)) {
       // we need to do it to keep formatting the same
       const manifestRaw = Manifest.replace(res.manifestRaw, {});
@@ -272,7 +270,7 @@ export default class Deploy extends DeployCommand {
     /**
      * Warn if the existing squid has a Postgres addon but the new manifest removes it
      */
-    if (!hardReset && target?.addons?.postgres && !manifest.deploy?.addons?.postgres) {
+    if (!hardReset && target?.addons?.postgres && !manifest.deploy?.addons?.postgres && !allowPostgresDeletion) {
       const confirmed = await this.promptPostgresDeletion(target, { interactive });
       if (!confirmed) return;
     }
@@ -306,6 +304,12 @@ export default class Deploy extends DeployCommand {
 
     const deployment = await this.pollDeploy({ organization, deploy });
     if (!deployment || !deployment.squid) return;
+
+    const squidRef = formatSquidReference({
+      org: deployment.organization.code,
+      name: deployment.squid.name,
+      slot: deployment.squid.slot,
+    });
 
     if (target) {
       this.logDeployResult(UPDATE_COLOR, `The squid ${printSquid(target)} has been successfully updated`);
@@ -344,7 +348,13 @@ export default class Deploy extends DeployCommand {
     if (interactive) {
       this.warn(warning.join('\n'));
     } else {
-      this.error([...warning, `Please do it explicitly ${using}`].join('\n'));
+      this.error(
+        [
+          ...warning,
+          `Please do it explicitly ${using}.`,
+          `Example: sqd deploy . --name ${squid.name} --allow-update`,
+        ].join('\n'),
+      );
     }
 
     const { confirm } = await inquirer.prompt([
@@ -362,7 +372,7 @@ export default class Deploy extends DeployCommand {
   private async promptOverrideConflict(
     dest: string,
     src: string,
-    { using = 'using "--allow--manifest-override" flag', interactive }: { using?: string; interactive?: boolean } = {},
+    { using = 'using "--allow-manifest-override" flag', interactive }: { using?: string; interactive?: boolean } = {},
   ) {
     const warning = [
       'Conflict detected!',
@@ -375,7 +385,9 @@ export default class Deploy extends DeployCommand {
     if (interactive) {
       this.warn(warning);
     } else {
-      this.error([warning, `Please do it explicitly ${using}`].join('\n'));
+      this.error(
+        [warning, `Please do it explicitly ${using}.`, `Example: sqd deploy . --allow-manifest-override`].join('\n'),
+      );
     }
 
     this.log(
@@ -400,7 +412,13 @@ export default class Deploy extends DeployCommand {
     const warning = `The new manifest does not include "addons.postgres", but the squid ${printSquid(squid)} currently has a Postgres database. Deploying will permanently delete the database and all its data.`;
 
     if (!interactive) {
-      this.error([warning, `Please do it explicitly ${using}`].join('\n'));
+      this.error(
+        [
+          warning,
+          `Please do it explicitly using "--allow-postgres-deletion" flag.`,
+          `Example: sqd deploy . --allow-postgres-deletion`,
+        ].join('\n'),
+      );
     }
 
     this.warn(warning);
@@ -428,7 +446,9 @@ export default class Deploy extends DeployCommand {
     if (interactive) {
       this.warn(warning);
     } else {
-      this.error([warning, `Please specify it explicitly ${using}`].join('\n'));
+      this.error(
+        [warning, `Please specify it explicitly ${using}.`, `Example: sqd deploy . --name my-squid`].join('\n'),
+      );
     }
 
     const { input } = await inquirer.prompt([

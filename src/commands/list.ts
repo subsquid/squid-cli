@@ -3,11 +3,18 @@ import { ux as CliUx, Flags } from '@oclif/core';
 import { listSquids } from '../api';
 import { CliCommand, SqdFlags } from '../command';
 import { printSquid } from '../utils';
+import { formatSquidJson } from './view';
 
 export default class List extends CliCommand {
   static aliases = ['ls'];
 
   static description = 'List squids deployed to the Cloud';
+
+  static examples = [
+    'sqd list --org my-org',
+    'sqd ls --org my-org --name my-squid --tag prod',
+    'sqd list --org my-org --json',
+  ];
 
   static flags = {
     org: SqdFlags.org({
@@ -34,11 +41,14 @@ export default class List extends CliCommand {
       default: false,
       allowNo: true,
     }),
+    json: Flags.boolean({
+      description: 'Output in JSON format',
+    }),
   };
 
   async run(): Promise<void> {
     const {
-      flags: { truncate, reference, interactive, ...flags },
+      flags: { truncate, json, reference, interactive, ...flags },
     } = await this.parse(List);
 
     const { org, name, slot, tag } = reference ? reference : (flags as any);
@@ -51,6 +61,15 @@ export default class List extends CliCommand {
     if (tag || slot) {
       squids = squids.filter((s) => s.slot === slot || s.tags.some((t) => t.name === tag));
     }
+
+    if (json) {
+      return this.log(JSON.stringify(squids.map(formatSquidJson), null, 2));
+    }
+
+    if (!squids.length) {
+      return this.log('No squids found');
+    }
+
     if (squids.length) {
       CliUx.ux.table(
         squids,

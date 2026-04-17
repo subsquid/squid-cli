@@ -33,9 +33,7 @@ describe('Deploy', () => {
           ? { postgres: { connections: [], disk: { usageStatus: 'NORMAL', usedBytes: 0, totalBytes: 0 } } }
           : undefined,
         manifest: {
-          current: pgVersion
-            ? { deploy: { addons: { postgres: { version: pgVersion } } } }
-            : { deploy: {} },
+          current: pgVersion ? { deploy: { addons: { postgres: { version: pgVersion } } } } : { deploy: {} },
           raw: '',
         },
       } as any;

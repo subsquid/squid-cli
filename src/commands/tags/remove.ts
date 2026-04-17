@@ -3,15 +3,20 @@ import { Args } from '@oclif/core';
 import { removeSquidTag } from '../../api';
 import { SqdFlags } from '../../command';
 import { DeployCommand } from '../../deploy-command';
-import { formatSquidReference, printSquid } from '../../utils';
+import { printSquid } from '../../utils';
 import { UPDATE_COLOR } from '../deploy';
 
 export default class Remove extends DeployCommand {
   static description = 'Remove a tag from a squid';
 
+  static examples = [
+    'sqd tags remove prod --reference my-squid@v1 --org my-org',
+    'sqd tags remove prod --name my-squid --slot abc123',
+  ];
+
   static args = {
     tag: Args.string({
-      description: `New tag to assign`,
+      description: `Tag to remove`,
       required: true,
     }),
   };

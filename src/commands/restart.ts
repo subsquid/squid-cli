@@ -4,12 +4,14 @@ import { isNil, omitBy } from 'lodash';
 import { restartSquid } from '../api';
 import { SqdFlags } from '../command';
 import { DeployCommand } from '../deploy-command';
-import { formatSquidReference as formatSquidReference, printSquid } from '../utils';
+import { printSquid } from '../utils';
 
 import { UPDATE_COLOR } from './deploy';
 
 export default class Restart extends DeployCommand {
   static description = 'Restart a squid deployed to the Cloud';
+
+  static examples = ['sqd restart --reference my-squid@v1', 'sqd restart --name my-squid --slot abc123 --org my-org'];
 
   static flags = {
     org: SqdFlags.org({
@@ -49,5 +51,8 @@ export default class Restart extends DeployCommand {
     if (!deployment || !deployment.squid) return;
 
     this.logDeployResult(UPDATE_COLOR, `The squid ${printSquid(squid)} has been successfully restarted`);
+    this.log(`squid: ${squid.name}@${squid.slot}`);
+    this.log(`deploy_id: ${deployment.id}`);
+    this.log(`duration: ${Math.round(deployment.totalElapsedTimeMs / 1000)}s`);
   }
 }

@@ -5,7 +5,7 @@ import inquirer from 'inquirer';
 import { deleteSquid } from '../api';
 import { SqdFlags } from '../command';
 import { DeployCommand } from '../deploy-command';
-import { ParsedSquidReference, printSquid } from '../utils';
+import { formatSquidReference, ParsedSquidReference, printSquid } from '../utils';
 
 import { DELETE_COLOR } from './deploy';
 
@@ -13,6 +13,12 @@ export default class Remove extends DeployCommand {
   static description = 'Remove a squid deployed to the Cloud';
 
   static aliases = ['rm'];
+
+  static examples = [
+    'sqd remove --reference my-squid@v1 --force',
+    'sqd remove --name my-squid --slot abc123 --org my-org --force',
+    'sqd rm --reference my-squid@v1 -f',
+  ];
 
   static flags = {
     org: SqdFlags.org({
@@ -60,7 +66,14 @@ export default class Remove extends DeployCommand {
       ];
 
       if (!interactive && !force) {
-        this.error([...warning, 'Please do it explicitly using --force flag'].join('\n'));
+        this.error(
+          [
+            ...warning,
+            '',
+            'Please do it explicitly using --force flag.',
+            `Example: sqd remove --reference ${name}@${slot || tag || 'v1'} --force`,
+          ].join('\n'),
+        );
       } else {
         this.warn(warning.join('\n'));
       }
@@ -83,5 +96,8 @@ export default class Remove extends DeployCommand {
     if (!deployment || !deployment.squid) return;
 
     this.logDeployResult(DELETE_COLOR, `The squid ${printSquid(squid)} was successfully deleted`);
+    this.log(`squid: ${formatSquidReference({ name: squid.name, slot: squid.slot })}`);
+    this.log(`deploy_id: ${deployment.id}`);
+    this.log(`duration: ${Math.round(deployment.totalElapsedTimeMs / 1000)}s`);
   }
 }

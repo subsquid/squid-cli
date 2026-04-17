@@ -11,6 +11,12 @@ export default class Ls extends CliCommand {
 
   static description = 'List available gateways';
 
+  static examples = [
+    'sqd gateways list',
+    'sqd gateways list --type evm',
+    'sqd gateways list --type evm --name ethereum --chain 1',
+  ];
+
   static flags = {
     type: Flags.string({
       char: 't',
@@ -97,7 +103,7 @@ export default class Ls extends CliCommand {
       },
     });
 
-    gateways.map(({ chainName, chainId, chainSS58Prefix, providers }) => {
+    gateways.forEach(({ chainName, chainId, chainSS58Prefix, providers }) => {
       const row = [chainName, chalk.dim(chainId || chainSS58Prefix || '-'), providers[0].dataSourceUrl];
       table.push(row);
     });

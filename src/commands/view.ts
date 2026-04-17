@@ -1,13 +1,10 @@
-import { json } from 'stream/consumers';
-
 import { ux as CliUx, Flags } from '@oclif/core';
-import { Manifest, ManifestValue } from '@subsquid/manifest';
+import { ManifestValue } from '@subsquid/manifest';
 import chalk from 'chalk';
-import { func } from 'joi';
-import { startCase, toUpper } from 'lodash';
+import { startCase } from 'lodash';
 import prettyBytes from 'pretty-bytes';
 
-import { getSquid, Squid, SquidAddonsPostgres } from '../api';
+import { getSquid, Squid } from '../api';
 import {
   SquidAddonsHasuraResponseStatus,
   SquidApiResponseStatus,
@@ -20,6 +17,12 @@ import { printSquid } from '../utils';
 
 export default class View extends CliCommand {
   static description = 'View information about a squid';
+
+  static examples = [
+    'sqd view --reference my-squid@v1',
+    'sqd view --name my-squid --slot abc123 --org my-org',
+    'sqd view --reference my-squid@v1 --json',
+  ];
 
   static flags = {
     org: SqdFlags.org({
@@ -47,18 +50,22 @@ export default class View extends CliCommand {
       flags: { reference, interactive, json, ...flags },
     } = await this.parse(View);
 
-    this.validateSquidNameFlags({ reference, ...flags });
-
     const { org, name, slot, tag } = reference ? reference : (flags as any);
 
-    const organization = name
-      ? await this.promptSquidOrganization(org, name, { interactive })
-      : await this.promptOrganization(org, { interactive });
+    let squid;
+    if (name || reference) {
+      const organization = name
+        ? await this.promptSquidOrganization(org, name, { interactive })
+        : await this.promptOrganization(org, { interactive });
 
-    const squid = await getSquid({ organization, squid: { name, tag, slot } });
+      squid = await getSquid({ organization, squid: { name, tag, slot } });
+    } else {
+      const organization = await this.promptOrganization(org, { interactive });
+      squid = await this.promptSquid(organization, { interactive });
+    }
 
     if (json) {
-      return this.log(JSON.stringify(squid, null, 2));
+      return this.log(JSON.stringify(formatSquidJson(squid), null, 2));
     }
 
     this.log(`${chalk.bold('SQUID:')} ${printSquid(squid)} (${squid.tags.map((t) => t.name).join(', ')})`);
@@ -124,7 +131,7 @@ export default class View extends CliCommand {
             name: 'Progress',
             value:
               `${formatNumber(processor.syncState.currentBlock)}/${formatNumber(processor.syncState.totalBlocks)} ` +
-              `(${Math.round((processor.syncState.currentBlock / processor.syncState.totalBlocks) * 100)}%)`,
+              `(${processor.syncState.totalBlocks > 0 ? Math.round((processor.syncState.currentBlock / processor.syncState.totalBlocks) * 100) : 0}%)`,
           },
           {
             name: 'Profile',
@@ -275,4 +282,54 @@ function formatPostgresStatus(status?: SquidDiskResponseUsageStatus): any {
 
 export function formatNumber(value: number) {
   return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(value);
+}
+
+export function formatSquidJson(squid: Squid) {
+  return {
+    name: squid.name,
+    reference: squid.reference,
+    slot: squid.slot,
+    description: squid.description ?? null,
+    tags: squid.tags.map((t) => t.name),
+    status: squid.status ?? null,
+    organization: {
+      name: squid.organization.name,
+      code: squid.organization.code,
+    },
+    api: squid.api
+      ? {
+          status: squid.api.status,
+          urls: squid.api.urls?.map((u) => u.url) ?? [],
+        }
+      : null,
+    processors: (squid.processors ?? []).map((p) => ({
+      name: p.name,
+      status: p.status,
+      syncState: p.syncState,
+    })),
+    addons: {
+      postgres: squid.addons?.postgres
+        ? {
+            connections: squid.addons.postgres.connections?.map((c) => c.uri) ?? [],
+            disk: squid.addons.postgres.disk,
+          }
+        : null,
+      neon: squid.addons?.neon
+        ? {
+            connections: squid.addons.neon.connections?.map((c) => c.uri) ?? [],
+          }
+        : null,
+      hasura: squid.addons?.hasura
+        ? {
+            status: squid.addons.hasura.status,
+            urls: squid.addons.hasura.urls?.map((u) => u.url) ?? [],
+            replicas: squid.addons.hasura.replicas,
+          }
+        : null,
+    },
+    links: squid.links,
+    deployedAt: squid.deployedAt ?? null,
+    hibernatedAt: squid.hibernatedAt ?? null,
+    createdAt: squid.createdAt,
+  };
 }

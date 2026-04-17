@@ -9,7 +9,7 @@ export default class Explorer extends CliCommand {
   static hidden = true;
 
   static description = 'Open a visual explorer for the Cloud deployments';
-  // static hidden = true;
+
   static flags = {
     org: Flags.string({
       char: 'o',
@@ -27,9 +27,6 @@ export default class Explorer extends CliCommand {
     const screen = blessed.screen({
       smartCSR: true,
       fastCSR: true,
-      // dockBorders: true,
-      debug: true,
-      // autoPadding: true,
       fullUnicode: true,
     });
 
@@ -58,8 +55,6 @@ export default class Explorer extends CliCommand {
     screen.key(['C-c'], () => {
       return process.exit(0);
     });
-
-    // screen.program.disableMouse();
 
     manager.focus();
     screen.render();

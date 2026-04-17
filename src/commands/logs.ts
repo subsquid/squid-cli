@@ -24,6 +24,13 @@ function parseDate(str: string): Date {
 export default class Logs extends CliCommand {
   static description = 'Fetch logs from a squid deployed to the Cloud';
 
+  static examples = [
+    'sqd logs --reference my-squid@v1 --org my-org',
+    'sqd logs --name my-squid --slot abc123 --since 2h',
+    'sqd logs --reference my-squid@v1 -f',
+    'sqd logs --reference my-squid@v1 --level error --container processor',
+  ];
+
   static flags = {
     org: SqdFlags.org({
       required: false,
@@ -74,7 +81,7 @@ export default class Logs extends CliCommand {
       summary: 'Follow',
       required: false,
       default: false,
-      exclusive: ['fromDate', 'pageSize'],
+      exclusive: ['since', 'pageSize'],
     }),
   };
 
@@ -116,6 +123,7 @@ export default class Logs extends CliCommand {
       return;
     }
     let cursor = undefined;
+    let isFirstPage = true;
     do {
       const { hasLogs, nextPage }: LogResult = await this.fetchLogs({
         organization,
@@ -129,11 +137,12 @@ export default class Logs extends CliCommand {
           search,
         },
       });
-      if (!hasLogs) {
+      if (!hasLogs && isFirstPage) {
         this.log('No logs found');
         return;
       }
-      if (nextPage) {
+      isFirstPage = false;
+      if (nextPage && interactive) {
         const more = await CliUx.ux.prompt(`type "it" to fetch more logs...`);
         if (more !== 'it') {
           return;
