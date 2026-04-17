@@ -1,6 +1,12 @@
+import chalk from 'chalk';
+
 import { profile } from '../api/profile';
 import { CliCommand } from '../command';
 import { getConfig } from '../config';
+
+function field(label: string, value: string) {
+  return `${chalk.dim(label.padEnd(10))}${value}`;
+}
 
 export default class Whoami extends CliCommand {
   static description = `Show the user details for the current Cloud account`;
@@ -11,7 +17,7 @@ export default class Whoami extends CliCommand {
     await this.parse(Whoami);
 
     const { username, email } = await profile();
-    const { apiUrl, credentials } = getConfig();
+    const { apiUrl } = getConfig();
 
     if (email) {
       this.log(`Email: ${email}`);
@@ -20,6 +26,5 @@ export default class Whoami extends CliCommand {
       this.log(`Username: ${username}`);
     }
     this.log(`API URL: ${apiUrl}`);
-    this.log(`Token: ${'*'.repeat(Math.max(0, credentials.length - 4))}${credentials.slice(-4)}`);
   }
 }
