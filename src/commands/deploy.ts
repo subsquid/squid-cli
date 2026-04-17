@@ -320,10 +320,6 @@ export default class Deploy extends DeployCommand {
       );
     }
 
-    this.log(`squid: ${squidRef}`);
-    this.log(`deploy_id: ${deployment.id}`);
-    this.log(`duration: ${Math.round(deployment.totalElapsedTimeMs / 1000)}s`);
-
     if (streamLogs) {
       await this.streamLogs({ organization: deployment.organization, squid: deployment.squid });
     }
