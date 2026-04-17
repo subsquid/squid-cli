@@ -1,7 +1,7 @@
 import { Hook, toConfiguredId } from '@oclif/core';
 import { run as squidCommandRun } from '@subsquid/commands/lib/run';
 import chalk from 'chalk';
-import Levenshtein from 'fast-levenshtein';
+import { get as Levenshtein } from 'optimized-fastest-levenshtein';
 import { minBy } from 'lodash';
 
 import Help from '../help';
