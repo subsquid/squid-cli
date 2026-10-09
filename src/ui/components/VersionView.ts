@@ -11,7 +11,7 @@ import { SquidDeployTab } from './VersionDeployTab';
 import { VersionLogTab } from './VersionLogsTab';
 import { VersionSummaryTab } from './VersionSummaryTab';
 
-const figletAsync = (text: string, options?: figlet.Options) => {
+const figletAsync = (text: string, options?: figlet.FigletOptions) => {
   return new Promise<string>((resolve, reject) => {
     figlet(text, options, (error, result) => {
       if (error || !result) {
